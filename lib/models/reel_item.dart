@@ -24,14 +24,14 @@ class ReelItem {
   Map<String, dynamic> toMap() {
     return {
       'url': url,
-      'title' : title,
-      'caption' : caption,
-      'thumbnailUrl' : thumbnailUrl,
-      'takeaways' : takeaways,
-      'platform' : platform,
-      'savedAt' : savedAt.toIso8601String(),
-      'isReviewed' : isReviewed,
-    }; 
+      'title': title,
+      'caption': caption,
+      'thumbnailUrl': thumbnailUrl,
+      'takeaways': takeaways,
+      'platform': platform,
+      'savedAt': savedAt.toIso8601String(),
+      'isReviewed': isReviewed,
+    };
   }
 
   factory ReelItem.fromMap(String id, Map<String, dynamic> map) {
@@ -41,7 +41,7 @@ class ReelItem {
       title: map['title'] ?? '',
       caption: map['caption'] ?? '',
       thumbnailUrl: map['thumbnailUrl'] ?? '',
-      takeaways: List<String>.from(map['takeways'] ?? []),
+      takeaways: List<String>.from(map['takeaways'] ?? []),
       platform: map['platform'] ?? '',
       savedAt: DateTime.parse(map['savedAt']),
       isReviewed: map['isReviewed'] ?? false,
