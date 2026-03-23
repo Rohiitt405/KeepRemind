@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
+import 'providers/reel_provider.dart';
 import 'screens/home_screen.dart';
 
 class ReelRemindApp extends StatelessWidget {
@@ -6,14 +8,17 @@ class ReelRemindApp extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      title: 'ReelRemind',
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: ColorScheme.fromSeed(seedColor: const Color.fromARGB(255, 92, 3, 244)),
-        useMaterial3: true,
+    return ChangeNotifierProvider(
+      create: (_) => ReelProvider()..listenToReels(),
+      child: MaterialApp(
+        title: 'ReelRemind',
+        debugShowCheckedModeBanner: false,
+        theme: ThemeData(
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          useMaterial3: true,
+        ),
+        home: const HomeScreen(),
       ),
-      home: const HomeScreen(),
     );
   }
 }

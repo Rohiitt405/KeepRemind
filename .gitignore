@@ -59,3 +59,6 @@ analysis_options.yaml
 dot.iml
 pubspec.lock
 del.dart
+
+config
+README.md
