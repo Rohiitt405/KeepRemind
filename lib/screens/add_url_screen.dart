@@ -4,7 +4,9 @@ import 'package:provider/provider.dart';
 import '../providers/reel_provider.dart';
 
 class AddUrlScreen extends StatefulWidget {
-  const AddUrlScreen({super.key});
+  final String? initialUrl;
+
+  const AddUrlScreen({super.key, this.initialUrl});
 
   @override
   State<AddUrlScreen> createState() => _AddUrlScreenState();
@@ -13,6 +15,15 @@ class AddUrlScreen extends StatefulWidget {
 class _AddUrlScreenState extends State<AddUrlScreen> {
   // Controller lets us read and control the text field
   final TextEditingController _urlController = TextEditingController();
+
+  @override
+  void initState() {
+    super.initState();
+    // If a URL was passed in (from share sheet), pre-fill the field
+    if (widget.initialUrl != null) {
+      _urlController.text = widget.initialUrl!;
+    }
+  }
 
   // Key lets us validate the form
   final GlobalKey<FormState> _formKey = GlobalKey<FormState>();
