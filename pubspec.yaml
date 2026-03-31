@@ -49,7 +49,7 @@ dependencies:
 
   url_launcher: ^6.3.1
 
-  receive_sharing_intent: ^1.8.1
+  receive_sharing_intent: ^1.4.1
 
 dev_dependencies:
   flutter_test:

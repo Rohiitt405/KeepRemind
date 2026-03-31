@@ -19,9 +19,14 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
   @override
   void initState() {
     super.initState();
-    // If a URL was passed in (from share sheet), pre-fill the field
-    if (widget.initialUrl != null) {
-      _urlController.text = widget.initialUrl!;
+    if (widget.initialUrl != null && widget.initialUrl!.isNotEmpty) {
+      // Small delay ensures the text field is mounted before we set text
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        if (mounted) {
+          _urlController.text = widget.initialUrl!;
+          print('✅ URL pre-filled: ${widget.initialUrl}');
+        }
+      });
     }
   }
 
@@ -68,6 +73,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                 controller: _urlController,
                 decoration: InputDecoration(
                   hintText: 'https://www.instagram.com/reel/...',
+                  hintStyle: TextStyle(color: Colors.grey.withValues(alpha: 0.5)),
                   prefixIcon: const Icon(Icons.link),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),
