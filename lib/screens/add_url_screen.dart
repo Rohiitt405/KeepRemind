@@ -73,7 +73,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                 controller: _urlController,
                 decoration: InputDecoration(
                   hintText: 'https://www.instagram.com/reel/...',
-                  hintStyle: TextStyle(color: Colors.grey.withValues(alpha: 0.5)),
+                  hintStyle: TextStyle(color: Colors.grey.withValues(alpha: 0.8)),
                   prefixIcon: const Icon(Icons.link),
                   border: OutlineInputBorder(
                     borderRadius: BorderRadius.circular(12),

@@ -115,7 +115,7 @@ class _ReelRemindAppState extends State<ReelRemindApp> {
         title: 'ReelRemind',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
+          colorScheme: ColorScheme.fromSeed(seedColor: Colors.blue[900] ?? Colors.blue),
           useMaterial3: true,
         ),
         home: const HomeScreen(),
