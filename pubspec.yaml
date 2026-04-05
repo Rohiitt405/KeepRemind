@@ -40,16 +40,13 @@ dependencies:
   firebase_storage: ^13.1.0
 
   metadata_fetch: ^0.4.2
-
   http: ^1.6.0
-
   provider: ^6.1.5+1
-
   cached_network_image: ^3.4.1
-
   url_launcher: ^6.3.1
-
   receive_sharing_intent: ^1.4.1
+  flutter_local_notifications: ^20.1.0
+  timezone: ^0.10.1  
 
 dev_dependencies:
   flutter_test:
