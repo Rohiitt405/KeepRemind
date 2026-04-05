@@ -3,11 +3,13 @@ import '../models/reel_item.dart';
 import '../services/firestore_service.dart';
 import '../services/metadata_service.dart';
 import '../services/ai_service.dart';
+import '../services/notification_service.dart';
 
 class ReelProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   final MetadataService _metadataService = MetadataService();
   final AiService _aiService = AiService();
+  final NotificationService _notificationService = NotificationService();
 
   List<ReelItem> _reels = [];
   bool _isLoading = false;
@@ -57,6 +59,12 @@ class ReelProvider extends ChangeNotifier {
       );
 
       await _firestoreService.saveReel(reel);
+
+      await _notificationService.scheduleWeeklyReminder(
+        weekday: DateTime.monday,
+        hour: 10,
+        minute: 0,
+      );
 
     } catch (e) {
       _errorMessage = 'Something went wrong. Please try again.';
