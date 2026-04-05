@@ -46,7 +46,8 @@ dependencies:
   url_launcher: ^6.3.1
   receive_sharing_intent: ^1.4.1
   flutter_local_notifications: ^20.1.0
-  timezone: ^0.10.1  
+  timezone: ^0.10.1
+  shared_preferences: ^2.5.5
 
 dev_dependencies:
   flutter_test:

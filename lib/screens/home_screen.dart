@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
 import '../providers/reel_provider.dart';
 import '../widgets/reel_card.dart';
@@ -40,6 +41,15 @@ class _HomeScreenState extends State<HomeScreen>
           'ReelRemind',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
+        actions: [
+          IconButton(
+            icon: Icon(Icons.settings_rounded),
+            onPressed: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => const SettingsScreen()),
+            ),
+          )
+        ],
         bottom: TabBar(
           controller: _tabController,
           tabs: [
