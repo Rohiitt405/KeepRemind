@@ -13,13 +13,13 @@ class _SettingsScreenState extends State<SettingsScreen> {
   final NotificationService _notificationService = NotificationService();
   final SettingsService _settingsService = SettingsService();
 
-  // Current selected values
+  // 'daily' or 'weekly'
+  String _reminderType = 'weekly';
   int _selectedWeekday = DateTime.monday;
   TimeOfDay _selectedTime = const TimeOfDay(hour: 10, minute: 0);
   bool _isLoading = true;
   bool _isSaving = false;
 
-  // Maps weekday int to display name
   final Map<int, String> _weekdays = {
     DateTime.monday: 'Monday',
     DateTime.tuesday: 'Tuesday',
@@ -36,37 +36,42 @@ class _SettingsScreenState extends State<SettingsScreen> {
     _loadSettings();
   }
 
-  // Load saved settings when screen opens
   Future<void> _loadSettings() async {
     final settings = await _settingsService.loadReminderSettings();
     setState(() {
-      _selectedWeekday = settings['weekday']!;
+      _reminderType = settings['type'] as String;
+      _selectedWeekday = settings['weekday'] as int;
       _selectedTime = TimeOfDay(
-        hour: settings['hour']!,
-        minute: settings['minute']!,
+        hour: settings['hour'] as int,
+        minute: settings['minute'] as int,
       );
       _isLoading = false;
     });
   }
 
-  // Save settings + reschedule notification
   Future<void> _saveSettings() async {
     setState(() => _isSaving = true);
 
     try {
-      // Save to SharedPreferences
       await _settingsService.saveReminderSettings(
+        type: _reminderType,
         weekday: _selectedWeekday,
         hour: _selectedTime.hour,
         minute: _selectedTime.minute,
       );
 
-      // Reschedule notification with new settings
-      await _notificationService.scheduleWeeklyReminder(
-        weekday: _selectedWeekday,
-        hour: _selectedTime.hour,
-        minute: _selectedTime.minute,
-      );
+      if (_reminderType == 'daily') {
+        await _notificationService.scheduleDailyReminder(
+          hour: _selectedTime.hour,
+          minute: _selectedTime.minute,
+        );
+      } else {
+        await _notificationService.scheduleWeeklyReminder(
+          weekday: _selectedWeekday,
+          hour: _selectedTime.hour,
+          minute: _selectedTime.minute,
+        );
+      }
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
@@ -90,13 +95,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     }
   }
 
-  // Open system time picker
   Future<void> _pickTime() async {
     final picked = await showTimePicker(
       context: context,
       initialTime: _selectedTime,
     );
-    // Only update if user confirmed (not cancelled)
     if (picked != null) {
       setState(() => _selectedTime = picked);
     }
@@ -119,14 +122,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   // Section header
                   _buildSectionHeader(
                     icon: Icons.notifications_outlined,
-                    title: 'Weekly Reminder',
-                    subtitle: 'Choose when to be reminded to review your reels',
+                    title: 'Reminder',
+                    subtitle: 'Choose how often to be reminded to review reels',
                   ),
                   const SizedBox(height: 24),
 
-                  // Day selector
+                  // ── Mode toggle ──────────────────────────────────────────
                   const Text(
-                    'Remind me every',
+                    'Remind me',
                     style: TextStyle(
                       fontSize: 14,
                       fontWeight: FontWeight.w500,
@@ -134,10 +137,25 @@ class _SettingsScreenState extends State<SettingsScreen> {
                     ),
                   ),
                   const SizedBox(height: 10),
-                  _buildDaySelector(),
+                  _buildModeToggle(),
                   const SizedBox(height: 24),
 
-                  // Time selector
+                  // ── Day selector (weekly only) ───────────────────────────
+                  if (_reminderType == 'weekly') ...[
+                    const Text(
+                      'On this day',
+                      style: TextStyle(
+                        fontSize: 14,
+                        fontWeight: FontWeight.w500,
+                        color: Colors.grey,
+                      ),
+                    ),
+                    const SizedBox(height: 10),
+                    _buildDaySelector(),
+                    const SizedBox(height: 24),
+                  ],
+
+                  // ── Time selector ────────────────────────────────────────
                   const Text(
                     'At this time',
                     style: TextStyle(
@@ -150,7 +168,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   _buildTimeTile(),
                   const SizedBox(height: 40),
 
-                  // Save button
+                  // ── Save button ──────────────────────────────────────────
                   SizedBox(
                     width: double.infinity,
                     height: 50,
@@ -179,7 +197,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
 
                   const SizedBox(height: 20),
 
-                  // Preview of next reminder
+                  // ── Preview ──────────────────────────────────────────────
                   _buildReminderPreview(),
                 ],
               ),
@@ -187,7 +205,8 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Section header with icon
+  // ── Widgets ────────────────────────────────────────────────────────────────
+
   Widget _buildSectionHeader({
     required IconData icon,
     required String title,
@@ -213,8 +232,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                   style: const TextStyle(
                       fontSize: 16, fontWeight: FontWeight.bold)),
               Text(subtitle,
-                  style:
-                      TextStyle(fontSize: 12, color: Colors.grey[600])),
+                  style: TextStyle(fontSize: 12, color: Colors.grey[600])),
             ],
           ),
         ),
@@ -222,7 +240,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Day of week selector — horizontal scrollable chips
+  /// Segmented-button toggle between Daily and Weekly
+  Widget _buildModeToggle() {
+    return SegmentedButton<String>(
+      segments: const [
+        ButtonSegment(
+          value: 'daily',
+          label: Text('Every Day'),
+          icon: Icon(Icons.today_outlined),
+        ),
+        ButtonSegment(
+          value: 'weekly',
+          label: Text('Weekly'),
+          icon: Icon(Icons.calendar_month_outlined),
+        ),
+      ],
+      selected: {_reminderType},
+      onSelectionChanged: (selected) {
+        setState(() => _reminderType = selected.first);
+      },
+    );
+  }
+
   Widget _buildDaySelector() {
     return SizedBox(
       height: 44,
@@ -251,7 +290,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Tappable tile that opens time picker
   Widget _buildTimeTile() {
     return InkWell(
       onTap: _pickTime,
@@ -279,10 +317,11 @@ class _SettingsScreenState extends State<SettingsScreen> {
     );
   }
 
-  // Shows a preview of when the next reminder will fire
   Widget _buildReminderPreview() {
-    final dayName = _weekdays[_selectedWeekday]!;
     final timeStr = _selectedTime.format(context);
+    final text = _reminderType == 'daily'
+        ? 'You\'ll be reminded every day at $timeStr'
+        : 'You\'ll be reminded every ${_weekdays[_selectedWeekday]!} at $timeStr';
 
     return Container(
       padding: const EdgeInsets.all(14),
@@ -297,7 +336,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
           const SizedBox(width: 10),
           Expanded(
             child: Text(
-              'You\'ll be reminded every $dayName at $timeStr',
+              text,
               style: TextStyle(
                 fontSize: 13,
                 color: Colors.amber[900],

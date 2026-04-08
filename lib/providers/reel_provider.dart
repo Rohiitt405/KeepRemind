@@ -4,12 +4,14 @@ import '../services/firestore_service.dart';
 import '../services/metadata_service.dart';
 import '../services/ai_service.dart';
 import '../services/notification_service.dart';
+import '../services/settings_service.dart';
 
 class ReelProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   final MetadataService _metadataService = MetadataService();
   final AiService _aiService = AiService();
   final NotificationService _notificationService = NotificationService();
+  final SettingsService _settingsService = SettingsService();
 
   List<ReelItem> _reels = [];
   bool _isLoading = false;
@@ -60,11 +62,20 @@ class ReelProvider extends ChangeNotifier {
 
       await _firestoreService.saveReel(reel);
 
-      await _notificationService.scheduleWeeklyReminder(
-        weekday: DateTime.monday,
-        hour: 10,
-        minute: 0,
-      );
+      // Re-schedule using whatever mode the user has configured
+      final settings = await _settingsService.loadReminderSettings();
+      if (settings['type'] == 'daily') {
+        await _notificationService.scheduleDailyReminder(
+          hour: settings['hour'] as int,
+          minute: settings['minute'] as int,
+        );
+      } else {
+        await _notificationService.scheduleWeeklyReminder(
+          weekday: settings['weekday'] as int,
+          hour: settings['hour'] as int,
+          minute: settings['minute'] as int,
+        );
+      }
 
     } catch (e) {
       _errorMessage = 'Something went wrong. Please try again.';
