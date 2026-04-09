@@ -80,28 +80,73 @@ class _HomeScreenState extends State<HomeScreen>
 
   // Builds the scrollable list for a given set of reels
   Widget _buildReelList(BuildContext context, List<ReelItem> reels) {
-    if (reels.isEmpty) {
-      return _buildEmptyState();
-    }
+  if (reels.isEmpty) {
+    return _buildEmptyState();
+  }
 
-    return ListView.builder(
+  // Wrap ListView with RefreshIndicator for pull to refresh
+  return RefreshIndicator(
+    onRefresh: () async {
+      // Reels stream auto-updates, but this gives visual feedback
+      await Future.delayed(const Duration(milliseconds: 800));
+    },
+    child: ListView.builder(
       padding: const EdgeInsets.symmetric(vertical: 8),
       itemCount: reels.length,
       itemBuilder: (context, index) {
         final reel = reels[index];
-        return ReelCard(
-          reel: reel,
-          onTap: () => Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (_) => DetailScreen(reel: reel),
+
+        // Wrap each card with Dismissible for swipe to delete
+        return Dismissible(
+          key: Key(reel.id),
+          direction: DismissDirection.endToStart,
+          background: Container(
+            alignment: Alignment.centerRight,
+            padding: const EdgeInsets.only(right: 20),
+            margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+            decoration: BoxDecoration(
+              color: Colors.red,
+              borderRadius: BorderRadius.circular(12),
             ),
+            child: const Icon(Icons.delete, color: Colors.white, size: 28),
           ),
-          onDelete: () => _confirmDelete(context, reel.id),
+          // Confirm before dismissing
+          confirmDismiss: (_) async {
+            return await showDialog<bool>(
+              context: context,
+              builder: (ctx) => AlertDialog(
+                title: const Text('Delete Reel?'),
+                content: const Text('This cannot be undone.'),
+                actions: [
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, false),
+                    child: const Text('Cancel'),
+                  ),
+                  TextButton(
+                    onPressed: () => Navigator.pop(ctx, true),
+                    child: const Text('Delete',
+                        style: TextStyle(color: Colors.red)),
+                  ),
+                ],
+              ),
+            );
+          },
+          onDismissed: (_) {
+            context.read<ReelProvider>().deleteReel(reel.id);
+          },
+          child: ReelCard(
+            reel: reel,
+            onTap: () => Navigator.push(
+              context,
+              MaterialPageRoute(builder: (_) => DetailScreen(reel: reel)),
+            ),
+            onDelete: () => _confirmDelete(context, reel.id),
+          ),
         );
       },
-    );
-  }
+    ),
+  );
+}
 
   // Empty state UI when no reels are saved
   Widget _buildEmptyState() {

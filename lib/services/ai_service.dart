@@ -21,7 +21,7 @@ class AiService {
 
     try {
       final response = await http.post(
-        Uri.parse('${AppConstants.geminiApiKey}?key=${AppConstants.geminiApiKey}'),
+        Uri.parse('${AppConstants.geminiApiUrl}?key=${AppConstants.geminiApiKey}'),
         headers: {'Content-Type' : 'application/json'},
         body: jsonEncode({
           "contents" : [
@@ -39,8 +39,8 @@ class AiService {
         final text = json['candidates'][0]['content']['parts'][0]['text'] as String;
         final cleaned = text
           .trim()
-          .replaceAll('```', '')
-          .replaceAll('```', '')
+          .replaceAll(RegExp(r'```json\s*'), '')
+          .replaceAll(RegExp(r'```\s*'), '')
           .trim();
         
         final List<dynamic> decoded = jsonDecode(cleaned);

@@ -70,11 +70,14 @@ class ReelProvider extends ChangeNotifier {
           minute: settings['minute'] as int,
         );
       } else {
-        await _notificationService.scheduleWeeklyReminder(
-          weekday: settings['weekday'] as int,
-          hour: settings['hour'] as int,
-          minute: settings['minute'] as int,
-        );
+          final settingsService = SettingsService();
+          final settings = await settingsService.loadReminderSettings();
+
+          await _notificationService.scheduleWeeklyReminder(
+            weekday: settings['weekday']!,
+            hour: settings['hour']!,
+            minute: settings['minute']!,
+          );
       }
 
     } catch (e) {
