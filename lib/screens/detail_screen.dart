@@ -4,7 +4,6 @@ import 'package:cached_network_image/cached_network_image.dart';
 import 'package:url_launcher/url_launcher.dart';
 import '../models/reel_item.dart';
 import '../providers/reel_provider.dart';
-import '../widgets/takeaway_chip.dart';
 
 class DetailScreen extends StatelessWidget {
   final ReelItem reel;
@@ -16,10 +15,7 @@ class DetailScreen extends StatelessWidget {
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          // Collapsible app bar with thumbnail
           _buildSliverAppBar(context),
-
-          // Main content
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
@@ -29,8 +25,6 @@ class DetailScreen extends StatelessWidget {
                   _buildPlatformBadge(),
                   const SizedBox(height: 10),
                   _buildTitle(),
-                  const SizedBox(height: 20),
-                  _buildTakeawaysSection(),
                   const SizedBox(height: 20),
                   if (reel.caption.isNotEmpty) _buildCaptionSection(),
                   const SizedBox(height: 24),
@@ -45,7 +39,6 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  // App bar that shows thumbnail and collapses on scroll
   Widget _buildSliverAppBar(BuildContext context) {
     return SliverAppBar(
       expandedHeight: 250,
@@ -55,20 +48,23 @@ class DetailScreen extends StatelessWidget {
             ? CachedNetworkImage(
                 imageUrl: reel.thumbnailUrl,
                 fit: BoxFit.cover,
-                placeholder: (context, url) => Container(color: Colors.grey[200]),
-                errorWidget: (context, url, error) =>
-                    Container(color: Colors.grey[200],
-                      child: const Icon(Icons.video_library, size: 60, color: Colors.grey)),
+                placeholder: (context, url) =>
+                    Container(color: Colors.grey[200]),
+                errorWidget: (context, url, error) => Container(
+                  color: Colors.grey[200],
+                  child: const Icon(Icons.video_library,
+                      size: 60, color: Colors.grey),
+                ),
               )
             : Container(
                 color: Colors.grey[200],
-                child: const Icon(Icons.video_library, size: 60, color: Colors.grey),
+                child: const Icon(Icons.video_library,
+                    size: 60, color: Colors.grey),
               ),
       ),
     );
   }
 
-  // Platform badge (Instagram / YouTube)
   Widget _buildPlatformBadge() {
     final isInstagram = reel.platform == 'instagram';
     return Container(
@@ -95,37 +91,12 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  // AI takeaways section
-  Widget _buildTakeawaysSection() {
-    return Column(
-      crossAxisAlignment: CrossAxisAlignment.start,
-      children: [
-        const Text(
-          '🧠 Key Takeaways',
-          style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
-        ),
-        const SizedBox(height: 12),
-        if (reel.takeaways.isEmpty)
-          Text('No takeaways available.',
-              style: TextStyle(color: Colors.grey[500]))
-        else
-          ...reel.takeaways.asMap().entries.map(
-                (entry) => TakeawayChip(
-                  index: entry.key,
-                  text: entry.value,
-                ),
-              ),
-      ],
-    );
-  }
-
-  // Original caption section
   Widget _buildCaptionSection() {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
         const Text(
-          '📝 Original Caption',
+          '📝 Caption',
           style: TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
         ),
         const SizedBox(height: 8),
@@ -141,13 +112,11 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  // Open URL + Mark as reviewed buttons
   Widget _buildActionButtons(BuildContext context) {
     final provider = context.read<ReelProvider>();
 
     return Column(
       children: [
-        // Open original reel
         SizedBox(
           width: double.infinity,
           child: OutlinedButton.icon(
@@ -157,8 +126,6 @@ class DetailScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-
-        // Mark as reviewed (only show if not already reviewed)
         if (!reel.isReviewed)
           SizedBox(
             width: double.infinity,
@@ -186,16 +153,19 @@ class DetailScreen extends StatelessWidget {
             children: [
               const Icon(Icons.check_circle, color: Colors.green),
               const SizedBox(width: 6),
-              Text('Reviewed',
-                  style: TextStyle(color: Colors.green[700],
-                      fontWeight: FontWeight.w600)),
+              Text(
+                'Reviewed',
+                style: TextStyle(
+                  color: Colors.green[700],
+                  fontWeight: FontWeight.w600,
+                ),
+              ),
             ],
           ),
       ],
     );
   }
 
-  // Launch the original URL in browser
   Future<void> _openUrl(BuildContext context) async {
     final uri = Uri.parse(reel.url);
     if (await canLaunchUrl(uri)) {

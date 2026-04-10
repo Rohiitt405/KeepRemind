@@ -4,7 +4,6 @@ class ReelItem {
   final String title;
   final String caption;
   final String thumbnailUrl;
-  final List<String> takeaways;
   final String platform;
   final DateTime savedAt;
   final bool isReviewed;
@@ -15,7 +14,6 @@ class ReelItem {
     required this.title,
     required this.caption,
     required this.thumbnailUrl,
-    required this.takeaways,
     required this.platform,
     required this.savedAt,
     required this.isReviewed,
@@ -27,7 +25,6 @@ class ReelItem {
       'title': title,
       'caption': caption,
       'thumbnailUrl': thumbnailUrl,
-      'takeaways': takeaways,
       'platform': platform,
       'savedAt': savedAt.toIso8601String(),
       'isReviewed': isReviewed,
@@ -41,7 +38,6 @@ class ReelItem {
       title: map['title'] ?? '',
       caption: map['caption'] ?? '',
       thumbnailUrl: map['thumbnailUrl'] ?? '',
-      takeaways: List<String>.from(map['takeaways'] ?? []),
       platform: map['platform'] ?? '',
       savedAt: DateTime.parse(map['savedAt']),
       isReviewed: map['isReviewed'] ?? false,
@@ -54,7 +50,6 @@ class ReelItem {
     String? title,
     String? caption,
     String? thumbnailUrl,
-    List<String>? takeaways,
     String? platform,
     DateTime? savedAt,
     bool? isReviewed,
@@ -65,7 +60,6 @@ class ReelItem {
       title: title ?? this.title,
       caption: caption ?? this.caption,
       thumbnailUrl: thumbnailUrl ?? this.thumbnailUrl,
-      takeaways: takeaways ?? this.takeaways,
       platform: platform ?? this.platform,
       savedAt: savedAt ?? this.savedAt,
       isReviewed: isReviewed ?? this.isReviewed,

@@ -2,16 +2,13 @@ import 'package:flutter/material.dart';
 import '../models/reel_item.dart';
 import '../services/firestore_service.dart';
 import '../services/metadata_service.dart';
-import '../services/ai_service.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
 
 class ReelProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   final MetadataService _metadataService = MetadataService();
-  final AiService _aiService = AiService();
   final NotificationService _notificationService = NotificationService();
-  final SettingsService _settingsService = SettingsService();
 
   List<ReelItem> _reels = [];
   bool _isLoading = false;
@@ -21,8 +18,10 @@ class ReelProvider extends ChangeNotifier {
   bool get isLoading => _isLoading;
   String? get errorMessage => _errorMessage;
 
-  List<ReelItem> get unreviewedReels => _reels.where((r) => !r.isReviewed).toList();
-  List<ReelItem> get reviewedReels => _reels.where((r) => r.isReviewed).toList();
+  List<ReelItem> get unreviewedReels =>
+      _reels.where((r) => !r.isReviewed).toList();
+  List<ReelItem> get reviewedReels =>
+      _reels.where((r) => r.isReviewed).toList();
 
   void listenToReels() {
     _firestoreService.getReels().listen((reels) {
@@ -31,9 +30,10 @@ class ReelProvider extends ChangeNotifier {
     });
   }
 
+  // Simplified save flow — no AI involved
   Future<void> saveReelFromUrl(String url) async {
-    if(!_metadataService.isValidUrl(url)) {
-      _errorMessage = 'Only Instagram and Youtube links are supported.';
+    if (!_metadataService.isValidUrl(url)) {
+      _errorMessage = 'Only Instagram and YouTube links are supported.';
       notifyListeners();
       return;
     }
@@ -42,43 +42,32 @@ class ReelProvider extends ChangeNotifier {
     _errorMessage = null;
 
     try {
+      // Step 1: Extract metadata from URL
       final metadata = await _metadataService.fetchMetadata(url);
-      final takeaways = await _aiService.generateTakeaways(
-        metadata.title, 
-        metadata.caption
-      );
 
+      // Step 2: Build ReelItem
       final reel = ReelItem(
         id: '',
         url: url,
         title: metadata.title,
         caption: metadata.caption,
         thumbnailUrl: metadata.thumbnailUrl,
-        takeaways: takeaways,
         platform: metadata.platform,
         savedAt: DateTime.now(),
-        isReviewed: false
+        isReviewed: false,
       );
 
+      // Step 3: Save to Firestore
       await _firestoreService.saveReel(reel);
 
-      // Re-schedule using whatever mode the user has configured
-      final settings = await _settingsService.loadReminderSettings();
-      if (settings['type'] == 'daily') {
-        await _notificationService.scheduleDailyReminder(
-          hour: settings['hour'] as int,
-          minute: settings['minute'] as int,
-        );
-      } else {
-          final settingsService = SettingsService();
-          final settings = await settingsService.loadReminderSettings();
-
-          await _notificationService.scheduleWeeklyReminder(
-            weekday: settings['weekday']!,
-            hour: settings['hour']!,
-            minute: settings['minute']!,
-          );
-      }
+      // Step 4: Schedule weekly reminder
+      final settingsService = SettingsService();
+      final settings = await settingsService.loadReminderSettings();
+      await _notificationService.scheduleWeeklyReminder(
+        weekday: settings['weekday']!,
+        hour: settings['hour']!,
+        minute: settings['minute']!,
+      );
 
     } catch (e) {
       _errorMessage = 'Something went wrong. Please try again.';
@@ -91,7 +80,6 @@ class ReelProvider extends ChangeNotifier {
   Future<void> markAsReviewed(String reelId) async {
     try {
       await _firestoreService.markAsReviewed(reelId);
-
     } catch (e) {
       _errorMessage = 'Could not update reel.';
       notifyListeners();

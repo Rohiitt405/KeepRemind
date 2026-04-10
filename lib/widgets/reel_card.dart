@@ -57,7 +57,7 @@ class ReelCard extends StatelessWidget {
                     const SizedBox(height: 4),
 
                     Text(
-                      '${reel.takeaways.length} key takeaways',
+                      'Saved ${_formatDate(reel.savedAt)}',
                       style: TextStyle(
                         fontSize: 12,
                         color: Colors.grey[600],
@@ -99,6 +99,16 @@ class ReelCard extends StatelessWidget {
       color: Colors.grey[200],
       child: const Icon(Icons.video_library, color: Colors.grey),
     );
+  }
+
+  String _formatDate(DateTime date) {
+    final now = DateTime.now();
+    final diff = now.difference(date).inDays;
+
+    if (diff == 0) return 'today';
+    if (diff == 1) return 'yesterday';
+    if (diff < 7) return '$diff days ago';
+    return '${date.day}/${date.month}/${date.year}';
   }
 
   Widget _buildPlatformBadge() {
