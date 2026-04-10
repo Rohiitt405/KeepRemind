@@ -28,7 +28,7 @@ class ReelCard extends StatelessWidget {
 
             Expanded(
               child: Padding(
-                padding: const EdgeInsets.all(12),
+                padding: const EdgeInsets.all(10),
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
                   children: [
@@ -39,10 +39,10 @@ class ReelCard extends StatelessWidget {
                         
                         if (reel.isReviewed)
                           const Icon(Icons.check_circle,
-                          color: Colors.green, size: 18,),
+                          color: Colors.green, size: 20,),
                       ],
                     ),
-                    const SizedBox(height: 6),
+                    const SizedBox(height: 4),
 
                     Text(
                       reel.title.isNotEmpty ? reel.title : 'No title',
@@ -66,11 +66,6 @@ class ReelCard extends StatelessWidget {
                   ],
                 ),
               )
-            ),
-
-            IconButton(
-              icon: Icon(Icons.delete, color: Colors.redAccent),
-              onPressed: onDelete, 
             ),
           ],
         ),
@@ -124,7 +119,7 @@ class ReelCard extends StatelessWidget {
         isInstgram ? 'Instagram' : 'Youtube',
         style: TextStyle(
           fontSize: 11,
-          color:  isInstgram ? Colors.purple : Colors.red,
+          color:  isInstgram ? Colors.purple[900] : Colors.red[900],
           fontWeight: FontWeight.w600,
         ),
       ),
