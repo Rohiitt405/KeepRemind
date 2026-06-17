@@ -61,6 +61,7 @@ class NotificationService {
     int weekday = DateTime.monday,
     int hour = 10,
     int minute = 0,
+    String? reminderText,
   }) async {
     // Cancel both so no stale daily reminder lingers when switching modes
     await cancelAll();
@@ -82,8 +83,8 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: _weeklyReminderId,
-      title: '🎬 Time to review your saved reels!',
-      body: 'You have saved reels waiting. Tap to review your key takeaways.',
+      title: '🎬 Time to review your saved reels',
+      body: reminderText ?? 'Review your saved reels',
       scheduledDate: scheduledDate,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,

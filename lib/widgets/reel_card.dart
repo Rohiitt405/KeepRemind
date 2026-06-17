@@ -18,7 +18,7 @@ class ReelCard extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Card(
-      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+      margin: const EdgeInsets.symmetric(horizontal: 16, vertical: 6),
       clipBehavior: Clip.antiAlias,
       child: InkWell(
         onTap: onTap,
@@ -54,6 +54,16 @@ class ReelCard extends StatelessWidget {
                       ),
                     ),
 
+                    if(reel.aiMemory != null && reel.aiMemory!.isNotEmpty)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          '💡 ${reel.aiMemory}',
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                    ),
+
                     const SizedBox(height: 4),
 
                     Text(
@@ -78,7 +88,7 @@ class ReelCard extends StatelessWidget {
       return CachedNetworkImage(
         imageUrl: reel.thumbnailUrl,
         width: 100,
-        height: 100,
+        height: 120,
         fit: BoxFit.cover,
         placeholder: (context, url) => _thumbnailPlaceholder(),
         errorWidget: (context, url, error) => _thumbnailPlaceholder(),
@@ -90,7 +100,7 @@ class ReelCard extends StatelessWidget {
   Widget _thumbnailPlaceholder() {
     return Container(
       width: 100,
-      height: 100,
+      height: 120,
       color: Colors.grey[200],
       child: const Icon(Icons.video_library, color: Colors.grey),
     );
