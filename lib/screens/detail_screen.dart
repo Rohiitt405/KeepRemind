@@ -30,6 +30,36 @@ class DetailScreen extends StatelessWidget {
                   const SizedBox(height: 24),
                   _buildActionButtons(context),
                   const SizedBox(height: 40),
+
+                  if(reel.aiMemory != null)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Column(
+                          crossAxisAlignment: CrossAxisAlignment.start,
+                          children: [
+                            Text('Why You Saved This',
+                            style: Theme.of(context)
+                              .textTheme
+                              .titleMedium,
+                            ),
+                            const SizedBox(height: 8),
+                            Text(reel.aiMemory!),
+                          ],
+                        ),
+                      ),
+                    ),
+                  
+                  Wrap(
+                    spacing: 8,
+                    children: reel.aiTags
+                        ?.map(
+                          (tag) => Chip(
+                            label: Text(tag),
+                          ),
+                        )
+                        .toList() ?? [],
+                  )
                 ],
               ),
             ),

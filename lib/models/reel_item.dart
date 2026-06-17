@@ -1,4 +1,6 @@
 class ReelItem {
+  final String? aiMemory;
+  final List<String>? aiTags;
   final String id;
   final String url;
   final String title;
@@ -9,6 +11,8 @@ class ReelItem {
   final bool isReviewed;
 
   ReelItem({
+    this. aiMemory,
+    this.aiTags,
     required this.id,
     required this.url,
     required this.title,
@@ -21,6 +25,8 @@ class ReelItem {
 
   Map<String, dynamic> toMap() {
     return {
+      'aiMemory': aiMemory,
+      'aiTags': aiTags,
       'url': url,
       'title': title,
       'caption': caption,
@@ -33,6 +39,10 @@ class ReelItem {
 
   factory ReelItem.fromMap(String id, Map<String, dynamic> map) {
     return ReelItem(
+      aiMemory: map['aiMemory'],
+      aiTags: map['aiTags'] != null
+        ? List<String>.from(map['aiTags'])
+        : null,
       id: id,
       url: map['url'] ?? '',
       title: map['title'] ?? '',
@@ -45,6 +55,8 @@ class ReelItem {
   }
 
   ReelItem copyWith({
+    String? aiMemory,
+    List<String>? aiTags,
     String? id,
     String? url,
     String? title,
@@ -55,6 +67,8 @@ class ReelItem {
     bool? isReviewed,
   }) {
     return ReelItem(
+      aiMemory: aiMemory ?? this.aiMemory,
+      aiTags: aiTags ?? this.aiTags,
       id: id ?? this.id,
       url: url ?? this.url,
       title: title ?? this.title,

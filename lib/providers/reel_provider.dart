@@ -1,4 +1,6 @@
 import 'package:flutter/material.dart';
+import 'package:project/models/ai_memory.dart';
+import 'package:project/services/ai_service.dart';
 import '../models/reel_item.dart';
 import '../services/firestore_service.dart';
 import '../services/metadata_service.dart';
@@ -9,6 +11,7 @@ class ReelProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
   final MetadataService _metadataService = MetadataService();
   final NotificationService _notificationService = NotificationService();
+  final AiService _aiService = AiService();
 
   List<ReelItem> _reels = [];
   bool _isLoading = false;
@@ -45,6 +48,11 @@ class ReelProvider extends ChangeNotifier {
       // Step 1: Extract metadata from URL
       final metadata = await _metadataService.fetchMetadata(url);
 
+      final aiMemory = await _aiService.generateMemory(
+        title: metadata.title, 
+        caption: metadata.caption
+      );
+
       // Step 2: Build ReelItem
       final reel = ReelItem(
         id: '',
@@ -53,12 +61,21 @@ class ReelProvider extends ChangeNotifier {
         caption: metadata.caption,
         thumbnailUrl: metadata.thumbnailUrl,
         platform: metadata.platform,
+
+        aiMemory: aiMemory?.memory,
+        aiTags: aiMemory?.tags,
+        
         savedAt: DateTime.now(),
         isReviewed: false,
       );
 
-      // Step 3: Save to Firestore
-      await _firestoreService.saveReel(reel);
+      // Step 3: Save to Firestore and update local list immediately
+      final savedReelId = await _firestoreService.saveReel(reel);
+      final savedReel = reel.copyWith(id: savedReelId);
+      if (!_reels.any((r) => r.id == savedReelId)) {
+        _reels.insert(0, savedReel);
+        notifyListeners();
+      }
 
       // Step 4: Schedule weekly reminder
       final settingsService = SettingsService();
@@ -69,7 +86,10 @@ class ReelProvider extends ChangeNotifier {
         minute: settings['minute']!,
       );
 
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint('SAVE REEL ERROR: $e');
+      debugPrintStack(stackTrace: stackTrace);
+      
       _errorMessage = 'Something went wrong. Please try again.';
       notifyListeners();
     } finally {

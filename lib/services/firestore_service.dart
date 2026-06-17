@@ -26,10 +26,11 @@ class FirestoreService {
   }
 
   // Save a new reel to Firestore
-  Future<void> saveReel(ReelItem reel) async {
+  Future<String> saveReel(ReelItem reel) async {
     final collection = await _reelsCollection();
     // .add() auto-generates a unique document ID
-    await collection.add(reel.toMap());
+    final docRef = await collection.add(reel.toMap());
+    return docRef.id;
   }
 
   // Fetch all reels as a live stream (UI updates automatically)
