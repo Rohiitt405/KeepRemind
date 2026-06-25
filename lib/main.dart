@@ -14,5 +14,5 @@ void main() async {
   final notificationService = NotificationService();
   await notificationService.initialize();
   
-  runApp(const ReelRemindApp());
+  runApp(const KeepRemindApp());
 }

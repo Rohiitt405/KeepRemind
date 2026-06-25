@@ -31,7 +31,30 @@ class DetailScreen extends StatelessWidget {
                   _buildActionButtons(context),
                   const SizedBox(height: 40),
 
-                  if(reel.aiMemory != null)
+                  if (reel.isGenerating)
+                    Card(
+                      child: Padding(
+                        padding: const EdgeInsets.all(16),
+                        child: Row(
+                          children: [
+                            const SizedBox(
+                              width: 20,
+                              height: 20,
+                              child: CircularProgressIndicator(strokeWidth: 2),
+                            ),
+                            const SizedBox(width: 12),
+                            Expanded(
+                              child: Text(
+                                'AI memory is being generated. It will appear here when ready.',
+                                style: Theme.of(context).textTheme.bodyMedium,
+                              ),
+                            ),
+                          ],
+                        ),
+                      ),
+                    ),
+
+                  if (!reel.isGenerating && reel.aiMemory != null)
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -39,9 +62,9 @@ class DetailScreen extends StatelessWidget {
                           crossAxisAlignment: CrossAxisAlignment.start,
                           children: [
                             Text('Why You Saved This',
-                            style: Theme.of(context)
-                              .textTheme
-                              .titleMedium,
+                              style: Theme.of(context)
+                                .textTheme
+                                .titleMedium,
                             ),
                             const SizedBox(height: 8),
                             Text(reel.aiMemory!),

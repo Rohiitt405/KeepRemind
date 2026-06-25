@@ -54,7 +54,21 @@ class ReelCard extends StatelessWidget {
                       ),
                     ),
 
-                    if(reel.aiMemory != null && reel.aiMemory!.isNotEmpty)
+                    if (reel.isGenerating)
+                      Padding(
+                        padding: const EdgeInsets.only(top: 8),
+                        child: Text(
+                          '🤖 Generating AI memory... this may take a moment.',
+                          style: const TextStyle(
+                            fontSize: 12,
+                            color: Colors.blueGrey,
+                          ),
+                          maxLines: 2,
+                          overflow: TextOverflow.ellipsis,
+                        ),
+                      ),
+
+                    if (reel.aiMemory != null && reel.aiMemory!.isNotEmpty)
                       Padding(
                         padding: const EdgeInsets.only(top: 8),
                         child: Text(
@@ -62,7 +76,7 @@ class ReelCard extends StatelessWidget {
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
                         ),
-                    ),
+                      ),
 
                     const SizedBox(height: 4),
 

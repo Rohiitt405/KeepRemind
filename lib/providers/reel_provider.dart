@@ -1,4 +1,5 @@
 import 'package:flutter/material.dart';
+import 'package:project/models/ai_memory.dart';
 import 'package:project/services/ai_service.dart';
 import '../models/reel_item.dart';
 import '../services/firestore_service.dart';

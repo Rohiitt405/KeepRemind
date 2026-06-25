@@ -38,7 +38,7 @@ class _HomeScreenState extends State<HomeScreen>
     return Scaffold(
       appBar: AppBar(
         title: const Text(
-          'ReelRemind',
+          'KeepRemind',
           style: TextStyle(fontWeight: FontWeight.bold),
         ),
         actions: [

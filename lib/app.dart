@@ -8,14 +8,14 @@ import 'screens/onboarding_screen.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'screens/add_url_screen.dart';
 
-class ReelRemindApp extends StatefulWidget {
-  const ReelRemindApp({super.key});
+class KeepRemindApp extends StatefulWidget {
+  const KeepRemindApp({super.key});
 
   @override
-  State<ReelRemindApp> createState() => _ReelRemindAppState();
+  State<KeepRemindApp> createState() => _KeepRemindAppState();
 }
 
-class _ReelRemindAppState extends State<ReelRemindApp> {
+class _KeepRemindAppState extends State<KeepRemindApp> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   StreamSubscription? _shareSubscription;
   String? _pendingUrl;
@@ -109,7 +109,7 @@ class _ReelRemindAppState extends State<ReelRemindApp> {
       create: (_) => ReelProvider()..listenToReels(),
       child: MaterialApp(
         navigatorKey: _navigatorKey,
-        title: 'ReelRemind',
+        title: 'KeepRemind',
         debugShowCheckedModeBanner: false,
         theme: ThemeData(
           colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),

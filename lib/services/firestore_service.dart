@@ -47,6 +47,12 @@ class FirestoreService {
     });
   }
 
+  // Update a reel document with partial fields
+  Future<void> updateReel(String reelId, Map<String, dynamic> data) async {
+    final collection = await _reelsCollection();
+    await collection.doc(reelId).update(data);
+  }
+
   // Mark a reel as reviewed
   Future<void> markAsReviewed(String reelId) async {
     final collection = await _reelsCollection();

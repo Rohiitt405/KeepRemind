@@ -1,6 +1,7 @@
 class ReelItem {
   final String? aiMemory;
   final List<String>? aiTags;
+  final bool isGenerating;
   final String id;
   final String url;
   final String title;
@@ -11,8 +12,9 @@ class ReelItem {
   final bool isReviewed;
 
   ReelItem({
-    this. aiMemory,
+    this.aiMemory,
     this.aiTags,
+    this.isGenerating = false,
     required this.id,
     required this.url,
     required this.title,
@@ -27,6 +29,7 @@ class ReelItem {
     return {
       'aiMemory': aiMemory,
       'aiTags': aiTags,
+      'aiGenerating': isGenerating,
       'url': url,
       'title': title,
       'caption': caption,
@@ -43,6 +46,7 @@ class ReelItem {
       aiTags: map['aiTags'] != null
         ? List<String>.from(map['aiTags'])
         : null,
+      isGenerating: map['aiGenerating'] == true,
       id: id,
       url: map['url'] ?? '',
       title: map['title'] ?? '',
@@ -57,6 +61,7 @@ class ReelItem {
   ReelItem copyWith({
     String? aiMemory,
     List<String>? aiTags,
+    bool? isGenerating,
     String? id,
     String? url,
     String? title,
@@ -69,6 +74,7 @@ class ReelItem {
     return ReelItem(
       aiMemory: aiMemory ?? this.aiMemory,
       aiTags: aiTags ?? this.aiTags,
+      isGenerating: isGenerating ?? this.isGenerating,
       id: id ?? this.id,
       url: url ?? this.url,
       title: title ?? this.title,
