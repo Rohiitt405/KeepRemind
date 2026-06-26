@@ -37,9 +37,13 @@ class AiService {
     for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
       try {
         final response = await _model.generateContent([Content.text(prompt)]);
+        debugPrint('AI service raw response: $response');
         final text = response.text;
 
+        debugPrint('AI service response text: ${text ?? '<null>'}');
+
         if (text == null || text.trim().isEmpty) {
+          debugPrint('AI service returned empty text');
           return null;
         }
 

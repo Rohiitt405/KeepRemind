@@ -102,8 +102,9 @@ class ReelProvider extends ChangeNotifier {
       Duration(minutes: 2),
     ];
 
-    var attempt = 0;
-    while (true) {
+    final maxAttempts = retryDelays.length + 1; // final try after delays
+
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         final aiMemory = await _aiService.generateMemory(
           title: title,
@@ -119,15 +120,27 @@ class ReelProvider extends ChangeNotifier {
           return;
         }
 
-        debugPrint('AI generation returned no valid memory for reel $reelId on attempt ${attempt + 1}. Retrying...');
+        debugPrint('AI generation returned no valid memory for reel $reelId on attempt ${attempt + 1}.');
       } catch (e, stackTrace) {
         debugPrint('AI generation background error for reel $reelId on attempt ${attempt + 1}: $e');
         debugPrintStack(stackTrace: stackTrace);
       }
 
-      final delay = attempt < retryDelays.length ? retryDelays[attempt] : retryDelays.last;
-      await Future.delayed(delay);
-      attempt += 1;
+      if (attempt < retryDelays.length) {
+        final delay = retryDelays[attempt];
+        debugPrint('Waiting ${delay.inSeconds}s before next AI attempt for reel $reelId.');
+        await Future.delayed(delay);
+      }
+    }
+
+    // After exhausting attempts, mark generation as finished to avoid a stuck UI.
+    try {
+      await _firestoreService.updateReel(reelId, {
+        'aiGenerating': false,
+      });
+      debugPrint('AI generation failed for reel $reelId after $maxAttempts attempts. Marked as not generating.');
+    } catch (e) {
+      debugPrint('Failed to update generation flag for reel $reelId: $e');
     }
   }
 
