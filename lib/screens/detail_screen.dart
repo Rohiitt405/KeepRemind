@@ -12,26 +12,32 @@ class DetailScreen extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+    final provider = context.watch<ReelProvider>();
+    final currentReel = provider.reels.firstWhere(
+      (item) => item.id == reel.id,
+      orElse: () => reel,
+    );
+
     return Scaffold(
       body: CustomScrollView(
         slivers: [
-          _buildSliverAppBar(context),
+          _buildSliverAppBar(context, currentReel),
           SliverToBoxAdapter(
             child: Padding(
               padding: const EdgeInsets.all(16),
               child: Column(
                 crossAxisAlignment: CrossAxisAlignment.start,
                 children: [
-                  _buildPlatformBadge(),
+                  _buildPlatformBadge(currentReel),
                   const SizedBox(height: 10),
-                  _buildTitle(),
+                  _buildTitle(currentReel),
                   const SizedBox(height: 20),
-                  if (reel.caption.isNotEmpty) _buildCaptionSection(),
+                  if (currentReel.caption.isNotEmpty) _buildCaptionSection(currentReel),
                   const SizedBox(height: 24),
-                  _buildActionButtons(context),
+                  _buildActionButtons(context, currentReel),
                   const SizedBox(height: 40),
 
-                  if (reel.isGenerating)
+                  if (currentReel.isGenerating)
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -54,7 +60,7 @@ class DetailScreen extends StatelessWidget {
                       ),
                     ),
 
-                  if (!reel.isGenerating && reel.aiMemory != null)
+                  if (!currentReel.isGenerating && currentReel.aiMemory != null)
                     Card(
                       child: Padding(
                         padding: const EdgeInsets.all(16),
@@ -67,7 +73,7 @@ class DetailScreen extends StatelessWidget {
                                 .titleMedium,
                             ),
                             const SizedBox(height: 8),
-                            Text(reel.aiMemory!),
+                            Text(currentReel.aiMemory!),
                           ],
                         ),
                       ),
@@ -75,7 +81,7 @@ class DetailScreen extends StatelessWidget {
                   
                   Wrap(
                     spacing: 8,
-                    children: reel.aiTags
+                    children: currentReel.aiTags
                         ?.map(
                           (tag) => Chip(
                             label: Text(tag),
@@ -92,7 +98,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildSliverAppBar(BuildContext context) {
+  Widget _buildSliverAppBar(BuildContext context, ReelItem currentReel) {
     return SliverAppBar(
       expandedHeight: 250,
       pinned: true,
@@ -118,8 +124,8 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildPlatformBadge() {
-    final isInstagram = reel.platform == 'instagram';
+  Widget _buildPlatformBadge(ReelItem currentReel) {
+    final isInstagram = currentReel.platform == 'instagram';
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
       decoration: BoxDecoration(
@@ -137,14 +143,14 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildTitle() {
+  Widget _buildTitle(ReelItem currentReel) {
     return Text(
-      reel.title.isNotEmpty ? reel.title : 'No title available',
+      currentReel.title.isNotEmpty ? currentReel.title : 'No title available',
       style: const TextStyle(fontSize: 20, fontWeight: FontWeight.bold),
     );
   }
 
-  Widget _buildCaptionSection() {
+  Widget _buildCaptionSection(ReelItem currentReel) {
     return Column(
       crossAxisAlignment: CrossAxisAlignment.start,
       children: [
@@ -154,7 +160,7 @@ class DetailScreen extends StatelessWidget {
         ),
         const SizedBox(height: 8),
         Text(
-          reel.caption,
+          currentReel.caption,
           style: TextStyle(
             fontSize: 14,
             color: Colors.grey[700],
@@ -165,7 +171,7 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Widget _buildActionButtons(BuildContext context) {
+  Widget _buildActionButtons(BuildContext context, ReelItem currentReel) {
     final provider = context.read<ReelProvider>();
 
     return Column(
@@ -179,12 +185,12 @@ class DetailScreen extends StatelessWidget {
           ),
         ),
         const SizedBox(height: 12),
-        if (!reel.isReviewed)
+        if (!currentReel.isReviewed)
           SizedBox(
             width: double.infinity,
             child: ElevatedButton.icon(
               onPressed: () async {
-                await provider.markAsReviewed(reel.id);
+                await provider.markAsReviewed(currentReel.id);
                 if (context.mounted) {
                   ScaffoldMessenger.of(context).showSnackBar(
                     const SnackBar(content: Text('Marked as reviewed ✅')),

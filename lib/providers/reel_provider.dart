@@ -1,3 +1,4 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:project/services/ai_service.dart';
 import '../models/reel_item.dart';
@@ -32,7 +33,7 @@ class ReelProvider extends ChangeNotifier {
     });
   }
 
-  // Simplified save flow — no AI involved
+  // Save flow with background AI generation
   Future<void> saveReelFromUrl(String url) async {
     if (!_metadataService.isValidUrl(url)) {
       _errorMessage = 'Only Instagram and YouTube links are supported.';
@@ -47,12 +48,7 @@ class ReelProvider extends ChangeNotifier {
       // Step 1: Extract metadata from URL
       final metadata = await _metadataService.fetchMetadata(url);
 
-      final aiMemory = await _aiService.generateMemory(
-        title: metadata.title, 
-        caption: metadata.caption
-      );
-
-      // Step 2: Build ReelItem
+      // Step 2: Save the reel immediately with generating state
       final reel = ReelItem(
         id: '',
         url: url,
@@ -60,23 +56,22 @@ class ReelProvider extends ChangeNotifier {
         caption: metadata.caption,
         thumbnailUrl: metadata.thumbnailUrl,
         platform: metadata.platform,
-
-        aiMemory: aiMemory?.memory,
-        aiTags: aiMemory?.tags,
-        
+        aiMemory: null,
+        aiTags: null,
+        isGenerating: true,
         savedAt: DateTime.now(),
         isReviewed: false,
       );
 
-      // Step 3: Save to Firestore and update local list immediately
       final savedReelId = await _firestoreService.saveReel(reel);
       final savedReel = reel.copyWith(id: savedReelId);
+
       if (!_reels.any((r) => r.id == savedReelId)) {
         _reels.insert(0, savedReel);
         notifyListeners();
       }
 
-      // Step 4: Schedule weekly reminder
+      // Step 3: Schedule weekly reminder
       final settingsService = SettingsService();
       final settings = await settingsService.loadReminderSettings();
       await _notificationService.scheduleWeeklyReminder(
@@ -85,14 +80,67 @@ class ReelProvider extends ChangeNotifier {
         minute: settings['minute']!,
       );
 
+      // Step 4: Generate AI memory in background until it succeeds.
+      unawaited(_generateAiForReel(savedReelId, metadata.title, metadata.caption));
     } catch (e, stackTrace) {
       debugPrint('SAVE REEL ERROR: $e');
       debugPrintStack(stackTrace: stackTrace);
-      
+
       _errorMessage = 'Something went wrong. Please try again.';
       notifyListeners();
     } finally {
       _setLoading(false);
+    }
+  }
+
+  Future<void> _generateAiForReel(String reelId, String title, String caption) async {
+    const retryDelays = [
+      Duration(seconds: 5),
+      Duration(seconds: 15),
+      Duration(seconds: 30),
+      Duration(minutes: 1),
+      Duration(minutes: 2),
+    ];
+
+    final maxAttempts = retryDelays.length + 1; // final try after delays
+
+    for (var attempt = 0; attempt < maxAttempts; attempt++) {
+      try {
+        final aiMemory = await _aiService.generateMemory(
+          title: title,
+          caption: caption,
+        );
+
+        if (aiMemory != null && aiMemory.memory.trim().isNotEmpty) {
+          await _firestoreService.updateReel(reelId, {
+            'aiMemory': aiMemory.memory,
+            'aiTags': aiMemory.tags,
+            'aiGenerating': false,
+          });
+          return;
+        }
+
+        debugPrint('AI generation returned no valid memory for reel $reelId on attempt ${attempt + 1}.');
+      } catch (e, stackTrace) {
+        debugPrint('AI generation background error for reel $reelId on attempt ${attempt + 1}: $e');
+        debugPrintStack(stackTrace: stackTrace);
+      }
+
+      if (attempt < retryDelays.length) {
+        final delay = retryDelays[attempt];
+        debugPrint('Waiting ${delay.inSeconds}s before next AI attempt for reel $reelId.');
+        await Future.delayed(delay);
+      }
+    }
+
+    // After exhausting attempts, mark generation as finished to avoid a stuck UI.
+    try {
+      await _firestoreService.updateReel(reelId, {
+        'aiGenerating': false,
+      });
+      debugPrint('AI generation failed for reel $reelId after $maxAttempts attempts. Marked as not generating.');
+    } catch (e) {
+      debugPrint('Failed to update generation flag for reel $reelId: $e');
     }
   }
 
