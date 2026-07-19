@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:project/screens/settings_screen.dart';
 import 'package:provider/provider.dart';
+import '../constants/app_theme.dart';
 import '../providers/reel_provider.dart';
 import '../widgets/reel_card.dart';
 import '../models/reel_item.dart';
@@ -18,31 +19,14 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
 
-  static const Color primaryColor = Colors.black;
-  static const Color backgroundColor = Color(0xFFF9F9F9);
-  // static const Color surfaceContainerLow = Color(0xFFF3F3F3);
-  static const Color tertiaryFixed = Color(0xFF72FF70);
-  static const Color secondaryFixed = Color(0xFFEAEA00);
-  static const Color errorColor = Color(0xFFBA1A1A);
-  static const Color onSurfaceVariant = Color(0xFF4C4546);
+  static const Color primaryColor = AppThemeConstants.primaryColor;
+  static const Color backgroundColor = AppThemeConstants.backgroundColor;
+  static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
+  static const Color secondaryFixed = AppThemeConstants.secondaryFixed;
+  static const Color quarterFixed = AppThemeConstants.quarterFixed;
+  static const Color onSurfaceVariant = AppThemeConstants.onSurfaceVariant;
 
-  List<BoxShadow> get neoShadow => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(6, 6),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
-
-  List<BoxShadow> get neoShadowSm => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(4, 4),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+  List<BoxShadow> get neoShadowSm => AppThemeConstants.neoShadowSm;
 
   @override
   void initState() {
@@ -75,7 +59,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ),
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppThemeConstants.surfaceColor,
           elevation: 0,
           scrolledUnderElevation: 0,
           shape: const Border(
@@ -101,8 +85,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               child: Container(
                 margin: const EdgeInsets.only(right: 16),
                 padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2)),
-                child: const Icon(Icons.menu_rounded, color: primaryColor, size: 22),
+                decoration: BoxDecoration(border: Border.all(color: AppThemeConstants.primaryColor, width: 2)),
+                child: const Icon(Icons.schedule_rounded, color: primaryColor, size: 22),
               ),
             )
           ],
@@ -125,7 +109,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                     padding: const EdgeInsets.all(6),
                     margin: const EdgeInsets.symmetric(horizontal: 16),
                     decoration: BoxDecoration(
-                      color: Colors.white,
+                      color: AppThemeConstants.surfaceColor,
                       border: Border.all(color: primaryColor, width: 4),
                       boxShadow: neoShadowSm,
                     ),
@@ -196,7 +180,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
     return RefreshIndicator(
       color: primaryColor,
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeConstants.surfaceColor,
       onRefresh: () async {
         await Future.delayed(const Duration(milliseconds: 800));
       },
@@ -215,9 +199,9 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
               margin: const EdgeInsets.symmetric(vertical: 8),
               decoration: BoxDecoration(
                 color: const Color(0xFFFFDAD6),
-                border: Border.all(color: errorColor, width: 4),
+                border: Border.all(color: quarterFixed, width: 4),
               ),
-              child: const Icon(Icons.delete_forever_outlined, color: errorColor, size: 28),
+              child: const Icon(Icons.delete_forever_outlined, color: quarterFixed, size: 28),
             ),
             confirmDismiss: (_) async {
               return await showDialog<bool>(
@@ -236,7 +220,6 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
                   context,
                   MaterialPageRoute(builder: (_) => DetailScreen(reel: reel)),
                 ),
-                onDelete: () => _confirmDelete(context, reel.id, spaceFont, monoFont),
               ),
             ),
           );
@@ -251,7 +234,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         padding: const EdgeInsets.all(24),
         margin: const EdgeInsets.all(24),
         decoration: BoxDecoration(
-          color: Colors.white,
+          color: AppThemeConstants.surfaceColor,
           border: Border.all(color: primaryColor, width: 4),
           boxShadow: neoShadowSm,
         ),
@@ -283,7 +266,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
 
   Widget _buildBrutalistDialog(BuildContext context, String title, TextStyle spaceFont, TextStyle monoFont) {
     return AlertDialog(
-      backgroundColor: Colors.white,
+      backgroundColor: AppThemeConstants.surfaceColor,
       shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
       titlePadding: const EdgeInsets.all(20),
       contentPadding: const EdgeInsets.symmetric(horizontal: 20),
@@ -292,10 +275,10 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       insetPadding: const EdgeInsets.symmetric(horizontal: 24),
       title: Container(
         padding: const EdgeInsets.all(8),
-        color: Colors.black,
+        color: AppThemeConstants.primaryColor,
         child: Text(
           title,
-          style: spaceFont.copyWith(color: Colors.white, fontSize: 14, fontWeight: FontWeight.bold),
+          style: spaceFont.copyWith(color: AppThemeConstants.surfaceColor, fontSize: 14, fontWeight: FontWeight.bold),
         ),
       ),
       content: Container(
@@ -319,8 +302,8 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           onTap: () => Navigator.pop(context, true),
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
-            color: errorColor,
-            child: Text('DELETE', style: spaceFont.copyWith(color: Colors.white, fontSize: 12, fontWeight: FontWeight.bold)),
+            color: quarterFixed,
+            child: Text('DELETE', style: spaceFont.copyWith(color: AppThemeConstants.surfaceColor, fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ),
       ],
@@ -376,22 +359,17 @@ class _NeoFloatingActionButtonState extends State<NeoFloatingActionButton> {
         decoration: BoxDecoration(
           color: widget.accentColor,
           shape: BoxShape.circle,
-          border: Border.all(color: Colors.black, width: 4),
+          border: Border.all(color: AppThemeConstants.primaryColor, width: 4),
           boxShadow: _isPressed
-              ? const [
-                  BoxShadow(
-                    color: Colors.black,
+              ? [
+                  const BoxShadow(
+                    color: AppThemeConstants.primaryColor,
                     offset: Offset(2, 2),
                   )
                 ]
-              : const [
-                  BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(6, 6),
-                  )
-                ],
+              : AppThemeConstants.neoShadow,
         ),
-        child: const Icon(Icons.add, color: Colors.black, size: 32),
+        child: const Icon(Icons.add, color: AppThemeConstants.primaryColor, size: 32),
       ),
     );
   }
@@ -413,7 +391,7 @@ class _DotGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black.withOpacity(0.06)
+      ..color = AppThemeConstants.primaryColor.withValues(alpha: 0.06)
       ..style = PaintingStyle.fill;
 
     const double spacing = 20.0;

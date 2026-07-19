@@ -1,12 +1,11 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
 import 'dart:async';
 import 'providers/reel_provider.dart';
-import 'screens/home_screen.dart';
-import 'screens/onboarding_screen.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+import 'constants/app_theme.dart';
 import 'screens/add_url_screen.dart';
+import 'screens/share_loading_screen.dart';
 import 'screens/splash_screen.dart';
 
 class KeepRemindApp extends StatefulWidget {
@@ -20,13 +19,13 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
   StreamSubscription? _shareSubscription;
   String? _pendingUrl;
-  bool _onboardingDone = false;
-  bool _checkingOnboarding = true;
+  bool _shareIntentChecked = false;
+  bool _shareFlowActive = false;
+  bool _shareLoadingRouteVisible = false;
 
   @override
   void initState() {
     super.initState();
-    _checkOnboarding();
     _handleShareIntents();
   }
 
@@ -36,35 +35,38 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
     super.dispose();
   }
 
-  // Check if onboarding was already completed
-  Future<void> _checkOnboarding() async {
-    final prefs = await SharedPreferences.getInstance();
-    setState(() {
-      _onboardingDone = prefs.getBool('onboarding_done') ?? false;
-      _checkingOnboarding = false;
-    });
-  }
-
   void _handleShareIntents() {
     ReceiveSharingIntent.instance.getInitialMedia().then((media) {
       if (media.isNotEmpty) {
         final url = _extractUrl(media);
         if (url != null && url.isNotEmpty) {
-          _pendingUrl = url;
+          setState(() {
+            _pendingUrl = url;
+            _shareFlowActive = true;
+            _shareIntentChecked = true;
+          });
           _tryNavigate(url);
+        } else {
+          setState(() {
+            _shareIntentChecked = true;
+          });
         }
         ReceiveSharingIntent.instance.reset();
+      } else {
+        setState(() {
+          _shareIntentChecked = true;
+        });
       }
     }).catchError((e) {
       debugPrint('Error getting initial media: $e');
     });
 
-    _shareSubscription =
-        ReceiveSharingIntent.instance.getMediaStream().listen(
+    _shareSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
       (media) {
         if (media.isNotEmpty) {
           final url = _extractUrl(media);
           if (url != null && url.isNotEmpty) {
+            _showShareLoading(url);
             _tryNavigate(url);
           }
         }
@@ -83,28 +85,56 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
     return match?.group(0) ?? text;
   }
 
-  void _tryNavigate(String url) {
+  void _showShareLoading(String? url) {
+    if (!mounted) return;
+
+    setState(() {
+      _pendingUrl = url;
+      _shareFlowActive = true;
+      _shareIntentChecked = true;
+    });
+
+    if (_shareLoadingRouteVisible) return;
+
     WidgetsBinding.instance.addPostFrameCallback((_) {
       final nav = _navigatorKey.currentState;
-      if (nav != null) {
-        _pendingUrl = null;
+      if (nav != null && mounted) {
+        setState(() {
+          _shareLoadingRouteVisible = true;
+        });
         nav.push(
           MaterialPageRoute(
-            builder: (_) => AddUrlScreen(initialUrl: url),
+            builder: (_) => ShareLoadingScreen(initialUrl: url),
+            fullscreenDialog: true,
           ),
         );
       }
     });
   }
 
+  void _tryNavigate(String url) {
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      Future.delayed(const Duration(milliseconds: 350), () {
+        if (!mounted) return;
+
+        final nav = _navigatorKey.currentState;
+        if (nav != null) {
+          setState(() {
+            _shareLoadingRouteVisible = false;
+          });
+          nav.pushReplacement(
+            MaterialPageRoute(
+              builder: (_) => AddUrlScreen(initialUrl: url),
+            ),
+          );
+        }
+      });
+    });
+  }
+
   @override
   Widget build(BuildContext context) {
-    if (_pendingUrl != null) {
-      final url = _pendingUrl!;
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        if (_pendingUrl != null) _tryNavigate(url);
-      });
-    }
+    final shouldShowShareLoading = _shareFlowActive || !_shareIntentChecked;
 
     return ChangeNotifierProvider(
       create: (_) => ReelProvider()..listenToReels(),
@@ -112,21 +142,10 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
         navigatorKey: _navigatorKey,
         title: 'KeepRemind',
         debugShowCheckedModeBanner: false,
-        theme: ThemeData(
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.deepPurple),
-          useMaterial3: true,
-        ),
-        // Show splash while checking, then onboarding or home
-        home: _checkingOnboarding
-            ? const Scaffold(
-                body: Center(child: CircularProgressIndicator()),
-              )
-            : _onboardingDone
-                ? const HomeScreen()
-                : const OnboardingScreen(),
-
-        // home: OnboardingScreen()
-        
+        theme: AppThemeConstants.buildTheme(),
+        home: shouldShowShareLoading
+            ? ShareLoadingScreen(initialUrl: _pendingUrl)
+            : const SplashScreen(),
       ),
     );
   }

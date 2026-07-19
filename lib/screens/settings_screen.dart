@@ -497,9 +497,13 @@ class _NeoBrutalistSynchronizeButtonState extends State<NeoBrutalistSynchronizeB
       onTapCancel: () => setState(() => _isPressed = false),
       child: AnimatedContainer(
         duration: const Duration(milliseconds: 60),
-        transform: _isPressed
-            ? Matrix4.translationValues(4, 4, 0)
-            : Matrix4.translationValues(0, 0, 0),
+        width: double.infinity,
+        height: 72,
+        transform: Matrix4.translationValues(
+          _isPressed ? 4 : 0,
+          _isPressed ? 4 : 0,
+          0,
+        ),
         decoration: BoxDecoration(
           color: widget.backgroundColor,
           border: Border.all(color: Colors.black, width: 4),
@@ -508,40 +512,40 @@ class _NeoBrutalistSynchronizeButtonState extends State<NeoBrutalistSynchronizeB
                   BoxShadow(
                     color: Colors.black,
                     offset: Offset(2, 2),
-                  )
+                  ),
                 ]
               : const [
                   BoxShadow(
                     color: Colors.black,
                     offset: Offset(6, 6),
-                  )
+                  ),
                 ],
         ),
-        child: Padding(
-          padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 14),
-          child: widget.isLoading
-              ? const Center(
-                  child: SizedBox(
-                    width: 28,
-                    height: 28,
-                    child: CircularProgressIndicator(strokeWidth: 3, color: Colors.black),
-                  ),
-                )
-              : Row(
-                  mainAxisAlignment: MainAxisAlignment.center,
-                  children: [
-                    Text(
-                      'SYNCHRONIZE',
-                      style: widget.displayFont.copyWith(
-                        fontSize: 28,
-                        letterSpacing: 2,
-                        color: Colors.black,
+        child: Center(
+          child: AnimatedSwitcher(
+            duration: const Duration(milliseconds: 200),
+            child: Row(
+                    key: const ValueKey('text'),
+                    mainAxisSize: MainAxisSize.min,
+                    mainAxisAlignment: MainAxisAlignment.center,
+                    children: [
+                      Text(
+                        'SYNCHRONIZE',
+                        style: widget.displayFont.copyWith(
+                          fontSize: 28,
+                          letterSpacing: 2,
+                          color: Colors.black,
+                        ),
                       ),
-                    ),
-                    const SizedBox(width: 12),
-                    const Icon(Icons.bolt, color: Colors.black, size: 30),
-                  ],
-                ),
+                      const SizedBox(width: 12),
+                      const Icon(
+                        Icons.bolt,
+                        color: Colors.black,
+                        size: 30,
+                      ),
+                    ],
+                  ),
+          ),
         ),
       ),
     );

@@ -13,9 +13,13 @@ class ReelProvider extends ChangeNotifier {
   final NotificationService _notificationService = NotificationService();
   final AiService _aiService = AiService();
 
+  StreamSubscription<List<ReelItem>>? _reelsSubscription;
+  Completer<void>? _initialDataCompleter;
+
   List<ReelItem> _reels = [];
   bool _isLoading = false;
   String? _errorMessage;
+  bool _hasLoadedInitialData = false;
 
   List<ReelItem> get reels => _reels;
   bool get isLoading => _isLoading;
@@ -27,10 +31,41 @@ class ReelProvider extends ChangeNotifier {
       _reels.where((r) => r.isReviewed).toList();
 
   void listenToReels() {
-    _firestoreService.getReels().listen((reels) {
+    _reelsSubscription?.cancel();
+
+    _reelsSubscription = _firestoreService.getReels().listen((reels) {
       _reels = reels;
+      if (!_hasLoadedInitialData) {
+        _hasLoadedInitialData = true;
+        _initialDataCompleter?.complete();
+        _initialDataCompleter = null;
+      }
       notifyListeners();
+    }, onError: (error) {
+      debugPrint('Reel stream error: $error');
+      if (!_hasLoadedInitialData) {
+        _hasLoadedInitialData = true;
+        _initialDataCompleter?.complete();
+        _initialDataCompleter = null;
+      }
     });
+  }
+
+  Future<void> ensureInitialDataLoaded({Duration timeout = const Duration(seconds: 6)}) async {
+    if (_hasLoadedInitialData) return;
+
+    final completer = Completer<void>();
+    _initialDataCompleter = completer;
+
+    try {
+      await completer.future.timeout(timeout);
+    } on TimeoutException {
+      debugPrint('Timed out waiting for initial reel data.');
+    } finally {
+      if (_initialDataCompleter == completer) {
+        _initialDataCompleter = null;
+      }
+    }
   }
 
   // Save flow with background AI generation
@@ -144,9 +179,12 @@ class ReelProvider extends ChangeNotifier {
     }
   }
 
-  Future<void> markAsReviewed(String reelId) async {
+  Future<void> toggleReviewed(ReelItem reel) async {
     try {
-      await _firestoreService.markAsReviewed(reelId);
+      await _firestoreService.setReviewed(
+        reel.id,
+        !reel.isReviewed,
+      );
     } catch (e) {
       _errorMessage = 'Could not update reel.';
       notifyListeners();

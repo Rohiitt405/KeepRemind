@@ -53,10 +53,11 @@ class FirestoreService {
     await collection.doc(reelId).update(data);
   }
 
-  // Mark a reel as reviewed
-  Future<void> markAsReviewed(String reelId) async {
+  Future<void> setReviewed(String reelId, bool reviewed) async {
     final collection = await _reelsCollection();
-    await collection.doc(reelId).update({'isReviewed': true});
+    await collection.doc(reelId).update({
+      'isReviewed': reviewed,
+    });
   }
 
   // Delete a reel

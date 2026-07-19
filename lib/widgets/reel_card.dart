@@ -6,16 +6,13 @@ import '../models/reel_item.dart';
 class ReelCard extends StatelessWidget {
   final ReelItem reel;
   final VoidCallback onTap;
-  final VoidCallback onDelete;
 
   const ReelCard({
     super.key,
     required this.reel,
     required this.onTap,
-    required this.onDelete,
   });
 
-  // Neo-Brutalist Global Style System Design Tokens
   static const Color primaryColor = Colors.black;
   static const Color surfaceWhite = Colors.white;
   static const Color surfaceContainerLow = Color(0xFFF3F3F3);
@@ -36,7 +33,6 @@ class ReelCard extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    final displayFont = GoogleFonts.anton();
     final monoFont = GoogleFonts.jetBrainsMono();
     final spaceFont = GoogleFonts.spaceGrotesk();
 

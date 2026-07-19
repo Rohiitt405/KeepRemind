@@ -3,6 +3,7 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import '../constants/app_theme.dart';
 import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -14,14 +15,14 @@ class OnboardingScreen extends StatefulWidget {
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
   // Neo-Brutalist Color Palette Mapping
-  static const Color primaryColor = Colors.black;
-  static const Color backgroundColor = Color(0xFFF9F9F9);
-  static const Color surfaceContainerLow = Color(0xFFF3F3F3);
-  static const Color tertiaryFixed = Color(0xFF72FF70);
-  static const Color onTertiaryFixed = Color(0xFF002203);
-  static const Color secondaryFixed = Color.fromARGB(255, 244, 244, 0);
-  static const Color errorColor = Color.fromARGB(255, 213, 10, 10);
-  static const Color onSurfaceVariant = Color(0xFF4C4546);
+  static const Color primaryColor = AppThemeConstants.primaryColor;
+  static const Color backgroundColor = AppThemeConstants.backgroundColor;
+  static const Color surfaceContainerLow = AppThemeConstants.surfaceContainerLow;
+  static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
+  static const Color onTertiaryFixed = AppThemeConstants.onTertiaryFixed;
+  static const Color secondaryFixed = AppThemeConstants.secondaryFixed;
+  static const Color quarterFixed = AppThemeConstants.quarterFixed;
+  static const Color onSurfaceVariant = AppThemeConstants.onSurfaceVariant;
 
   late Timer _typewriterTimer;
   final String _headline1 = "STOP REWATCHING.";
@@ -43,23 +44,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   bool _showCursor = true;
 
   // Custom Neo-Brutalist Box Shadow Vectors
-  List<BoxShadow> get neoShadow => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(6, 6),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+  List<BoxShadow> get neoShadow => AppThemeConstants.neoShadow;
 
-  List<BoxShadow> get neoShadowSm => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(4, 4),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+  List<BoxShadow> get neoShadowSm => AppThemeConstants.neoShadowSm;
 
   Future<void> _finish(BuildContext context) async {
     if (_isInitializing) return;
@@ -242,7 +229,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         '[ SYSTEM_ALERT ]',
                                         style: monoFont.copyWith(
                                           fontSize: 14,
-                                          color: errorColor,
+                                          color: quarterFixed,
                                           fontWeight: FontWeight.bold,
                                           letterSpacing: 0.5,
                                         ),
@@ -289,7 +276,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                               Container(
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppThemeConstants.surfaceColor,
                                   border: Border.all(color: primaryColor, width: 6),
                                   boxShadow: neoShadow,
                                 ),
@@ -305,7 +292,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                             'VISUAL_PROCESSOR_V1.0',
                                             style: monoFont.copyWith(
                                               fontSize: 14,
-                                              color: Colors.white,
+                                              color: AppThemeConstants.surfaceColor,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
@@ -373,7 +360,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                             child: Container(
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
-                                                color: const Color(0xFFE7E700).withValues(alpha: 10),
+                                                color: AppThemeConstants.secondaryFixed.withValues(alpha: 0.04),
                                                 border: Border.all(color: primaryColor, width: 2),
                                                 boxShadow: neoShadowSm,
                                               ),
@@ -425,7 +412,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Container(
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
-                                  color: Colors.white,
+                                  color: AppThemeConstants.surfaceColor,
                                   border: Border.all(color: primaryColor, width: 4),
                                   boxShadow: neoShadow,
                                 ),
@@ -555,7 +542,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   _buildGridCard(
                                     title: 'INSTANT SYNC',
                                     description: 'Auto-ingest from Instagram & TikTok.',
-                                    indicatorColor: errorColor,
+                                    indicatorColor: quarterFixed,
                                     progress: 0.75,
                                     monoFont: monoFont,
                                   ),
@@ -596,7 +583,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     return Container(
       padding: const EdgeInsets.all(16),
       decoration: BoxDecoration(
-        color: Colors.white,
+        color: AppThemeConstants.surfaceColor,
         border: Border.all(color: primaryColor, width: 4),
         boxShadow: neoShadowSm,
       ),
@@ -633,7 +620,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           const SizedBox(height: 8),
           Container(
             height: 6,
-            color: const Color(0xFFE2E2E2),
+            color: AppThemeConstants.surfaceContainerLow,
             width: double.infinity,
             alignment: Alignment.centerLeft,
             child: FractionallySizedBox(
@@ -680,21 +667,16 @@ class _NeoBrutalistButtonState extends State<NeoBrutalistButton> {
             ? Matrix4.translationValues(4, 4, 0)
             : Matrix4.translationValues(0, 0, 0),
         decoration: BoxDecoration(
-          color: const Color(0xFFEAEA00),
-          border: Border.all(color: Colors.black, width: 6),
+          color: AppThemeConstants.secondaryFixed,
+          border: Border.all(color: AppThemeConstants.primaryColor, width: 6),
           boxShadow: _isPressed
-              ? const [
-                  BoxShadow(
-                    color: Colors.black,
+              ? [
+                  const BoxShadow(
+                    color: AppThemeConstants.primaryColor,
                     offset: Offset(2, 2),
                   )
                 ]
-              : const [
-                  BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(6, 6),
-                  )
-                ],
+              : AppThemeConstants.neoShadow,
         ),
         child: widget.child,
       ),

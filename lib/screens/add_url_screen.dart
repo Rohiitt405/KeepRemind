@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import '../constants/app_theme.dart';
 import '../providers/reel_provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -20,22 +21,15 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
   bool _pressed = false;
 
   // Neo-Brutalist Color Tokens
-  static const Color primaryColor = Colors.black;
-  static const Color backgroundColor = Color(0xFFF9F9F9);
-  static const Color surfaceContainerLow = Color(0xFFF3F3F3);
-  static const Color tertiaryFixed = Color(0xFF72FF70);
-  static const Color secondaryFixed = Color(0xFFEAEA00);
-  static const Color errorColor = Color(0xFFBA1A1A);
-  static const Color onSurfaceVariant = Color(0xFF4C4546);
+  static const Color primaryColor = AppThemeConstants.primaryColor;
+  static const Color backgroundColor = AppThemeConstants.backgroundColor;
+  static const Color surfaceContainerLow = AppThemeConstants.surfaceContainerLow;
+  static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
+  static const Color secondaryFixed = AppThemeConstants.secondaryFixed;
+  static const Color errorColor = AppThemeConstants.errorColor;
+  static const Color onSurfaceVariant = AppThemeConstants.onSurfaceVariant;
 
-  List<BoxShadow> get neoShadowSm => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(4, 4),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+  List<BoxShadow> get neoShadowSm => AppThemeConstants.neoShadowSm;
 
   @override
   void initState() {
@@ -67,6 +61,8 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
   Future<void> _saveReel() async {
     if (!_formKey.currentState!.validate()) return;
 
+    await Future.delayed(const Duration(milliseconds: 120));
+
     final url = _urlController.text.trim();
     final provider = context.read<ReelProvider>();
 
@@ -82,10 +78,10 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
           content: Text(
             'Reel saved successfully! 🎉',
             style: GoogleFonts.jetBrainsMono(
-              textStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(color: AppThemeConstants.surfaceColor, fontWeight: FontWeight.bold),
             ),
           ),
-          backgroundColor: Colors.green,
+          backgroundColor: AppThemeConstants.successColor,
         ),
       );
       Navigator.pop(context);
@@ -106,7 +102,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
       ),
       child: Scaffold(
         appBar: AppBar(
-          backgroundColor: Colors.white,
+          backgroundColor: AppThemeConstants.surfaceColor,
           elevation: 0,
           scrolledUnderElevation: 0,
           automaticallyImplyLeading: false,
@@ -119,7 +115,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                 onTap: () => Navigator.pop(context),
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2)),
+                  decoration: BoxDecoration(border: Border.all(color: AppThemeConstants.primaryColor, width: 2)),
                   child: const Icon(Icons.keyboard_return, color: primaryColor),
                 ),
               ),
@@ -153,7 +149,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                     children: [
                       Container(
                         decoration: BoxDecoration(
-                          color: Colors.white,
+                          color: AppThemeConstants.surfaceColor,
                           border: Border.all(color: primaryColor, width: 4),
                           boxShadow: neoShadowSm,
                         ),
@@ -238,7 +234,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                       if (provider.errorMessage != null) ...[
                         Container(
                           padding: const EdgeInsets.all(16),
-                          color: Colors.black,
+                          color: AppThemeConstants.primaryColor,
                           child: Text(
                             '>> ERROR_LOG: ${provider.errorMessage}',
                             style: monoFont.copyWith(color: const Color(0xFFFFDAD6), fontSize: 13),
@@ -247,16 +243,22 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                         const SizedBox(height: 20),
                       ],
 
-                      GestureDetector(
-                        onTapDown: (_) => setState(() => _pressed = true),
-                        onTapUp: (_) => setState(() => _pressed = false),
-                        onTapCancel: () => setState(() => _pressed = false),
-
+                      Listener(
+                        onPointerDown: (_) {
+                          if (!provider.isLoading) {
+                            setState(() => _pressed = true);
+                          }
+                        },
+                        onPointerUp: (_) {
+                          setState(() => _pressed = false);
+                        },
+                        onPointerCancel: (_) {
+                          setState(() => _pressed = false);
+                        },
                         child: InkWell(
                           onTap: provider.isLoading ? null : _saveReel,
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
-
                           child: AnimatedContainer(
                             duration: const Duration(milliseconds: 120),
                             transform: Matrix4.translationValues(
@@ -264,37 +266,25 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                               _pressed ? 4 : 0,
                               0,
                             ),
-
                             padding: const EdgeInsets.symmetric(
                               horizontal: 20,
                               vertical: 10,
                             ),
-
                             decoration: BoxDecoration(
                               color: secondaryFixed,
                               border: Border.all(
                                 color: primaryColor,
                                 width: 2,
                               ),
-
-                              boxShadow: _pressed
-                                  ? []
-                                  : [
-                                      const BoxShadow(
-                                        color: Colors.black,
-                                        offset: Offset(4, 4),
-                                        blurRadius: 0,
-                                      ),
-                                    ],
+                              boxShadow: _pressed ? [] : AppThemeConstants.neoShadowSm,
                             ),
-
                             child: provider.isLoading
                                 ? const Center(
                                     child: SizedBox(
                                       width: 24,
                                       height: 24,
                                       child: CircularProgressIndicator(
-                                        color: Colors.black,
+                                        color: AppThemeConstants.primaryColor,
                                         strokeWidth: 3,
                                       ),
                                     ),
@@ -322,13 +312,13 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                           ),
                         ),
                       ),
-                      const SizedBox(height: 40),
+                      const SizedBox(height: 30),
 
                       Text(
                         '// OPERATION_ON_FETCH_DATA',
                         style: monoFont.copyWith(fontSize: 12, fontWeight: FontWeight.bold, color: onSurfaceVariant),
                       ),
-                      const SizedBox(height: 16),
+                      const SizedBox(height: 8),
                       
                       _buildPipelineStep('META_EXTRACTION', 'Title and thumbnail are extracted from the Url', tertiaryFixed, monoFont),
                       _buildPipelineStep('AI_MEMORY', 'AI generate 3-5 tags, and memory', secondaryFixed, monoFont),
@@ -345,40 +335,13 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
     );
   }
 
-  Widget _buildStatusIndicator(String label, String value, Color color, TextStyle monoFont, {bool textInvert = false}) {
-    return Expanded(
-      child: Container(
-        padding: const EdgeInsets.all(8),
-        decoration: BoxDecoration(
-          color: Colors.white,
-          border: Border.all(color: primaryColor, width: 3),
-        ),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            Text(label, style: monoFont.copyWith(fontSize: 9, color: onSurfaceVariant, fontWeight: FontWeight.bold)),
-            const SizedBox(height: 4),
-            Container(
-              padding: const EdgeInsets.symmetric(horizontal: 4, vertical: 2),
-              color: color,
-              child: Text(
-                value,
-                style: monoFont.copyWith(fontSize: 12, fontWeight: FontWeight.bold, color: textInvert ? Colors.white : Colors.black),
-              ),
-            )
-          ],
-        ),
-      ),
-    );
-  }
-
   Widget _buildPipelineStep(String header, String body, Color stepColor, TextStyle monoFont) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
-      decoration: const BoxDecoration(
-        color: Colors.white,
-        border: Border(left: BorderSide(color: primaryColor, width: 10), bottom: BorderSide(color: primaryColor, width: 2)),
+      decoration: BoxDecoration(
+        color: AppThemeConstants.surfaceColor,
+        border: const Border(left: BorderSide(color: primaryColor, width: 10), bottom: BorderSide(color: primaryColor, width: 2)),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
@@ -420,7 +383,7 @@ class _DotGridPainter extends CustomPainter {
   @override
   void paint(Canvas canvas, Size size) {
     final paint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.06)
+      ..color = AppThemeConstants.primaryColor.withValues(alpha: 0.06)
       ..style = PaintingStyle.fill;
 
     const double spacing = 20.0;
