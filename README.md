@@ -4,18 +4,37 @@
 
 **Release:** v1.0.0 (Build 1)
 
-[⬇️ Download APK](https://github.com/Rohiitt405/Volt/releases/latest)
+[⬇️ Download APK](https://github.com/Rohiitt405/KeepRemind/releases/tag/v1.0.0)
 
 ---
+## 📸 App Screenshots
 
-## 📸 Screenshots & Banner
+<details>
+<summary><strong>Click to view app screenshots</strong> 📱</summary>
 
-> Placeholder section for app screenshots and banner artwork. Add images here later when assets are ready.
+<br>
 
-- **Banner:** Placeholder banner image — add a promotional banner here.
-- **Screenshots:** Placeholder screenshots — add app-screen captures here.
-- **Alt text:** Use descriptive alt text for accessibility when images are added.
+<p align="center">
+  <img src="assets/screenshots/Onboard.jpg" width="700" alt="Onboarding Screen">
+</p>
 
+<p align="center">
+  <img src="assets/screenshots/Home.jpg" width="700" alt="Home Screen">
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/Detail.jpg" width="700" alt="Detail Screen">
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/Reminder.jpg" width="700" alt="Reminder Screen">
+</p>
+
+<p align="center">
+  <img src="assets/screenshots/Add.jpg" width="700" alt="Add Reel Screen">
+</p>
+
+</details>
 ---
 
 ## 📱 Features
