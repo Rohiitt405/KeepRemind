@@ -3,6 +3,7 @@ import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_theme.dart';
 import '../providers/reel_provider.dart';
+import 'home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 class AddUrlScreen extends StatefulWidget {
@@ -63,17 +64,20 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
 
     await Future.delayed(const Duration(milliseconds: 120));
 
+    if (!mounted) return;
+
     final url = _urlController.text.trim();
     final provider = context.read<ReelProvider>();
-
     await provider.saveReelFromUrl(url);
 
-    if (mounted) {
-      setState(() => _pressed = false);
-    }
+    if (!mounted) return;
 
-    if (context.mounted && provider.errorMessage == null) {
-      ScaffoldMessenger.of(context).showSnackBar(
+    setState(() => _pressed = false);
+
+    if (provider.errorMessage == null) {
+      final navigator = Navigator.of(context);
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.showSnackBar(
         SnackBar(
           content: Text(
             'Reel saved successfully! 🎉',
@@ -84,8 +88,17 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
           backgroundColor: AppThemeConstants.successColor,
         ),
       );
-      Navigator.pop(context);
+      _returnToHome(navigator);
     }
+  }
+
+  void _returnToHome(NavigatorState navigator) {
+    if (!mounted) return;
+
+    navigator.pushAndRemoveUntil(
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
+      (route) => false,
+    );
   }
 
   @override
@@ -112,7 +125,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
           title: Row(
             children: [
               GestureDetector(
-                onTap: () => Navigator.pop(context),
+                onTap: () => _returnToHome(Navigator.of(context)),
                 child: Container(
                   padding: const EdgeInsets.all(4),
                   decoration: BoxDecoration(border: Border.all(color: AppThemeConstants.primaryColor, width: 2)),

@@ -26,8 +26,8 @@ class MetadataService {
   }
 
   bool isValidUrl(String url) {
-    final Platform = _detectPlatform(url);
-    return Platform == 'instagram' || Platform == 'youtube';
+    final platform = _detectPlatform(url);
+    return platform == 'instagram' || platform == 'youtube';
   }
 
   Future<MetadataResult> fetchMetadata(String url) async {

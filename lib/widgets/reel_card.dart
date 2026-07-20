@@ -1,6 +1,7 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:project/constants/app_theme.dart';
 import '../models/reel_item.dart';
 
 class ReelCard extends StatelessWidget {
@@ -13,14 +14,13 @@ class ReelCard extends StatelessWidget {
     required this.onTap,
   });
 
-  static const Color primaryColor = Colors.black;
-  static const Color surfaceWhite = Colors.white;
-  static const Color surfaceContainerLow = Color(0xFFF3F3F3);
-  static const Color tertiaryFixedDim = Color(0xFF00E639);
-  static const Color tertiaryFixed = Color(0xFF72FF70);
-  static const Color secondaryFixed = Color(0xFFEAEA00);
-  static const Color errorColor = Color(0xFFBA1A1A);
-  static const Color onSurfaceVariant = Color(0xFF4C4546);
+  static const Color primaryColor = AppThemeConstants.primaryColor;
+  static const Color surfaceWhite = AppThemeConstants.surfaceColor;
+  static const Color surfaceContainerLow = AppThemeConstants.surfaceContainerLow;
+  static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
+  static const Color secondaryFixed = AppThemeConstants.secondaryFixed;
+  static const Color quarterFixed = AppThemeConstants.quarterFixed;
+  static const Color onSurfaceVariant = AppThemeConstants.onSurfaceVariant;
 
   List<BoxShadow> get neoShadowSm => const [
         BoxShadow(
@@ -36,7 +36,6 @@ class ReelCard extends StatelessWidget {
     final monoFont = GoogleFonts.jetBrainsMono();
     final spaceFont = GoogleFonts.spaceGrotesk();
 
-    // Dynamically assign platform accent tags based on web neon system rules
     final bool isInstagram = reel.platform == 'instagram';
     final Color platformAccent = isInstagram ? tertiaryFixed : secondaryFixed;
 
@@ -53,7 +52,6 @@ class ReelCard extends StatelessWidget {
           child: Row(
             crossAxisAlignment: CrossAxisAlignment.start,
             children: [
-              // --- 1. Industrial Framed Grayscale Thumbnail ---
               Container(
                 width: 80,
                 height: 110,
@@ -73,7 +71,6 @@ class ReelCard extends StatelessWidget {
                       ]), // Matches the technical web app's layout rules natively
                       child: _buildThumbnail(),
                     ),
-                    // High-contrast identity neon border bracket decoration
                     Positioned(
                       top: 0,
                       left: 0,
@@ -94,7 +91,6 @@ class ReelCard extends StatelessWidget {
               ),
               const SizedBox(width: 16),
 
-              // --- 2. Meta Content Layout Core ---
               Expanded(
                 child: Column(
                   crossAxisAlignment: CrossAxisAlignment.start,
@@ -102,7 +98,6 @@ class ReelCard extends StatelessWidget {
                     Row(
                       crossAxisAlignment: CrossAxisAlignment.start,
                       children: [
-                        // Technical Uppercase Dynamic Title Layout
                         Expanded(
                           child: Text(
                             reel.title.isNotEmpty ? reel.title.toUpperCase() : 'UNTITLED_STREAM',
@@ -121,11 +116,10 @@ class ReelCard extends StatelessWidget {
                     ),
                     const SizedBox(height: 4),
                     
-                    // Metadata Metrics Timeline Row
                     Row(
                       children: [
                         Text(
-                          'SAVED_AT // ${_formatDate(reel.savedAt)}'.toUpperCase(),
+                          'SAVED_AT ${_formatDate(reel.savedAt)}'.toUpperCase(),
                           style: spaceFont.copyWith(
                             fontSize: 10,
                             fontWeight: FontWeight.bold,
@@ -137,14 +131,13 @@ class ReelCard extends StatelessWidget {
                         Expanded(
                           child: Container(
                             height: 2,
-                            color: primaryColor.withOpacity(0.15),
+                            color: primaryColor.withValues(alpha: 0.15),
                           ),
                         ),
                       ],
                     ),
-                    const SizedBox(height: 10),
+                    const SizedBox(height: 6),
 
-                    // --- 3. Brutalist Labeled Context Block Segment ---
                     Container(
                       width: double.infinity,
                       decoration: const BoxDecoration(
@@ -243,7 +236,7 @@ class ReelCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: isInstagram ? tertiaryFixed : errorColor,
+        color: isInstagram ? tertiaryFixed : quarterFixed,
         border: Border.all(color: primaryColor, width: 2),
       ),
       child: Text(
@@ -251,7 +244,7 @@ class ReelCard extends StatelessWidget {
         style: spaceFont.copyWith(
           fontSize: 8,
           fontWeight: FontWeight.w900,
-          color: isInstagram ? primaryColor : surfaceWhite,
+          color: primaryColor,
           letterSpacing: 0.5,
         ),
       ),

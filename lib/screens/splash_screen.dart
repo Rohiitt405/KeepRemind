@@ -24,7 +24,7 @@ class _SplashScreenState extends State<SplashScreen> {
   static const Color backgroundColor = AppThemeConstants.backgroundColor;
   static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
   static const Color secondaryFixed = AppThemeConstants.secondaryFixed;
-  static const Color errorColor = AppThemeConstants.errorColor;
+  static const Color quarterFixed = AppThemeConstants.quarterFixed;
 
   String _systemStatus = 'INITIALIZING_CORE...';
   double _loadProgress = 0.0;
@@ -47,7 +47,7 @@ class _SplashScreenState extends State<SplashScreen> {
 
   void _startBootSequence() {
     // Artificial pipeline staging increments to mimic terminal execution load array strings
-    const duration = Duration(milliseconds: 60);
+    const duration = Duration(milliseconds: 40);
     _progressTimer = Timer.periodic(duration, (timer) {
       if (!mounted) return;
       
@@ -141,7 +141,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               width: 14,
                               height: 14,
                               decoration: BoxDecoration(
-                                color: errorColor,
+                                color: quarterFixed,
                                 border: Border.all(color: primaryColor, width: 2),
                               ),
                             ),
@@ -169,7 +169,7 @@ class _SplashScreenState extends State<SplashScreen> {
                         
                         // Bold Brand Core Title Header
                         Text(
-                          'REEL REMIND',
+                          'KEEP REMIND',
                           style: displayFont.copyWith(
                             fontSize: 44,
                             color: primaryColor,
@@ -184,7 +184,7 @@ class _SplashScreenState extends State<SplashScreen> {
                           padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
                           color: primaryColor,
                           child: Text(
-                            'V4.0.2 // NEON',
+                            'V1.0.0',
                             style: monoFont.copyWith(
                               fontSize: 11,
                               fontWeight: FontWeight.bold,

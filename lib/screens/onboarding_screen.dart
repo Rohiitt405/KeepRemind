@@ -48,7 +48,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
   List<BoxShadow> get neoShadowSm => AppThemeConstants.neoShadowSm;
 
-  Future<void> _finish(BuildContext context) async {
+  Future<void> _finish() async {
     if (_isInitializing) return;
 
     setState(() {
@@ -200,7 +200,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                   title: Padding(
                     padding: const EdgeInsets.only(top: 12.0),
                     child: Text(
-                      'REEL REMIND',
+                      'KEEP REMIND',
                       style: displayFont.copyWith(
                         fontSize: 28,
                         color: primaryColor,
@@ -360,7 +360,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                             child: Container(
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
-                                                color: AppThemeConstants.secondaryFixed.withValues(alpha: 0.04),
+                                                color: secondaryFixed,
                                                 border: Border.all(color: primaryColor, width: 2),
                                                 boxShadow: neoShadowSm,
                                               ),
@@ -480,7 +480,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
                               // 5. Brutalist Mechanical Interactive Action CTA Button
                               NeoBrutalistButton(
-                                onPressed: () => _finish(context),
+                                onPressed: _finish,
                                 child: Padding(
                                   padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
                                   child: Row(

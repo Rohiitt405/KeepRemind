@@ -294,7 +294,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
           child: Container(
             padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
             decoration: BoxDecoration(border: Border.all(color: primaryColor, width: 2)),
-            child: Text('Cancel', style: spaceFont.copyWith(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold)),
+            child: Text('CANCEL', style: spaceFont.copyWith(color: primaryColor, fontSize: 12, fontWeight: FontWeight.bold)),
           ),
         ),
         const SizedBox(width: 8),
@@ -309,19 +309,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
       ],
     );
   }
-
-  Future<void> _confirmDelete(BuildContext context, String reelId, TextStyle spaceFont, TextStyle monoFont) async {
-    final confirmed = await showDialog<bool>(
-      context: context,
-      builder: (ctx) => _buildBrutalistDialog(ctx, 'DELETE RECORD?', spaceFont, monoFont),
-    );
-
-    if (confirmed == true) {
-      if (mounted) context.read<ReelProvider>().deleteReel(reelId);
-    }
-  }
 }
-
 
 class NeoFloatingActionButton extends StatefulWidget {
   final VoidCallback onPressed;

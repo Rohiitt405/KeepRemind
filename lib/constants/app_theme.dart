@@ -37,7 +37,6 @@ class AppThemeConstants {
   static ThemeData buildTheme() {
     final colorScheme = ColorScheme.fromSeed(
       seedColor: primaryColor,
-      background: backgroundColor,
       surface: surfaceColor,
       brightness: Brightness.light,
     );

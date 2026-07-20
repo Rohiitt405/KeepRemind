@@ -2,6 +2,20 @@
 
 **KeepRemind** is a Flutter-based mobile application that helps users save, organize, and remember short-form videos (reels) from Instagram and YouTube with AI-powered memory insights and smart reminders.
 
+**Release:** v1.0.0 (Build 1)
+
+[⬇️ Download APK](https://github.com/Rohiitt405/Volt/releases/latest)
+
+---
+
+## 📸 Screenshots & Banner
+
+> Placeholder section for app screenshots and banner artwork. Add images here later when assets are ready.
+
+- **Banner:** Placeholder banner image — add a promotional banner here.
+- **Screenshots:** Placeholder screenshots — add app-screen captures here.
+- **Alt text:** Use descriptive alt text for accessibility when images are added.
+
 ---
 
 ## 📱 Features

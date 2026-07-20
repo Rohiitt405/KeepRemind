@@ -115,7 +115,6 @@ class ReelProvider extends ChangeNotifier {
         minute: settings['minute']!,
       );
 
-      // Step 4: Generate AI memory in background until it succeeds.
       unawaited(_generateAiForReel(savedReelId, metadata.title, metadata.caption));
     } catch (e, stackTrace) {
       debugPrint('SAVE REEL ERROR: $e');
