@@ -5,6 +5,7 @@ class SettingsService {
   static const String _reminderDayKey = 'reminder_day';
   static const String _reminderHourKey = 'reminder_hour';
   static const String _reminderMinuteKey = 'reminder_minute';
+  static const String _lastUpdateCheckKey = 'last_update_check';
 
   Future<void> saveReminderSettings({
     required String type, // 'daily' or 'weekly'
@@ -27,5 +28,35 @@ class SettingsService {
       'hour': prefs.getInt(_reminderHourKey) ?? 10,
       'minute': prefs.getInt(_reminderMinuteKey) ?? 0,
     };
+  }
+
+  Future<void> saveLastUpdateCheck(DateTime dateTime) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(_lastUpdateCheckKey, dateTime.toIso8601String());
+  }
+
+  Future<DateTime?> getLastUpdateCheck() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    final value = prefs.getString(_lastUpdateCheckKey);
+
+    if(value == null) {
+      return null;
+    }
+
+    return DateTime.tryParse(value);
+  }
+
+  Future<bool> shouldCheckForUpdate() async {
+    final lastCheck = await getLastUpdateCheck();
+
+    if(lastCheck == null) {
+      return true;
+    }
+
+    final difference = DateTime.now().difference(lastCheck);
+
+    return difference.inHours >= 24;
   }
 }

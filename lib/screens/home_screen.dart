@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:project/screens/settings_screen.dart';
+import 'package:project/services/settings_service.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_theme.dart';
 import '../providers/reel_provider.dart';
@@ -8,6 +9,8 @@ import '../models/reel_item.dart';
 import 'detail_screen.dart';
 import 'add_url_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
+import '../providers/update_provider.dart';
+import '../widgets/update_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -18,6 +21,7 @@ class HomeScreen extends StatefulWidget {
 
 class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateMixin {
   late TabController _tabController;
+  final SettingsService _settingsService = SettingsService();
 
   static const Color primaryColor = AppThemeConstants.primaryColor;
   static const Color backgroundColor = AppThemeConstants.backgroundColor;
@@ -37,12 +41,35 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
         setState(() {});
       }
     });
+
+    WidgetsBinding.instance.addPostFrameCallback((_) {
+      _checkForAppUpdate();
+    });
   }
 
   @override
   void dispose() {
     _tabController.dispose();
     super.dispose();
+  }
+
+  Future<void> _checkForAppUpdate() async {
+    final shouldCheck = await _settingsService.shouldCheckForUpdate();
+
+    if(!shouldCheck) {
+      return;
+    }
+
+    final updateProvider = context.read<UpdateProvider>();
+
+    await updateProvider.checkForUpdate();
+    await _settingsService.saveLastUpdateCheck(DateTime.now());
+
+    if(!mounted)  return;
+
+    if(updateProvider.hasUpdate && updateProvider.updateInfo != null) {
+      await UpdateDialog.show(context, updateProvider.updateInfo!);
+    }
   }
 
   @override
