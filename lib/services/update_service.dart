@@ -1,6 +1,7 @@
 import 'dart:convert';
 import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
+import 'package:flutter/foundation.dart';
 
 import '../constants/github_constants.dart';
 import '../models/update_info.dart';
@@ -15,7 +16,7 @@ class UpdateService {
       final currentVersion = packageInfo.version;
 
       final response = await http.get(
-        Uri.parse(GithubConstants.lastestReleaseApi),
+        Uri.parse(GithubConstants.latestReleaseApi),
         headers: {
           'Accept': 'application/vnd.github+json',
         },
@@ -40,7 +41,9 @@ class UpdateService {
         hasUpdate: hasUpdate
       );
 
-    } catch (e) {
+    } catch (e, stackTrace) {
+      debugPrint("Update Error: $e");
+      debugPrintStack(stackTrace: stackTrace);
       return null;
     }
   }

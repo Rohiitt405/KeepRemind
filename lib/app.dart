@@ -1,7 +1,8 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import 'providers/reel_provider.dart';
+import './providers/reel_provider.dart';
+import './providers/update_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'constants/app_theme.dart';
 import 'screens/add_url_screen.dart';
@@ -136,8 +137,11 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
   Widget build(BuildContext context) {
     final shouldShowShareLoading = _shareFlowActive || !_shareIntentChecked;
 
-    return ChangeNotifierProvider(
-      create: (_) => ReelProvider()..listenToReels(),
+    return MultiProvider(
+      providers: [
+        ChangeNotifierProvider(create: (_) => ReelProvider()..listenToReels()),
+        ChangeNotifierProvider(create: (_) => UpdateProvider()),
+      ],
       child: MaterialApp(
         navigatorKey: _navigatorKey,
         title: 'KeepRemind',

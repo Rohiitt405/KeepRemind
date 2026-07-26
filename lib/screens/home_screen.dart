@@ -56,7 +56,7 @@ class _HomeScreenState extends State<HomeScreen> with SingleTickerProviderStateM
   Future<void> _checkForAppUpdate() async {
     final shouldCheck = await _settingsService.shouldCheckForUpdate();
 
-    if(!shouldCheck) {
+    if(!mounted &&!shouldCheck) {
       return;
     }
 
