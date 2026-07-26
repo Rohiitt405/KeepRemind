@@ -1,10 +1,11 @@
 # KeepRemind - Smart Video Bookmark & Memory Assistant
 
-**KeepRemind** is a Flutter-based mobile application that helps users save, organize, and remember short-form videos (reels) from Instagram and YouTube with AI-powered memory insights and smart reminders.
+**KeepRemind** is a Flutter mobile app that helps you save, organize, and revisit interesting Instagram and YouTube content with AI-generated memory notes and reminders.
 
-**Release:** v1.0.0 (Build 1)
+## 📥 Download
 
-[⬇️ Download APK](https://github.com/Rohiitt405/KeepRemind/releases/tag/v1.0.0)
+Download the latest Android APK from the latest GitHub Release.
+[⬇️ Download APK](https://github.com/Rohiitt405/KeepRemind/releases/latest)
 
 ---
 ## 📸 App Screenshots
@@ -48,6 +49,7 @@
 - **🎯 Share Intent Support** - Share links directly to KeepRemind from any app
 - **📌 Metadata Extraction** - Auto-fetch video title, description, and thumbnail using Open Graph protocol
 - **🗑️ Easy Management** - Swipe to delete reels with confirmation dialogs
+- **🔄 Automatic Update Checker** - Automatically checks GitHub Releases for newer app versions and notifies users with release notes and a direct APK download.
 - **✨ Material Design 3** - Modern, intuitive UI with deep purple theme
 
 ### AI-Powered Features
@@ -58,40 +60,81 @@
 
 ---
 
+## 🔄 Automatic Update System
+
+KeepRemind includes a built-in update checker powered by GitHub Releases.
+
+### How it works
+
+1. The app checks the latest GitHub release.
+2. It compares the installed version with the latest available version.
+3. If an update is available, users receive an update dialog.
+4. Users can view release notes before updating.
+5. Tapping **Update** opens the latest APK download.
+
+### Benefits
+
+- Automatic update notifications
+- Semantic version comparison
+- Release notes support
+- Direct APK downloads
+- Reduced network requests through cached update checks
+
+---
 ## 🏗️ Architecture
 
-### Project Structure
-
-```
+```text
 lib/
-├── main.dart                          # App entry point with Firebase & notification initialization
-├── app.dart                           # Main app widget with routing & share intent handling
-├── firebase_options.dart              # Firebase configuration for all platforms
+├── main.dart                          # Application entry point
+├── app.dart                           # Root widget and app configuration
+├── firebase_options.dart              # Firebase configuration
+│
+├── constants/
+│   └── github_constants.dart          # GitHub repository and API constants
 │
 ├── models/
-│   ├── reel_item.dart                # ReelItem data model with serialization
-│   └── ai_memory.dart                # AI memory response model
+│   ├── reel_item.dart                 # Reel data model
+│   ├── ai_memory.dart                 # AI memory response model
+│   └── update_info.dart               # App update information model
 │
 ├── providers/
-│   └── reel_provider.dart            # State management (ChangeNotifier pattern)
+│   ├── reel_provider.dart             # Reel state management
+│   └── update_provider.dart           # Update checking state management
 │
 ├── services/
-│   ├── firestore_service.dart        # Firestore database operations
-│   ├── metadata_service.dart         # URL parsing & metadata extraction
-│   ├── ai_service.dart               # AI memory generation using Gemini
-│   ├── notification_service.dart     # Local notifications scheduling
-│   └── settings_service.dart         # User preferences (SharedPreferences)
+│   ├── firestore_service.dart         # Firestore database operations
+│   ├── metadata_service.dart          # Video metadata extraction
+│   ├── ai_service.dart                # AI memory generation
+│   ├── notification_service.dart      # Local notification scheduling
+│   ├── settings_service.dart          # SharedPreferences management
+│   └── update_service.dart            # GitHub release update checker
+│
+├── utils/
+│   └── version_helper.dart            # Semantic version comparison helper
 │
 ├── screens/
-│   ├── home_screen.dart              # Main dashboard with tabbed views
-│   ├── detail_screen.dart            # Detailed reel view with full metadata
-│   ├── add_url_screen.dart           # URL input and preview screen
-│   ├── onboarding_screen.dart        # First-time user tutorial
-│   └── settings_screen.dart          # App settings and notification preferences
+│   ├── home_screen.dart               # Main application screen
+│   ├── detail_screen.dart             # Reel details
+│   ├── add_url_screen.dart            # Add new reel
+│   ├── onboarding_screen.dart         # First-time user experience
+│   └── settings_screen.dart           # Application settings
 │
 └── widgets/
-    └── reel_card.dart                # Reusable reel card component
+    ├── reel_card.dart                 # Reusable reel card widget
+    └── update_dialog.dart             # Update available dialog
 ```
+
+### Folder Overview
+
+| Folder | Description |
+|---------|-------------|
+| **constants/** | Stores application-wide constant values such as API endpoints and configuration. |
+| **models/** | Contains data models used throughout the application. |
+| **providers/** | Manages application state using the Provider package. |
+| **services/** | Contains business logic, Firebase operations, AI integration, notifications, and update checking. |
+| **utils/** | Utility classes and helper functions shared across the project. |
+| **screens/** | UI screens that represent complete pages of the application. |
+| **widgets/** | Reusable UI components shared between multiple screens. |
 
 ### Technology Stack
 
@@ -120,8 +163,8 @@ lib/
 
 1. **Clone the repository**
    ```bash
-   git clone https://github.com/Rohiitt405/Volt.git
-   cd Volt
+   git clone https://github.com/Rohiitt405/KeepRemind.git
+    cd KeepRemind
    ```
 
 2. **Install dependencies**
@@ -271,6 +314,7 @@ Manages reminders:
 - `url_launcher` - Open external links
 - `google_fonts` - Custom fonts
 - `http` - HTTP networking
+- `package_info_plus` - App version information
 
 ### Development
 - `flutter_lints` - Code quality
@@ -288,6 +332,7 @@ Manages reminders:
 4. **Create UI Screens** in `lib/screens/`
 5. **Create Reusable Widgets** in `lib/widgets/`
 6. **Update routing** in `app.dart`
+7. Publish APKs through GitHub Releases for automatic update detection.
 
 ### Key Patterns Used
 
@@ -316,7 +361,9 @@ flutter logs
 
 ## 📝 License
 
-This project is private. For access or collaboration, contact the repository owner.
+This repository is publicly available on GitHub for learning, reference, and portfolio purposes.
+
+Unless otherwise stated, all rights to the source code remain with the repository owner.
 
 ---
 
@@ -328,7 +375,80 @@ This project is private. For access or collaboration, contact the repository own
 
 ## 🤝 Contributing
 
-This is a private project. For feature requests or bug reports, please open an issue on GitHub.
+Contributions are welcome! 🎉
+
+If you'd like to improve KeepRemind, please follow these steps:
+
+### 1. Fork the Repository
+
+Click the **Fork** button at the top-right of this repository to create your own copy.
+
+### 2. Clone Your Fork
+
+```bash
+git clone https://github.com/<your-username>/KeepRemind.git
+cd KeepRemind
+```
+
+### 3. Create a New Branch
+
+```bash
+git checkout -b feature/your-feature-name
+```
+
+### 4. Install Dependencies
+
+```bash
+flutter pub get
+```
+
+### 5. Make Your Changes
+
+Implement your feature or fix the issue while following the existing project structure and coding style.
+
+### 6. Test Your Changes
+
+Ensure the application builds and runs successfully.
+
+```bash
+flutter test
+```
+
+or
+
+```bash
+flutter run
+```
+
+### 7. Commit Your Changes
+
+```bash
+git add .
+git commit -m "feat: add your feature description"
+```
+
+### 8. Push Your Branch
+
+```bash
+git push origin feature/your-feature-name
+```
+
+### 9. Open a Pull Request
+
+Create a Pull Request describing:
+
+- What was changed
+- Why the change was made
+- Screenshots (if the UI was modified)
+- Related issues (if applicable)
+
+### Contribution Guidelines
+
+- Follow Flutter and Dart best practices.
+- Keep pull requests focused on a single feature or bug fix.
+- Write clean, readable, and maintainable code.
+- Update the README if your changes introduce new functionality.
+- Ensure the application builds successfully before submitting a pull request.
 
 ---
 
