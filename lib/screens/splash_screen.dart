@@ -178,20 +178,6 @@ class _SplashScreenState extends State<SplashScreen> {
                           ),
                         ),
                         const SizedBox(height: 6),
-                        
-                        // Architecture Version Tag Label Container
-                        Container(
-                          padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
-                          color: primaryColor,
-                          child: Text(
-                            'V1.0.0',
-                            style: monoFont.copyWith(
-                              fontSize: 11,
-                              fontWeight: FontWeight.bold,
-                              color: tertiaryFixed,
-                            ),
-                          ),
-                        ),
                       ],
                     ),
                   ),
