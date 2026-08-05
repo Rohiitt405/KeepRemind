@@ -16,13 +16,11 @@ class FirestoreService {
     return credential.user!.uid;
   }
 
-  Future<CollectionReference<Map<String, dynamic>>> _savedLinksCollection() async {
+  Future<CollectionReference<Map<String, dynamic>>>
+  _savedLinksCollection() async {
     final userId = await getOrCreateUserId();
 
-    return _db
-      .collection('users')
-      .doc(userId)
-      .collection('saved_links');
+    return _db.collection('users').doc(userId).collection('saved_links');
   }
 
   Future<String> saveSavedLink(SavedLink savedLink) async {
@@ -35,42 +33,32 @@ class FirestoreService {
     final collection = await _savedLinksCollection();
 
     yield* collection
-      .orderBy('savedAt', descending: true)
-      .snapshots()
-      .map(
-        (snapshot) => snapshot.docs
-          .map(
-            (doc) => SavedLink.fromMap(
-              doc.id, 
-              doc.data(),
-            ),
-          )
-          .toList(),
-      );
+        .orderBy('savedAt', descending: true)
+        .snapshots()
+        .map(
+          (snapshot) => snapshot.docs
+              .map((doc) => SavedLink.fromMap(doc.id, doc.data()))
+              .toList(),
+        );
   }
 
   Future<void> updateSavedLink(
-      String savedLinkId, 
-      Map<String, dynamic> data
-    ) async {
-      final collection = await _savedLinksCollection();
-      await collection.doc(savedLinkId).update(data);
-  }
-
-  Future<void> setReviewed(
     String savedLinkId,
-    bool reviewed
+    Map<String, dynamic> data,
   ) async {
     final collection = await _savedLinksCollection();
+    await collection.doc(savedLinkId).update(data);
+  }
 
-    await collection.doc(savedLinkId).update({
-      'isReviewed': reviewed,
-    });
+  Future<void> setReviewed(String savedLinkId, bool reviewed) async {
+    final collection = await _savedLinksCollection();
+
+    await collection.doc(savedLinkId).update({'isReviewed': reviewed});
   }
 
   Future<void> deleteSavedLink(String savedLinkId) async {
     final collection = await _savedLinksCollection();
-    
+
     await collection.doc(savedLinkId).delete();
   }
 }

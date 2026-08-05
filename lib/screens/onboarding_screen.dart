@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_theme.dart';
+import '../widgets/shared/neo_brutalist_button.dart';
 import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
@@ -17,7 +18,8 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   // Neo-Brutalist Color Palette Mapping
   static const Color primaryColor = AppThemeConstants.primaryColor;
   static const Color backgroundColor = AppThemeConstants.backgroundColor;
-  static const Color surfaceContainerLow = AppThemeConstants.surfaceContainerLow;
+  static const Color surfaceContainerLow =
+      AppThemeConstants.surfaceContainerLow;
   static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
   static const Color onTertiaryFixed = AppThemeConstants.onTertiaryFixed;
   static const Color secondaryFixed = AppThemeConstants.secondaryFixed;
@@ -87,9 +89,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 
     Navigator.pushReplacement(
       context,
-      MaterialPageRoute(
-        builder: (_) => const HomeScreen(),
-      ),
+      MaterialPageRoute(builder: (_) => const HomeScreen()),
     );
   }
 
@@ -100,11 +100,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     _startTypewriter();
     _startLedAnimation();
 
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark, // Swapped to dark icons for light background
-      systemNavigationBarColor: backgroundColor,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness:
+            Brightness.dark, // Swapped to dark icons for light background
+        systemNavigationBarColor: backgroundColor,
+      ),
+    );
   }
 
   @override
@@ -116,23 +119,21 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _startLoaderAnimation() {
-    _loaderTimer = Timer.periodic(
-      const Duration(milliseconds: 500),
-      (_) {
-        if (!mounted || !_isInitializing) return;
+    _loaderTimer = Timer.periodic(const Duration(milliseconds: 500), (_) {
+      if (!mounted || !_isInitializing) return;
 
-        setState(() {
-          _showCursor = !_showCursor;
-        });
-      },
-    );
+      setState(() {
+        _showCursor = !_showCursor;
+      });
+    });
   }
-  
+
   void _startTypewriter() {
     int index = 0;
 
-    _typewriterTimer =
-        Timer.periodic(const Duration(milliseconds: 70), (timer) {
+    _typewriterTimer = Timer.periodic(const Duration(milliseconds: 70), (
+      timer,
+    ) {
       if (!mounted) return;
 
       setState(() {
@@ -157,17 +158,14 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   }
 
   void _startLedAnimation() {
-    _ledTimer = Timer.periodic(
-      const Duration(seconds: 1),
-      (timer) {
-        if (!mounted) return;
+    _ledTimer = Timer.periodic(const Duration(seconds: 1), (timer) {
+      if (!mounted) return;
 
-        setState(() {
-          _redLedOn = !_redLedOn;
-          _yellowLedOn = !_yellowLedOn;
-        });
-      },
-    );
+      setState(() {
+        _redLedOn = !_redLedOn;
+        _yellowLedOn = !_yellowLedOn;
+      });
+    });
   }
 
   @override
@@ -257,7 +255,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         WidgetSpan(
                                           child: Container(
                                             color: tertiaryFixed,
-                                            padding: const EdgeInsets.symmetric(horizontal: 4),
+                                            padding: const EdgeInsets.symmetric(
+                                              horizontal: 4,
+                                            ),
                                             child: Text(
                                               _displayHeadline2,
                                               style: displayFont.copyWith(
@@ -277,35 +277,57 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               Container(
                                 decoration: BoxDecoration(
                                   color: AppThemeConstants.surfaceColor,
-                                  border: Border.all(color: primaryColor, width: 6),
+                                  border: Border.all(
+                                    color: primaryColor,
+                                    width: 6,
+                                  ),
                                   boxShadow: neoShadow,
                                 ),
                                 child: Column(
                                   children: [
                                     Container(
                                       color: primaryColor,
-                                      padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 8),
+                                      padding: const EdgeInsets.symmetric(
+                                        horizontal: 16,
+                                        vertical: 8,
+                                      ),
                                       child: Row(
-                                        mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                        mainAxisAlignment:
+                                            MainAxisAlignment.spaceBetween,
                                         children: [
                                           Text(
                                             'VISUAL_PROCESSOR_V1.0',
                                             style: monoFont.copyWith(
                                               fontSize: 14,
-                                              color: AppThemeConstants.surfaceColor,
+                                              color: AppThemeConstants
+                                                  .surfaceColor,
                                               fontWeight: FontWeight.bold,
                                             ),
                                           ),
                                           Row(
                                             children: [
                                               AnimatedContainer(
-                                                duration: const Duration(milliseconds: 300),
+                                                duration: const Duration(
+                                                  milliseconds: 300,
+                                                ),
                                                 width: 12,
                                                 height: 12,
                                                 decoration: BoxDecoration(
                                                   color: _redLedOn
-                                                      ? const Color.fromARGB(255, 255, 0, 0)
-                                                      : const Color.fromARGB(255, 255, 0, 0).withValues(alpha: 0.25),
+                                                      ? const Color.fromARGB(
+                                                          255,
+                                                          255,
+                                                          0,
+                                                          0,
+                                                        )
+                                                      : const Color.fromARGB(
+                                                          255,
+                                                          255,
+                                                          0,
+                                                          0,
+                                                        ).withValues(
+                                                          alpha: 0.25,
+                                                        ),
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
                                                     color: primaryColor,
@@ -316,13 +338,18 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                               const SizedBox(width: 8),
 
                                               AnimatedContainer(
-                                                duration: const Duration(milliseconds: 300),
+                                                duration: const Duration(
+                                                  milliseconds: 300,
+                                                ),
                                                 width: 12,
                                                 height: 12,
                                                 decoration: BoxDecoration(
                                                   color: _yellowLedOn
                                                       ? secondaryFixed
-                                                      : secondaryFixed.withValues(alpha: 0.25),
+                                                      : secondaryFixed
+                                                            .withValues(
+                                                              alpha: 0.25,
+                                                            ),
                                                   shape: BoxShape.circle,
                                                   border: Border.all(
                                                     color: primaryColor,
@@ -331,7 +358,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                                 ),
                                               ),
                                             ],
-                                          )
+                                          ),
                                         ],
                                       ),
                                     ),
@@ -342,16 +369,33 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                         children: [
                                           Positioned.fill(
                                             child: ColorFiltered(
-                                              colorFilter: const ColorFilter.matrix([
-                                                0.2126, 0.7152, 0.0722, 0, 0,
-                                                0.2126, 0.7152, 0.0722, 0, 0,
-                                                0.2126, 0.7152, 0.0722, 0, 0,
-                                                0,      0,      0,      1, 0,
-                                              ]), 
+                                              colorFilter:
+                                                  const ColorFilter.matrix([
+                                                    0.2126,
+                                                    0.7152,
+                                                    0.0722,
+                                                    0,
+                                                    0,
+                                                    0.2126,
+                                                    0.7152,
+                                                    0.0722,
+                                                    0,
+                                                    0,
+                                                    0.2126,
+                                                    0.7152,
+                                                    0.0722,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    0,
+                                                    1,
+                                                    0,
+                                                  ]),
                                               child: Image.asset(
                                                 'assets/icons/sketch.png',
                                                 fit: BoxFit.cover,
-                                              )
+                                              ),
                                             ),
                                           ),
                                           Positioned(
@@ -361,18 +405,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                               padding: const EdgeInsets.all(8),
                                               decoration: BoxDecoration(
                                                 color: secondaryFixed,
-                                                border: Border.all(color: primaryColor, width: 2),
+                                                border: Border.all(
+                                                  color: primaryColor,
+                                                  width: 2,
+                                                ),
                                                 boxShadow: neoShadowSm,
                                               ),
                                               child: Column(
-                                                crossAxisAlignment: CrossAxisAlignment.start,
+                                                crossAxisAlignment:
+                                                    CrossAxisAlignment.start,
                                                 children: [
                                                   Text(
                                                     _processorStatus,
                                                     style: monoFont.copyWith(
                                                       color: primaryColor,
-                                                      fontWeight: FontWeight.bold,
-                                                      fontStyle: FontStyle.italic,
+                                                      fontWeight:
+                                                          FontWeight.bold,
+                                                      fontStyle:
+                                                          FontStyle.italic,
                                                       fontSize: 14,
                                                     ),
                                                   ),
@@ -396,13 +446,13 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                       width: double.infinity,
                                       alignment: Alignment.centerLeft,
                                       child: AnimatedFractionallySizedBox(
-                                        duration: const Duration(milliseconds: 150),
+                                        duration: const Duration(
+                                          milliseconds: 150,
+                                        ),
                                         curve: Curves.easeOut,
                                         widthFactor: _processorProgress,
-                                        child: Container(
-                                          color: secondaryFixed,
-                                        ),
-                                      )
+                                        child: Container(color: secondaryFixed),
+                                      ),
                                     ),
                                   ],
                                 ),
@@ -413,7 +463,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 padding: const EdgeInsets.all(24),
                                 decoration: BoxDecoration(
                                   color: AppThemeConstants.surfaceColor,
-                                  border: Border.all(color: primaryColor, width: 4),
+                                  border: Border.all(
+                                    color: primaryColor,
+                                    width: 4,
+                                  ),
                                   boxShadow: neoShadow,
                                 ),
                                 child: Column(
@@ -421,7 +474,11 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                   children: [
                                     Row(
                                       children: [
-                                        const Icon(Icons.memory, color: primaryColor, size: 26),
+                                        const Icon(
+                                          Icons.memory,
+                                          color: primaryColor,
+                                          size: 26,
+                                        ),
                                         const SizedBox(width: 8),
                                         Text(
                                           'CORE_FUNCTIONS',
@@ -437,7 +494,10 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                     Container(
                                       decoration: const BoxDecoration(
                                         border: Border(
-                                          left: BorderSide(color: secondaryFixed, width: 6),
+                                          left: BorderSide(
+                                            color: secondaryFixed,
+                                            width: 6,
+                                          ),
                                         ),
                                       ),
                                       padding: const EdgeInsets.only(left: 14),
@@ -451,12 +511,16 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                           ),
                                           children: [
                                             const TextSpan(
-                                              text: 'The ultimate memory tool for your saved Reels & Shorts. ',
+                                              text:
+                                                  'The ultimate memory tool for your saved SavedLinks & Shorts. ',
                                             ),
                                             WidgetSpan(
                                               child: Container(
                                                 color: tertiaryFixed,
-                                                padding: const EdgeInsets.symmetric(horizontal: 6),
+                                                padding:
+                                                    const EdgeInsets.symmetric(
+                                                      horizontal: 6,
+                                                    ),
                                                 child: Text(
                                                   'AI-powered takeaways',
                                                   style: monoFont.copyWith(
@@ -467,7 +531,9 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                                 ),
                                               ),
                                             ),
-                                            const TextSpan(text: ', no rewatching required.'),
+                                            const TextSpan(
+                                              text: ', no rewatching required.',
+                                            ),
                                           ],
                                         ),
                                       ),
@@ -477,41 +543,52 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                               ),
                               const SizedBox(height: 22),
 
-
-                              // 5. Brutalist Mechanical Interactive Action CTA Button
                               NeoBrutalistButton(
                                 onPressed: _finish,
                                 child: Padding(
-                                  padding: const EdgeInsets.symmetric(horizontal: 20, vertical: 12),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 20,
+                                    vertical: 12,
+                                  ),
                                   child: Row(
-                                    mainAxisAlignment: MainAxisAlignment.spaceBetween,
+                                    mainAxisAlignment:
+                                        MainAxisAlignment.spaceBetween,
                                     children: [
-                                      Text(
-                                        _isInitializing ? "INITIALIZING..." : "INITIALIZE_SYSTEM",
-                                        style: displayFont.copyWith(
-                                          color: primaryColor,
-                                          fontSize: 32,
-                                          letterSpacing: -0.5,
+                                      Expanded(
+                                        child: Text(
+                                          _isInitializing
+                                              ? "INITIALIZING..."
+                                              : "INITIALIZE_SYSTEM",
+                                          maxLines: 1,
+                                          overflow: TextOverflow.ellipsis,
+                                          style: displayFont.copyWith(
+                                            color: primaryColor,
+                                            fontSize: 32,
+                                            letterSpacing: -0.5,
+                                          ),
                                         ),
                                       ),
+
+                                      const SizedBox(width: 8),
+
                                       _isInitializing
-                                        ? SizedBox(
-                                            width: 28,
-                                            height: 28,
-                                            child: Text(
-                                              _showCursor ? "█" : "",
-                                              style: monoFont.copyWith(
-                                                fontSize: 26,
-                                                fontWeight: FontWeight.bold,
-                                                color: primaryColor,
+                                          ? SizedBox(
+                                              width: 28,
+                                              height: 28,
+                                              child: Text(
+                                                _showCursor ? "█" : "",
+                                                style: monoFont.copyWith(
+                                                  fontSize: 26,
+                                                  fontWeight: FontWeight.bold,
+                                                  color: primaryColor,
+                                                ),
                                               ),
+                                            )
+                                          : const Icon(
+                                              Icons.arrow_forward,
+                                              color: primaryColor,
+                                              size: 36,
                                             ),
-                                          )
-                                        : const Icon(
-                                            Icons.arrow_forward,
-                                            color: primaryColor,
-                                            size: 36,
-                                          )
                                     ],
                                   ),
                                 ),
@@ -526,29 +603,37 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                                 children: [
                                   _buildGridCard(
                                     title: 'RECAP',
-                                    description: 'AI-distilled summaries of your saved reels.',
+                                    description:
+                                        'AI-distilled summaries of your saved savedLinks.',
                                     indicatorColor: tertiaryFixed,
                                     progress: 1.0,
                                     monoFont: monoFont,
                                   ),
                                   _buildGridCard(
                                     title: 'SMART SEARCH',
-                                    description: 'Natural language memory retrieval.',
+                                    description:
+                                        'Natural language memory retrieval.',
                                     indicatorColor: secondaryFixed,
                                     progress: 0.66,
-                                    icon: const Icon(Icons.search, size: 16, color: primaryColor),
+                                    icon: const Icon(
+                                      Icons.search,
+                                      size: 16,
+                                      color: primaryColor,
+                                    ),
                                     monoFont: monoFont,
                                   ),
                                   _buildGridCard(
                                     title: 'INSTANT SYNC',
-                                    description: 'Auto-ingest from Instagram & TikTok.',
+                                    description:
+                                        'Auto-ingest from Instagram & TikTok.',
                                     indicatorColor: quarterFixed,
                                     progress: 0.75,
                                     monoFont: monoFont,
                                   ),
                                   _buildGridCard(
                                     title: 'AI INSIGHTS',
-                                    description: 'Actionable data from visual data.',
+                                    description:
+                                        'Actionable data from visual data.',
                                     indicatorColor: const Color(0xFF009923),
                                     progress: 0.5,
                                     monoFont: monoFont,
@@ -562,7 +647,7 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
                       ),
                     ]),
                   ),
-                )
+                ),
               ],
             ),
           ),
@@ -593,20 +678,24 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
           Row(
             mainAxisAlignment: MainAxisAlignment.spaceBetween,
             children: [
-                  Container(
-                    width: 12,
-                    height: 12,
-                    decoration: BoxDecoration(
-                      color: indicatorColor,
-                      border: Border.all(color: primaryColor, width: 2),
-                    ),
-                  ),
+              Container(
+                width: 12,
+                height: 12,
+                decoration: BoxDecoration(
+                  color: indicatorColor,
+                  border: Border.all(color: primaryColor, width: 2),
+                ),
+              ),
             ],
           ),
           const SizedBox(height: 12),
           Text(
             title,
-            style: monoFont.copyWith(fontWeight: FontWeight.bold, fontSize: 14, color: primaryColor),
+            style: monoFont.copyWith(
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+              color: primaryColor,
+            ),
           ),
           const SizedBox(height: 4),
           Expanded(
@@ -635,51 +724,3 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
 }
 
 // Custom Stateful Button Injecting Mechanical Layout Offset Shift on Actions
-class NeoBrutalistButton extends StatefulWidget {
-  final Widget child;
-  final VoidCallback onPressed;
-
-  const NeoBrutalistButton({
-    super.key,
-    required this.child,
-    required this.onPressed,
-  });
-
-  @override
-  State<NeoBrutalistButton> createState() => _NeoBrutalistButtonState();
-}
-
-class _NeoBrutalistButtonState extends State<NeoBrutalistButton> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 60),
-        transform: _isPressed
-            ? Matrix4.translationValues(4, 4, 0)
-            : Matrix4.translationValues(0, 0, 0),
-        decoration: BoxDecoration(
-          color: AppThemeConstants.secondaryFixed,
-          border: Border.all(color: AppThemeConstants.primaryColor, width: 6),
-          boxShadow: _isPressed
-              ? [
-                  const BoxShadow(
-                    color: AppThemeConstants.primaryColor,
-                    offset: Offset(2, 2),
-                  )
-                ]
-              : AppThemeConstants.neoShadow,
-        ),
-        child: widget.child,
-      ),
-    );
-  }
-}

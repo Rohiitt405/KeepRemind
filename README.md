@@ -1,6 +1,9 @@
-# KeepRemind - Smart Video Bookmark & Memory Assistant
+# KeepRemind - Smart Link Bookmark & AI Memory Assistant
 
-**KeepRemind** is a Flutter mobile app that helps you save, organize, and revisit interesting Instagram and YouTube content with AI-generated memory notes and reminders.
+**KeepRemind** is a Flutter mobile app that helps you save, organize, and revisit interesting content from Instagram, YouTube, X, Reddit, Facebook and other platforms.
+
+Instead of simply bookmarking links, KeepRemind automatically extracts metadata, generates AI-powered memory notes and tags using Google Gemini, and reminds you to revisit your saved content so you never forget why it mattered.
+
 
 ## 📥 Download
 
@@ -32,7 +35,7 @@ Download the latest Android APK from the latest GitHub Release.
 </p>
 
 <p align="center">
-  <img src="assets/screenshots/Add.jpg" width="700" alt="Add Reel Screen">
+  <img src="assets/screenshots/Add.jpg" width="700" alt="Add content Screen">
 </p>
 
 </details>
@@ -42,21 +45,39 @@ Download the latest Android APK from the latest GitHub Release.
 ## 📱 Features
 
 ### Core Functionality
-- **📹 Save Video Reels** - Quickly save Instagram and YouTube video links directly from the share sheet
-- **🤖 AI Memory Generation** - Automatically generate personalized memory notes and tags for each saved reel using Google's Gemini AI
-- **📝 Smart Organization** - Organize reels into reviewed/unreviewed categories with intuitive tabs
+- **🔗 Save Content** - Quickly save contents links directly from the share sheet
+- **🌐 Multi-Platform Support** - Save content from YouTube, Instagram, TikTok, Reddit, Facebook, X (Twitter), LinkedIn, Pinterest, Threads, Snapchat, and websites supporting Open Graph metadata.
+- **🤖 AI Memory Generation** - Automatically generate personalized memory notes and tags for each saved savedLink using Google's Gemini AI
+- **📝 Smart Organization** - Organize contents into reviewed/unreviewed categories with intuitive tabs
 - **🔔 Reminders** - Set flexible reminders (daily or weekly) to review your saved content
 - **🎯 Share Intent Support** - Share links directly to KeepRemind from any app
-- **📌 Metadata Extraction** - Auto-fetch video title, description, and thumbnail using Open Graph protocol
-- **🗑️ Easy Management** - Swipe to delete reels with confirmation dialogs
+- **📌 Smart Metadata Extraction** - Automatically extracts titles, descriptions, thumbnails, and platform information using Open Graph metadata with graceful fallback support when metadata is unavailable.
+- **🧠 Intelligent Platform Detection** - Automatically detects the source platform and adapts metadata extraction and UI presentation accordingly.
+- **🗑️ Easy Management** - Swipe to delete savedLinks content with confirmation dialogs
 - **🔄 Automatic Update Checker** - Automatically checks GitHub Releases for newer app versions and notifies users with release notes and a direct APK download.
 - **✨ Material Design 3** - Modern, intuitive UI with deep purple theme
 
 ### AI-Powered Features
-- **Memory Notes** - Get concise, under-20-word memory prompts for why you saved each reel
+- **Memory Notes** - Get concise, under-20-word memory prompts for why you saved each link
 - **Smart Tags** - Auto-generate relevant tags for content categorization
 - **Intelligent Retries** - Automatic retry logic for AI generation with exponential backoff
 - **Background Processing** - AI generation happens in the background without blocking the UI
+
+---
+
+## 🌐 Supported Platforms
+| Platform | Metadata | AI Memory | Status |
+|----------|----------|-----------|--------|
+| YouTube | ✅ | ✅ | Fully Supported |
+| Instagram | ✅ | ✅ | Fully Supported |
+| Reddit | ✅ | ✅ | Fully Supported |
+| LinkedIn | ✅ | ✅ | Fully Supported |
+| Pinterest | ✅ | ✅ | Fully Supported |
+| Facebook | ⚠ Fallback | ✅ | Supported |
+| Threads | ⚠ Fallback | ✅ | Supported |
+| Snapchat | ⚠ Fallback | ✅ | Supported |
+| X (Twitter) | ✅ | ✅ | Fully Supported |
+| Other Websites | Open Graph | ✅ | Supported |
 
 ---
 
@@ -85,43 +106,57 @@ KeepRemind includes a built-in update checker powered by GitHub Releases.
 
 ```text
 lib/
-├── main.dart                          # Application entry point
-├── app.dart                           # Root widget and app configuration
-├── firebase_options.dart              # Firebase configuration
+├── main.dart                             # Application entry point
+├── app.dart                              # Root widget and app configuration
+├── firebase_options.dart                 # Firebase configuration
 │
 ├── constants/
-│   └── github_constants.dart          # GitHub repository and API constants
+│   ├── app_theme.dart                    # Application theme configuration
+│   └── github_constants.dart             # GitHub repository and API constants
 │
 ├── models/
-│   ├── reel_item.dart                 # Reel data model
-│   ├── ai_memory.dart                 # AI memory response model
-│   └── update_info.dart               # App update information model
+│   ├── ai_memory.dart                    # AI memory response model
+│   ├── link_metadata.dart                # Link metadata model
+│   ├── saved_link_model.dart             # Saved link model
+│   ├── social_platform.dart              # Supported social media platforms
+│   └── update_info.dart                  # App update information model
 │
 ├── providers/
-│   ├── reel_provider.dart             # Reel state management
-│   └── update_provider.dart           # Update checking state management
-│
-├── services/
-│   ├── firestore_service.dart         # Firestore database operations
-│   ├── metadata_service.dart          # Video metadata extraction
-│   ├── ai_service.dart                # AI memory generation
-│   ├── notification_service.dart      # Local notification scheduling
-│   ├── settings_service.dart          # SharedPreferences management
-│   └── update_service.dart            # GitHub release update checker
-│
-├── utils/
-│   └── version_helper.dart            # Semantic version comparison helper
+│   ├── saved_link_provider.dart          # Saved links state management
+│   └── update_provider.dart              # Update checking state management
 │
 ├── screens/
-│   ├── home_screen.dart               # Main application screen
-│   ├── detail_screen.dart             # Reel details
-│   ├── add_url_screen.dart            # Add new reel
-│   ├── onboarding_screen.dart         # First-time user experience
-│   └── settings_screen.dart           # Application settings
+│   ├── add_url_screen.dart               # Add URL screen
+│   ├── detail_screen.dart                # Saved link details
+│   ├── home_screen.dart                  # Main application screen
+│   ├── onboarding_screen.dart            # First-time user experience
+│   ├── settings_screen.dart              # Application settings
+│   ├── share_loading_screen.dart         # Shared URL processing screen
+│   └── splash_screen.dart                # Splash screen
 │
-└── widgets/
-    ├── reel_card.dart                 # Reusable reel card widget
-    └── update_dialog.dart             # Update available dialog
+├── services/
+│   ├── metadata/
+│   │   ├── fallback_metadata_service.dart    # Fallback metadata extraction
+│   │   ├── metadata_fetch_service.dart       # HTTP metadata fetching
+│   │   ├── metadata_service.dart             # Metadata service facade
+│   │   └── platform_detector_service.dart    # Detect social media platform
+│   │
+│   ├── ai_service.dart                   # AI memory generation
+│   ├── firestore_service.dart            # Firestore database operations
+│   ├── notification_service.dart         # Local notification scheduling
+│   ├── settings_service.dart             # SharedPreferences management
+│   └── update_service.dart               # GitHub release update checker
+│
+├── utils/
+│   └── version_helper.dart               # Semantic version comparison helper
+│
+├── widgets/
+│   ├── save_link_card.dart               # Saved link card widget
+│   ├── update_dialog.dart                # Update available dialog
+│   │
+│   └── shared/
+│       ├── dot_grid_overlay.dart         # Dot grid background overlay
+│       └── neo_brutalist_button.dart     # Reusable Neo-Brutalist button
 ```
 
 ### Folder Overview
@@ -148,6 +183,28 @@ lib/
 | **Data Persistence** | Cloud Firestore + SharedPreferences |
 | **Metadata Extraction** | metadata_fetch |
 | **UI Design** | Material Design 3 |
+
+---
+
+## 🔍 Metadata Processing Pipeline
+
+When a link is added, KeepRemind processes it using the following pipeline:
+
+URL
+↓
+Platform Detection
+↓
+Metadata Extraction
+↓
+Fallback Metadata (if needed)
+↓
+Save to Firestore
+↓
+AI Memory Generation
+↓
+Automatic Reminder Scheduling
+
+This modular architecture allows new social platforms to be added with minimal changes.
 
 ---
 
@@ -185,18 +242,27 @@ lib/
 
 ### Environment Setup
 
-The app uses anonymous Firebase authentication. Firestore is configured to store user reels under:
+The app uses anonymous Firebase authentication. Firestore is configured to store user savedLink under:
 ```
-users/{userId}/reels/
+users/{userId}/saved_links/
 ```
 
 Ensure your Firestore security rules allow anonymous users:
 ```firestore
 rules_version = '2';
+
 service cloud.firestore {
   match /databases/{database}/documents {
-    match /users/{userId}/reels/{document=**} {
-      allow read, write: if request.auth != null;
+    match /users/{userId} {
+      allow read, write:
+          if request.auth != null &&
+             request.auth.uid == userId;
+        
+      match /saved_links/{savedLinkId} {
+        allow read, write:
+            if request.auth != null &&
+               request.auth.uid == userId;
+      }
     }
   }
 }
@@ -206,17 +272,17 @@ service cloud.firestore {
 
 ## 📚 Key Components
 
-### ReelItem Model
-Represents a saved reel with metadata and AI-generated insights:
+### SavedLink Model
+Represents a saved link with metadata and AI-generated insights:
 
 ```dart
-ReelItem(
+SavedLink(
   id: String,                    // Firestore document ID
   url: String,                   // Video URL
   title: String,                 // Video title
   caption: String,               // Video description
   thumbnailUrl: String,          // Video thumbnail
-  platform: String,              // 'instagram' or 'youtube'
+  platform: SocialPlatform,              // 'Major socialMedia Platforms'
   aiMemory: String?,             // AI-generated memory note
   aiTags: List<String>?,         // AI-generated tags
   isGenerating: bool,            // AI generation in progress
@@ -225,18 +291,18 @@ ReelItem(
 )
 ```
 
-### ReelProvider
-Manages the entire reel lifecycle:
+### SavedLinkProvider
+Manages the entire savedLink lifecycle:
 - Listen to real-time Firestore updates
-- Save reels with URL validation
+- Save link with URL validation
 - Generate AI insights with retry logic
 - Schedule reminders on save
-- Mark reels as reviewed/deleted
+- Mark content as reviewed/deleted
 
 ### FirestoreService
 Handles database operations:
 - Anonymous authentication
-- Real-time reel stream
+- Real-time savedLink stream
 - CRUD operations
 - User-scoped data isolation
 
@@ -260,21 +326,33 @@ Manages reminders:
 
 ### Onboarding
 1. First-time users see the onboarding screen
-2. Instructions on how to share reels to the app
+2. Instructions on how to share savedLinks to the app
 3. Optional notification permission request
 4. Stores onboarding completion in SharedPreferences
 
-### Adding a Reel
-1. User shares Instagram/YouTube link or uses in-app URL input
-2. App fetches metadata (title, description, thumbnail)
-3. Reel is saved immediately to Firestore with `isGenerating: true`
-4. AI service generates memory and tags in background
-5. Weekly reminder is scheduled automatically
-6. UI updates in real-time as AI completes
+### Saving a Link
+Paste or share a supported social media link
+        ↓
+Platform Detection
+        ↓
+Fetch Metadata (title, description, thumbnail)
+        ↓
+Save to Firestore (isGenerating: true)
+        ↓
+Show content in UI Immediately
+        ↓
+┌─────────────────────────────────────┐
+│ Background Processing               │
+│ • Generate AI Memory                │
+│ • Generate Tags                     │
+│ • Schedule Weekly Reminder          │
+└─────────────────────────────────────┘
+        ↓
+Real-time UI Update as AI Completes
 
-### Reviewing Reels
-1. Home screen displays reels in three tabs: All, Unreviewed, Reviewed
-2. Tap a reel to view full details with thumbnail and AI insights
+### Reviewing savedLinks
+1. Home screen displays savedLink in three tabs: All, Unreviewed, Reviewed
+2. Tap a savedLink to view full details with thumbnail and AI insights
 3. Mark as reviewed to track progress
 4. Swipe to delete with confirmation
 
@@ -285,13 +363,30 @@ Manages reminders:
 
 ---
 
+## 🌍 Supported Link Types
+
+KeepRemind supports multiple kinds of content, including:
+
+- Short-form videos
+- Long-form videos
+- Social media posts
+- Articles
+- Blogs
+- GitHub repositories
+- Documentation
+- News pages
+- Educational resources
+- Open Graph enabled websites
+
+---
+
 ## 🔐 Security & Privacy
 
 - **Anonymous Authentication**: No user login required; each device gets unique Firebase UID
-- **Data Isolation**: Each user's reels are isolated in their own Firestore subcollection
+- **Data Isolation**: Each user's savedLinks are isolated in their own Firestore subcollection
 - **No Personal Data**: App doesn't collect emails, names, or identifiable info
 - **Local-Only Settings**: Reminder preferences stored locally on device
-- **Third-party Links**: Only Instagram and YouTube URLs are supported
+- **Third-party Links**: Supports major social media platforms and websites that expose Open Graph metadata.
 
 ---
 
@@ -315,6 +410,7 @@ Manages reminders:
 - `google_fonts` - Custom fonts
 - `http` - HTTP networking
 - `package_info_plus` - App version information
+- `font_awesome_flutter` - Font Awesome social media and UI icons
 
 ### Development
 - `flutter_lints` - Code quality
@@ -455,12 +551,12 @@ Create a Pull Request describing:
 ## ✨ Roadmap
 
 - [ ] Search and filter functionality
-- [ ] Export reels to PDF
+- [ ] Export content to PDF
 - [ ] Dark mode support
 - [ ] Multi-language support
 - [ ] Cloud backup and sync across devices
 - [ ] Social sharing features
-- [ ] Reel analytics dashboard
+- [ ] Saved link insights dashboard
 - [ ] Custom tags and collections
 
 ---

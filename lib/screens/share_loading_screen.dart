@@ -1,6 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../constants/app_theme.dart';
+import '../widgets/shared/dot_grid_overlay.dart';
 
 class ShareLoadingScreen extends StatelessWidget {
   final String? initialUrl;
@@ -27,7 +28,10 @@ class ShareLoadingScreen extends StatelessWidget {
                 padding: const EdgeInsets.all(20),
                 decoration: BoxDecoration(
                   color: AppThemeConstants.surfaceColor,
-                  border: Border.all(color: AppThemeConstants.primaryColor, width: 4),
+                  border: Border.all(
+                    color: AppThemeConstants.primaryColor,
+                    width: 4,
+                  ),
                   boxShadow: AppThemeConstants.neoShadow,
                 ),
                 child: Column(
@@ -85,13 +89,19 @@ class ShareLoadingScreen extends StatelessWidget {
                         padding: const EdgeInsets.all(12),
                         decoration: BoxDecoration(
                           color: AppThemeConstants.secondaryFixed,
-                          border: Border.all(color: AppThemeConstants.primaryColor, width: 2),
+                          border: Border.all(
+                            color: AppThemeConstants.primaryColor,
+                            width: 2,
+                          ),
                         ),
                         child: Text(
                           'Received: $initialUrl',
                           maxLines: 2,
                           overflow: TextOverflow.ellipsis,
-                          style: monoFont.copyWith(fontSize: 12, color: AppThemeConstants.primaryColor),
+                          style: monoFont.copyWith(
+                            fontSize: 12,
+                            color: AppThemeConstants.primaryColor,
+                          ),
                         ),
                       ),
                     ],
@@ -108,18 +118,17 @@ class ShareLoadingScreen extends StatelessWidget {
   Widget _buildSkeletonRow(TextStyle monoFont) {
     return Row(
       children: [
-        Container(
-          width: 48,
-          height: 12,
-          color: const Color(0xFFEAEAEA),
-        ),
+        Container(width: 48, height: 12, color: const Color(0xFFEAEAEA)),
         const SizedBox(width: 12),
         Expanded(
           child: Container(
             height: 12,
             decoration: BoxDecoration(
               color: AppThemeConstants.surfaceContainerLow,
-              border: Border.all(color: AppThemeConstants.primaryColor, width: 1),
+              border: Border.all(
+                color: AppThemeConstants.primaryColor,
+                width: 1,
+              ),
             ),
           ),
         ),
@@ -137,32 +146,4 @@ class ShareLoadingScreen extends StatelessWidget {
       ),
     );
   }
-}
-
-class DotGridOverlay extends StatelessWidget {
-  const DotGridOverlay({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(painter: _DotGridPainter());
-  }
-}
-
-class _DotGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.06)
-      ..style = PaintingStyle.fill;
-
-    const double spacing = 20.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 1.2, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

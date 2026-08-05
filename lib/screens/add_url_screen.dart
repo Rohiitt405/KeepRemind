@@ -2,7 +2,8 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
 import '../constants/app_theme.dart';
-import '../providers/reel_provider.dart';
+import '../providers/saved_link_provider.dart';
+import '../widgets/shared/dot_grid_overlay.dart';
 import 'home_screen.dart';
 import 'package:google_fonts/google_fonts.dart';
 
@@ -21,10 +22,10 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
 
   bool _pressed = false;
 
-  // Neo-Brutalist Color Tokens
   static const Color primaryColor = AppThemeConstants.primaryColor;
   static const Color backgroundColor = AppThemeConstants.backgroundColor;
-  static const Color surfaceContainerLow = AppThemeConstants.surfaceContainerLow;
+  static const Color surfaceContainerLow =
+      AppThemeConstants.surfaceContainerLow;
   static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
   static const Color secondaryFixed = AppThemeConstants.secondaryFixed;
   static const Color errorColor = AppThemeConstants.errorColor;
@@ -59,7 +60,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
     }
   }
 
-  Future<void> _saveReel() async {
+  Future<void> _saveSavedLink() async {
     if (!_formKey.currentState!.validate()) return;
 
     await Future.delayed(const Duration(milliseconds: 120));
@@ -67,8 +68,8 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
     if (!mounted) return;
 
     final url = _urlController.text.trim();
-    final provider = context.read<ReelProvider>();
-    await provider.saveReelFromUrl(url);
+    final provider = context.read<SavedLinkProvider>();
+    await provider.saveSavedLinkFromUrl(url);
 
     if (!mounted) return;
 
@@ -80,9 +81,12 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
       messenger.showSnackBar(
         SnackBar(
           content: Text(
-            'Reel saved successfully! 🎉',
+            'SavedLink saved successfully! 🎉',
             style: GoogleFonts.jetBrainsMono(
-              textStyle: const TextStyle(color: AppThemeConstants.surfaceColor, fontWeight: FontWeight.bold),
+              textStyle: const TextStyle(
+                color: AppThemeConstants.surfaceColor,
+                fontWeight: FontWeight.bold,
+              ),
             ),
           ),
           backgroundColor: AppThemeConstants.successColor,
@@ -103,16 +107,16 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
 
   @override
   Widget build(BuildContext context) {
-    final provider = context.watch<ReelProvider>();
-    
+    final provider = context.watch<SavedLinkProvider>();
+
     final displayFont = GoogleFonts.anton();
     final monoFont = GoogleFonts.jetBrainsMono();
     final spaceFont = GoogleFonts.spaceGrotesk();
 
     return Theme(
-      data: Theme.of(context).copyWith(
-        scaffoldBackgroundColor: backgroundColor,
-      ),
+      data: Theme.of(
+        context,
+      ).copyWith(scaffoldBackgroundColor: backgroundColor),
       child: Scaffold(
         appBar: AppBar(
           backgroundColor: AppThemeConstants.surfaceColor,
@@ -128,7 +132,12 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                 onTap: () => _returnToHome(Navigator.of(context)),
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(border: Border.all(color: AppThemeConstants.primaryColor, width: 2)),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppThemeConstants.primaryColor,
+                      width: 2,
+                    ),
+                  ),
                   child: const Icon(Icons.keyboard_return, color: primaryColor),
                 ),
               ),
@@ -147,11 +156,9 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
         body: Stack(
           children: [
             const Positioned.fill(
-              child: IgnorePointer(
-                child: DotGridOverlay(),
-              ),
+              child: IgnorePointer(child: DotGridOverlay()),
             ),
-            
+
             Positioned.fill(
               child: SingleChildScrollView(
                 padding: const EdgeInsets.all(16.0),
@@ -170,17 +177,29 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                           crossAxisAlignment: CrossAxisAlignment.stretch,
                           children: [
                             Container(
-                              padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 8),
+                              padding: const EdgeInsets.symmetric(
+                                horizontal: 12,
+                                vertical: 8,
+                              ),
                               decoration: const BoxDecoration(
                                 color: tertiaryFixed,
-                                border: Border(bottom: BorderSide(color: primaryColor, width: 2)),
+                                border: Border(
+                                  bottom: BorderSide(
+                                    color: primaryColor,
+                                    width: 2,
+                                  ),
+                                ),
                               ),
                               child: Text(
                                 'INPUT_SOURCE_COLLECTOR',
-                                style: monoFont.copyWith(color: primaryColor, fontSize: 16, fontWeight: FontWeight.bold),
+                                style: monoFont.copyWith(
+                                  color: primaryColor,
+                                  fontSize: 16,
+                                  fontWeight: FontWeight.bold,
+                                ),
                               ),
                             ),
-                            
+
                             Padding(
                               padding: const EdgeInsets.all(20),
                               child: Column(
@@ -188,18 +207,27 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                                 children: [
                                   Text(
                                     'PASTE YOUTUBE OR INSTGRAM LINK',
-                                    style: spaceFont.copyWith(fontSize: 24, color: primaryColor, letterSpacing: 0.5, fontWeight: FontWeight.w600),
+                                    style: spaceFont.copyWith(
+                                      fontSize: 24,
+                                      color: primaryColor,
+                                      letterSpacing: 0.5,
+                                      fontWeight: FontWeight.w600,
+                                    ),
                                   ),
                                   const SizedBox(height: 12),
-                                  
+
                                   // Brutalist Input Box Style with embedded Action Label
                                   TextFormField(
                                     controller: _urlController,
                                     keyboardType: TextInputType.url,
                                     autocorrect: false,
-                                    style: monoFont.copyWith(fontSize: 14, color: primaryColor),
+                                    style: monoFont.copyWith(
+                                      fontSize: 14,
+                                      color: primaryColor,
+                                    ),
                                     validator: (value) {
-                                      if (value == null || value.trim().isEmpty) {
+                                      if (value == null ||
+                                          value.trim().isEmpty) {
                                         return 'ERR: PIPELINE_EMPTY';
                                       }
                                       if (!value.startsWith('http')) {
@@ -210,34 +238,58 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                                     decoration: InputDecoration(
                                       filled: true,
                                       fillColor: surfaceContainerLow,
-                                      hintText: 'Paste Instagram/YouTube link...',
-                                      hintStyle: monoFont.copyWith(color: onSurfaceVariant.withValues(alpha: 0.5)),
+                                      hintText:
+                                          'Paste Instagram/YouTube link...',
+                                      hintStyle: monoFont.copyWith(
+                                        color: onSurfaceVariant.withValues(
+                                          alpha: 0.5,
+                                        ),
+                                      ),
                                       suffixIcon: IconButton(
-                                        icon: const Icon(Icons.assignment, color: primaryColor),
+                                        icon: const Icon(
+                                          Icons.assignment,
+                                          color: primaryColor,
+                                        ),
                                         onPressed: _pasteFromClipboard,
                                       ),
-                                      errorStyle: monoFont.copyWith(color: errorColor, fontWeight: FontWeight.bold),
+                                      errorStyle: monoFont.copyWith(
+                                        color: errorColor,
+                                        fontWeight: FontWeight.bold,
+                                      ),
                                       enabledBorder: const OutlineInputBorder(
-                                        borderSide: BorderSide(color: primaryColor, width: 3),
+                                        borderSide: BorderSide(
+                                          color: primaryColor,
+                                          width: 3,
+                                        ),
                                         borderRadius: BorderRadius.zero,
                                       ),
                                       focusedBorder: const OutlineInputBorder(
-                                        borderSide: BorderSide(color: primaryColor, width: 4),
+                                        borderSide: BorderSide(
+                                          color: primaryColor,
+                                          width: 4,
+                                        ),
                                         borderRadius: BorderRadius.zero,
                                       ),
                                       errorBorder: const OutlineInputBorder(
-                                        borderSide: BorderSide(color: errorColor, width: 3),
+                                        borderSide: BorderSide(
+                                          color: errorColor,
+                                          width: 3,
+                                        ),
                                         borderRadius: BorderRadius.zero,
                                       ),
-                                      focusedErrorBorder: const OutlineInputBorder(
-                                        borderSide: BorderSide(color: errorColor, width: 4),
-                                        borderRadius: BorderRadius.zero,
-                                      ),
+                                      focusedErrorBorder:
+                                          const OutlineInputBorder(
+                                            borderSide: BorderSide(
+                                              color: errorColor,
+                                              width: 4,
+                                            ),
+                                            borderRadius: BorderRadius.zero,
+                                          ),
                                     ),
                                   ),
                                 ],
                               ),
-                            )
+                            ),
                           ],
                         ),
                       ),
@@ -250,7 +302,10 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                           color: AppThemeConstants.primaryColor,
                           child: Text(
                             '>> ERROR_LOG: ${provider.errorMessage}',
-                            style: monoFont.copyWith(color: const Color(0xFFFFDAD6), fontSize: 13),
+                            style: monoFont.copyWith(
+                              color: const Color(0xFFFFDAD6),
+                              fontSize: 13,
+                            ),
                           ),
                         ),
                         const SizedBox(height: 20),
@@ -269,7 +324,7 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                           setState(() => _pressed = false);
                         },
                         child: InkWell(
-                          onTap: provider.isLoading ? null : _saveReel,
+                          onTap: provider.isLoading ? null : _saveSavedLink,
                           splashColor: Colors.transparent,
                           highlightColor: Colors.transparent,
                           child: AnimatedContainer(
@@ -285,11 +340,10 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                             ),
                             decoration: BoxDecoration(
                               color: secondaryFixed,
-                              border: Border.all(
-                                color: primaryColor,
-                                width: 2,
-                              ),
-                              boxShadow: _pressed ? [] : AppThemeConstants.neoShadowSm,
+                              border: Border.all(color: primaryColor, width: 2),
+                              boxShadow: _pressed
+                                  ? []
+                                  : AppThemeConstants.neoShadowSm,
                             ),
                             child: provider.isLoading
                                 ? const Center(
@@ -329,52 +383,94 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
 
                       Text(
                         '// OPERATION_ON_FETCH_DATA',
-                        style: monoFont.copyWith(fontSize: 12, fontWeight: FontWeight.bold, color: onSurfaceVariant),
+                        style: monoFont.copyWith(
+                          fontSize: 12,
+                          fontWeight: FontWeight.bold,
+                          color: onSurfaceVariant,
+                        ),
                       ),
                       const SizedBox(height: 8),
-                      
-                      _buildPipelineStep('META_EXTRACTION', 'Title and thumbnail are extracted from the Url', tertiaryFixed, monoFont),
-                      _buildPipelineStep('AI_MEMORY', 'AI generate 3-5 tags, and memory', secondaryFixed, monoFont),
-                      _buildPipelineStep('PRIVATE_STORAGE', 'Everything is saved to your phone storage', errorColor, monoFont),
-                      _buildPipelineStep('SCHEDULED_REMINDER', 'You\'ll get a Weekly/Daily reminder to review it', Colors.grey, monoFont),
+
+                      _buildPipelineStep(
+                        'META_EXTRACTION',
+                        'Title and thumbnail are extracted from the Url',
+                        tertiaryFixed,
+                        monoFont,
+                      ),
+                      _buildPipelineStep(
+                        'AI_MEMORY',
+                        'AI generate 3-5 tags, and memory',
+                        secondaryFixed,
+                        monoFont,
+                      ),
+                      _buildPipelineStep(
+                        'PRIVATE_STORAGE',
+                        'Everything is saved to your phone storage',
+                        errorColor,
+                        monoFont,
+                      ),
+                      _buildPipelineStep(
+                        'SCHEDULED_REMINDER',
+                        'You\'ll get a Weekly/Daily reminder to review it',
+                        Colors.grey,
+                        monoFont,
+                      ),
                     ],
                   ),
                 ),
               ),
-            )
+            ),
           ],
         ),
       ),
     );
   }
 
-  Widget _buildPipelineStep(String header, String body, Color stepColor, TextStyle monoFont) {
+  Widget _buildPipelineStep(
+    String header,
+    String body,
+    Color stepColor,
+    TextStyle monoFont,
+  ) {
     return Container(
       margin: const EdgeInsets.only(bottom: 12),
       padding: const EdgeInsets.all(14),
       decoration: BoxDecoration(
         color: AppThemeConstants.surfaceColor,
-        border: const Border(left: BorderSide(color: primaryColor, width: 10), bottom: BorderSide(color: primaryColor, width: 2)),
+        border: const Border(
+          left: BorderSide(color: primaryColor, width: 10),
+          bottom: BorderSide(color: primaryColor, width: 2),
+        ),
       ),
       child: Row(
         crossAxisAlignment: CrossAxisAlignment.center,
         children: [
-          Container(
-            height: 15,
-            width: 15,
-            color: stepColor,
-          ),
+          Container(height: 15, width: 15, color: stepColor),
           const SizedBox(width: 14),
           Expanded(
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.start,
               children: [
-                Text(header, style: monoFont.copyWith(fontSize: 12, fontWeight: FontWeight.w900, color: primaryColor)),
+                Text(
+                  header,
+                  style: monoFont.copyWith(
+                    fontSize: 12,
+                    fontWeight: FontWeight.w900,
+                    color: primaryColor,
+                  ),
+                ),
                 const SizedBox(height: 5),
-                Text(body, style: monoFont.copyWith(fontSize: 13, color: onSurfaceVariant, height: 1.2)),
+                Text(
+                  body,
+                  style: monoFont.copyWith(
+                    fontSize: 13,
+                    color: onSurfaceVariant,
+                    height: 1.2,
+                  ),
+                ),
               ],
             ),
-          )
+          ),
         ],
       ),
     );
@@ -382,31 +478,3 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
 }
 
 // --- Custom Grid Pattern Canvas Painter Layer ---
-
-class DotGridOverlay extends StatelessWidget {
-  const DotGridOverlay({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(painter: _DotGridPainter());
-  }
-}
-
-class _DotGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = AppThemeConstants.primaryColor.withValues(alpha: 0.06)
-      ..style = PaintingStyle.fill;
-
-    const double spacing = 20.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 1.2, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
-}

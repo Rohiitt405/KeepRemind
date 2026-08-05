@@ -5,7 +5,8 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import '../constants/app_theme.dart';
-import '../providers/reel_provider.dart';
+import '../providers/saved_link_provider.dart';
+import '../widgets/shared/dot_grid_overlay.dart';
 import 'home_screen.dart';
 import 'onboarding_screen.dart';
 
@@ -19,7 +20,6 @@ class SplashScreen extends StatefulWidget {
 }
 
 class _SplashScreenState extends State<SplashScreen> {
-  // Neo-Brutalist Global Design Tokens
   static const Color primaryColor = AppThemeConstants.primaryColor;
   static const Color backgroundColor = AppThemeConstants.backgroundColor;
   static const Color tertiaryFixed = AppThemeConstants.tertiaryFixed;
@@ -35,25 +35,26 @@ class _SplashScreenState extends State<SplashScreen> {
   @override
   void initState() {
     super.initState();
-    
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: backgroundColor,
-    ));
+
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: backgroundColor,
+      ),
+    );
 
     _startBootSequence();
   }
 
   void _startBootSequence() {
-    // Artificial pipeline staging increments to mimic terminal execution load array strings
     const duration = Duration(milliseconds: 40);
     _progressTimer = Timer.periodic(duration, (timer) {
       if (!mounted) return;
-      
+
       setState(() {
         _loadProgress += 0.02;
-        
+
         if (_loadProgress >= 0.25 && _loadProgress < 0.60) {
           _systemStatus = 'TUNING_VISUAL_PROCESSORS...';
         } else if (_loadProgress >= 0.60 && _loadProgress < 0.85) {
@@ -79,7 +80,7 @@ class _SplashScreenState extends State<SplashScreen> {
     if (!mounted) return;
 
     if (onboardingDone) {
-      final provider = context.read<ReelProvider>();
+      final provider = context.read<SavedLinkProvider>();
       await provider.ensureInitialDataLoaded();
     }
 
@@ -88,7 +89,8 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) => onboardingDone ? const HomeScreen() : const OnboardingScreen(),
+        builder: (_) =>
+            onboardingDone ? const HomeScreen() : const OnboardingScreen(),
       ),
     );
   }
@@ -109,12 +111,7 @@ class _SplashScreenState extends State<SplashScreen> {
       backgroundColor: backgroundColor,
       body: Stack(
         children: [
-          // Background Canvas Alignment Dot Mesh Overlay
-          const Positioned.fill(
-            child: IgnorePointer(
-              child: DotGridOverlay(),
-            ),
-          ),
+          const Positioned.fill(child: IgnorePointer(child: DotGridOverlay())),
 
           // Central Geometric Logo Anchor Grid
           Center(
@@ -142,7 +139,10 @@ class _SplashScreenState extends State<SplashScreen> {
                               height: 14,
                               decoration: BoxDecoration(
                                 color: quarterFixed,
-                                border: Border.all(color: primaryColor, width: 2),
+                                border: Border.all(
+                                  color: primaryColor,
+                                  width: 2,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -151,7 +151,10 @@ class _SplashScreenState extends State<SplashScreen> {
                               height: 14,
                               decoration: BoxDecoration(
                                 color: secondaryFixed,
-                                border: Border.all(color: primaryColor, width: 2),
+                                border: Border.all(
+                                  color: primaryColor,
+                                  width: 2,
+                                ),
                               ),
                             ),
                             const SizedBox(width: 8),
@@ -160,13 +163,16 @@ class _SplashScreenState extends State<SplashScreen> {
                               height: 14,
                               decoration: BoxDecoration(
                                 color: tertiaryFixed,
-                                border: Border.all(color: primaryColor, width: 2),
+                                border: Border.all(
+                                  color: primaryColor,
+                                  width: 2,
+                                ),
                               ),
                             ),
                           ],
                         ),
                         const SizedBox(height: 20),
-                        
+
                         // Bold Brand Core Title Header
                         Text(
                           'KEEP REMIND',
@@ -231,7 +237,7 @@ class _SplashScreenState extends State<SplashScreen> {
                               ),
                             ),
                           ],
-                        )
+                        ),
                       ],
                     ),
                   ),
@@ -272,41 +278,9 @@ class _SplashScreenState extends State<SplashScreen> {
                 ],
               ),
             ),
-          )
+          ),
         ],
       ),
     );
   }
-}
-
-// --- Canvas Architecture Mesh Painter ---
-
-class DotGridOverlay extends StatelessWidget {
-  const DotGridOverlay({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _DotGridPainter(),
-    );
-  }
-}
-
-class _DotGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.06)
-      ..style = PaintingStyle.fill;
-
-    const double spacing = 20.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 1.2, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

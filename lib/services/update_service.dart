@@ -17,12 +17,10 @@ class UpdateService {
 
       final response = await http.get(
         Uri.parse(GithubConstants.latestReleaseApi),
-        headers: {
-          'Accept': 'application/vnd.github+json',
-        },
+        headers: {'Accept': 'application/vnd.github+json'},
       );
 
-      if(response.statusCode != 200) {
+      if (response.statusCode != 200) {
         return null;
       }
 
@@ -31,16 +29,14 @@ class UpdateService {
       final latestVersion = (json["tag_name"] as String).replaceFirst('v', '');
 
       final hasUpdate = VersionHelper.isNewerVersion(
-        lastestVersion: latestVersion, 
-        currentVersion: currentVersion
+        latestVersion: latestVersion,
+        currentVersion: currentVersion,
       );
-
       return UpdateInfo.fromGithubJson(
-        json: json, 
-        currentVersion: currentVersion, 
-        hasUpdate: hasUpdate
+        json: json,
+        currentVersion: currentVersion,
+        hasUpdate: hasUpdate,
       );
-
     } catch (e, stackTrace) {
       debugPrint("Update Error: $e");
       debugPrintStack(stackTrace: stackTrace);

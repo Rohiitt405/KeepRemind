@@ -22,8 +22,9 @@ class NotificationService {
     final timezoneInfo = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
 
-    const androidSettings =
-        AndroidInitializationSettings('@mipmap/ic_launcher');
+    const androidSettings = AndroidInitializationSettings(
+      '@mipmap/ic_launcher',
+    );
 
     const iosSettings = DarwinInitializationSettings(
       requestAlertPermission: true,
@@ -41,8 +42,10 @@ class NotificationService {
 
   // Request notification permission (Android 13+ requires explicit permission)
   Future<bool> requestPermission() async {
-    final android = _plugin.resolvePlatformSpecificImplementation
-        <AndroidFlutterLocalNotificationsPlugin>();
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<
+          AndroidFlutterLocalNotificationsPlugin
+        >();
 
     if (android != null) {
       final granted = await android.requestNotificationsPermission();
@@ -69,7 +72,7 @@ class NotificationService {
     const androidDetails = AndroidNotificationDetails(
       'weekly_reminder',
       'Weekly Reminder',
-      channelDescription: 'Weekly reminder to review your saved reels',
+      channelDescription: 'Weekly reminder to review your saved links',
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -83,8 +86,8 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: _weeklyReminderId,
-      title: '🎬 Time to review your saved reels',
-      body: reminderText ?? 'Review your saved reels',
+      title: '🎬 Time to review your saved links',
+      body: reminderText ?? 'Review your saved links',
       scheduledDate: scheduledDate,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -99,17 +102,14 @@ class NotificationService {
   // ─── Daily ─────────────────────────────────────────────────────────────────
 
   // Schedule a daily notification at the given hour:minute every day
-  Future<void> scheduleDailyReminder({
-    int hour = 10,
-    int minute = 0,
-  }) async {
+  Future<void> scheduleDailyReminder({int hour = 10, int minute = 0}) async {
     // Cancel both so no stale weekly reminder lingers when switching modes
     await cancelAll();
 
     const androidDetails = AndroidNotificationDetails(
       'daily_reminder',
       'Daily Reminder',
-      channelDescription: 'Daily reminder to review your saved reels',
+      channelDescription: 'Daily reminder to review your saved links',
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -123,8 +123,8 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: _dailyReminderId,
-      title: '🎬 Daily reel review!',
-      body: 'Take a moment to review your saved reels and key takeaways.',
+      title: '🎬 Daily saved link review!',
+      body: 'Take a moment to review your saved links and key takeaways.',
       scheduledDate: scheduledDate,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
@@ -189,11 +189,11 @@ class NotificationService {
   // (called from provider before scheduling)
   String buildNotificationBody(int unreviewedCount) {
     if (unreviewedCount == 0) {
-      return 'Open the app to revisit your saved reels.';
+      return 'Open the app to revisit your saved links.';
     } else if (unreviewedCount == 1) {
-      return 'You have 1 unreviewed reel waiting. Tap to review it!';
+      return 'You have 1 unreviewed saved link waiting. Tap to review it!';
     } else {
-      return 'You have $unreviewedCount unreviewed reels waiting. Tap to review them!';
+      return 'You have $unreviewedCount unreviewed saved links waiting. Tap to review them!';
     }
   }
 }

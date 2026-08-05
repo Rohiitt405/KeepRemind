@@ -17,22 +17,22 @@ class AppThemeConstants {
   static const Color successColor = Colors.green;
 
   static List<BoxShadow> get neoShadow => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(6, 6),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black,
+      offset: Offset(6, 6),
+      blurRadius: 0,
+      spreadRadius: 0,
+    ),
+  ];
 
   static List<BoxShadow> get neoShadowSm => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(4, 4),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black,
+      offset: Offset(4, 4),
+      blurRadius: 0,
+      spreadRadius: 0,
+    ),
+  ];
 
   static ThemeData buildTheme() {
     final colorScheme = ColorScheme.fromSeed(

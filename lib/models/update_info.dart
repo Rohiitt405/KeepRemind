@@ -47,13 +47,14 @@ class UpdateInfo {
     }
 
     return UpdateInfo(
-      hasUpdate: hasUpdate, 
-      currentVersion: currentVersion, 
-      latestVersion: (json["tag_name"] ?? "")
-        .toString()
-        .replaceFirst(RegExp(r'^v'), ''), 
-      downloadUrl: downloadUrl, 
-      releasePageUrl: (json["html_url"] ?? "").toString(), 
+      hasUpdate: hasUpdate,
+      currentVersion: currentVersion,
+      latestVersion: (json["tag_name"] ?? "").toString().replaceFirst(
+        RegExp(r'^v'),
+        '',
+      ),
+      downloadUrl: downloadUrl,
+      releasePageUrl: (json["html_url"] ?? "").toString(),
       releaseNotes: (json["body"] ?? "").toString(),
     );
   }

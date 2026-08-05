@@ -1,7 +1,7 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'dart:async';
-import './providers/reel_provider.dart';
+import 'providers/saved_link_provider.dart';
 import './providers/update_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 import 'constants/app_theme.dart';
@@ -37,30 +37,33 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
   }
 
   void _handleShareIntents() {
-    ReceiveSharingIntent.instance.getInitialMedia().then((media) {
-      if (media.isNotEmpty) {
-        final url = _extractUrl(media);
-        if (url != null && url.isNotEmpty) {
-          setState(() {
-            _pendingUrl = url;
-            _shareFlowActive = true;
-            _shareIntentChecked = true;
-          });
-          _tryNavigate(url);
-        } else {
-          setState(() {
-            _shareIntentChecked = true;
-          });
-        }
-        ReceiveSharingIntent.instance.reset();
-      } else {
-        setState(() {
-          _shareIntentChecked = true;
+    ReceiveSharingIntent.instance
+        .getInitialMedia()
+        .then((media) {
+          if (media.isNotEmpty) {
+            final url = _extractUrl(media);
+            if (url != null && url.isNotEmpty) {
+              setState(() {
+                _pendingUrl = url;
+                _shareFlowActive = true;
+                _shareIntentChecked = true;
+              });
+              _tryNavigate(url);
+            } else {
+              setState(() {
+                _shareIntentChecked = true;
+              });
+            }
+            ReceiveSharingIntent.instance.reset();
+          } else {
+            setState(() {
+              _shareIntentChecked = true;
+            });
+          }
+        })
+        .catchError((e) {
+          debugPrint('Error getting initial media: $e');
         });
-      }
-    }).catchError((e) {
-      debugPrint('Error getting initial media: $e');
-    });
 
     _shareSubscription = ReceiveSharingIntent.instance.getMediaStream().listen(
       (media) {
@@ -124,9 +127,7 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
             _shareLoadingRouteVisible = false;
           });
           nav.pushReplacement(
-            MaterialPageRoute(
-              builder: (_) => AddUrlScreen(initialUrl: url),
-            ),
+            MaterialPageRoute(builder: (_) => AddUrlScreen(initialUrl: url)),
           );
         }
       });
@@ -139,7 +140,9 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
 
     return MultiProvider(
       providers: [
-        ChangeNotifierProvider(create: (_) => ReelProvider()..listenToReels()),
+        ChangeNotifierProvider(
+          create: (_) => SavedLinkProvider()..listenToSavedLinks(),
+        ),
         ChangeNotifierProvider(create: (_) => UpdateProvider()),
       ],
       child: MaterialApp(

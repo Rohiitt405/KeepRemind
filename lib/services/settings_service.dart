@@ -41,7 +41,7 @@ class SettingsService {
 
     final value = prefs.getString(_lastUpdateCheckKey);
 
-    if(value == null) {
+    if (value == null) {
       return null;
     }
 
@@ -51,7 +51,7 @@ class SettingsService {
   Future<bool> shouldCheckForUpdate() async {
     final lastCheck = await getLastUpdateCheck();
 
-    if(lastCheck == null) {
+    if (lastCheck == null) {
       return true;
     }
 

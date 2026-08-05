@@ -1,17 +1,20 @@
-class ReelItem {
+import 'social_platform.dart';
+
+class SavedLink {
   final String? aiMemory;
   final List<String>? aiTags;
   final bool isGenerating;
+
   final String id;
   final String url;
   final String title;
   final String caption;
   final String thumbnailUrl;
-  final String platform;
+  final SocialPlatform platform;
   final DateTime savedAt;
   final bool isReviewed;
 
-  ReelItem({
+  const SavedLink({
     this.aiMemory,
     this.aiTags,
     this.isGenerating = false,
@@ -34,31 +37,36 @@ class ReelItem {
       'title': title,
       'caption': caption,
       'thumbnailUrl': thumbnailUrl,
-      'platform': platform,
+
+      // Store enum as String in Firestore
+      'platform': platform.value,
+
       'savedAt': savedAt.toIso8601String(),
       'isReviewed': isReviewed,
     };
   }
 
-  factory ReelItem.fromMap(String id, Map<String, dynamic> map) {
-    return ReelItem(
-      aiMemory: map['aiMemory'],
-      aiTags: map['aiTags'] != null
-        ? List<String>.from(map['aiTags'])
-        : null,
+  factory SavedLink.fromMap(String id, Map<String, dynamic> map) {
+    return SavedLink(
+      aiMemory: map['aiMemory'] as String?,
+      aiTags: map['aiTags'] != null ? List<String>.from(map['aiTags']) : null,
       isGenerating: map['aiGenerating'] == true,
       id: id,
       url: map['url'] ?? '',
       title: map['title'] ?? '',
       caption: map['caption'] ?? '',
       thumbnailUrl: map['thumbnailUrl'] ?? '',
-      platform: map['platform'] ?? '',
+
+      platform: SocialPlatformExtension.fromString(
+        map['platform'] ?? 'unknown',
+      ),
+
       savedAt: DateTime.parse(map['savedAt']),
       isReviewed: map['isReviewed'] ?? false,
     );
   }
 
-  ReelItem copyWith({
+  SavedLink copyWith({
     String? aiMemory,
     List<String>? aiTags,
     bool? isGenerating,
@@ -67,11 +75,11 @@ class ReelItem {
     String? title,
     String? caption,
     String? thumbnailUrl,
-    String? platform,
+    SocialPlatform? platform,
     DateTime? savedAt,
     bool? isReviewed,
   }) {
-    return ReelItem(
+    return SavedLink(
       aiMemory: aiMemory ?? this.aiMemory,
       aiTags: aiTags ?? this.aiTags,
       isGenerating: isGenerating ?? this.isGenerating,

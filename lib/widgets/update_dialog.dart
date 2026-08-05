@@ -4,14 +4,12 @@ import 'package:url_launcher/url_launcher.dart';
 
 import '../models/update_info.dart';
 import '../constants/app_theme.dart'; // Adjust path based on your folder structure
+import 'shared/neo_brutalist_button.dart';
 
 class UpdateDialog {
   const UpdateDialog._();
 
-  static Future<void> show(
-    BuildContext context,
-    UpdateInfo updateInfo,
-  ) async {
+  static Future<void> show(BuildContext context, UpdateInfo updateInfo) async {
     if (!context.mounted) return;
 
     final displayFont = GoogleFonts.anton();
@@ -25,12 +23,18 @@ class UpdateDialog {
         return Dialog(
           backgroundColor: AppThemeConstants.surfaceColor,
           elevation: 0,
-          insetPadding: const EdgeInsets.symmetric(horizontal: 20, vertical: 24),
+          insetPadding: const EdgeInsets.symmetric(
+            horizontal: 20,
+            vertical: 24,
+          ),
           shape: const RoundedRectangleBorder(borderRadius: BorderRadius.zero),
           child: Container(
             decoration: BoxDecoration(
               color: AppThemeConstants.surfaceColor,
-              border: Border.all(color: AppThemeConstants.primaryColor, width: 4),
+              border: Border.all(
+                color: AppThemeConstants.primaryColor,
+                width: 4,
+              ),
               boxShadow: AppThemeConstants.neoShadow,
             ),
             child: Column(
@@ -40,7 +44,10 @@ class UpdateDialog {
                 // --- Terminal Title Header ---
                 Container(
                   color: AppThemeConstants.primaryColor,
-                  padding: const EdgeInsets.symmetric(horizontal: 16, vertical: 12),
+                  padding: const EdgeInsets.symmetric(
+                    horizontal: 16,
+                    vertical: 12,
+                  ),
                   child: Row(
                     children: [
                       const Icon(
@@ -106,7 +113,9 @@ class UpdateDialog {
                             const SizedBox(height: 6),
                             Container(
                               height: 1,
-                              color: AppThemeConstants.primaryColor.withOpacity(0.2),
+                              color: AppThemeConstants.primaryColor.withValues(
+                                alpha: 0.2,
+                              ),
                             ),
                             const SizedBox(height: 6),
                             Row(
@@ -121,7 +130,10 @@ class UpdateDialog {
                                   ),
                                 ),
                                 Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 6,
+                                    vertical: 2,
+                                  ),
                                   color: AppThemeConstants.tertiaryFixed,
                                   child: Text(
                                     updateInfo.latestVersion,
@@ -198,7 +210,9 @@ class UpdateDialog {
                             child: GestureDetector(
                               onTap: () => Navigator.of(dialogContext).pop(),
                               child: Container(
-                                padding: const EdgeInsets.symmetric(vertical: 14),
+                                padding: const EdgeInsets.symmetric(
+                                  vertical: 14,
+                                ),
                                 decoration: BoxDecoration(
                                   color: AppThemeConstants.surfaceColor,
                                   border: Border.all(
@@ -224,7 +238,7 @@ class UpdateDialog {
                           // "Update" Primary Action
                           Expanded(
                             flex: 2,
-                            child: NeoBrutalistDialogButton(
+                            child: NeoBrutalistButton(
                               onPressed: () async {
                                 final url = updateInfo.downloadUrl.isNotEmpty
                                     ? updateInfo.downloadUrl
@@ -240,6 +254,8 @@ class UpdateDialog {
                                 }
                               },
                               backgroundColor: AppThemeConstants.secondaryFixed,
+                              borderColor: AppThemeConstants.primaryColor,
+                              padding: const EdgeInsets.symmetric(vertical: 14),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -276,55 +292,3 @@ class UpdateDialog {
 }
 
 // --- Stateful Interactive Button Component for Press Offset Effects ---
-
-class NeoBrutalistDialogButton extends StatefulWidget {
-  final Widget child;
-  final Color backgroundColor;
-  final VoidCallback onPressed;
-
-  const NeoBrutalistDialogButton({
-    super.key,
-    required this.child,
-    required this.backgroundColor,
-    required this.onPressed,
-  });
-
-  @override
-  State<NeoBrutalistDialogButton> createState() => _NeoBrutalistDialogButtonState();
-}
-
-class _NeoBrutalistDialogButtonState extends State<NeoBrutalistDialogButton> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 60),
-        padding: const EdgeInsets.symmetric(vertical: 12),
-        transform: _isPressed
-            ? Matrix4.translationValues(2, 2, 0)
-            : Matrix4.translationValues(0, 0, 0),
-        decoration: BoxDecoration(
-          color: widget.backgroundColor,
-          border: Border.all(color: AppThemeConstants.primaryColor, width: 3),
-          boxShadow: _isPressed
-              ? const [
-                  BoxShadow(
-                    color: AppThemeConstants.primaryColor,
-                    offset: Offset(2, 2),
-                  )
-                ]
-              : AppThemeConstants.neoShadowSm,
-        ),
-        child: widget.child,
-      ),
-    );
-  }
-}

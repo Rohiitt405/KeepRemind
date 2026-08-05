@@ -1,6 +1,6 @@
 import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:font_awesome_flutter/font_awesome_flutter.dart';
+
 import 'package:google_fonts/google_fonts.dart';
 
 import '../constants/app_theme.dart';
@@ -26,7 +26,7 @@ class SavedLinkCard extends StatelessWidget {
   static const Color quarterFixed = AppThemeConstants.quarterFixed;
   static const Color onSurfaceVariant = AppThemeConstants.onSurfaceVariant;
 
-  List<BoxShadow> get neoShadowSm => const [
+  static const List<BoxShadow> neoShadowSm = [
     BoxShadow(color: Colors.black, offset: Offset(4, 4), blurRadius: 0),
   ];
 
@@ -35,7 +35,7 @@ class SavedLinkCard extends StatelessWidget {
     final monoFont = GoogleFonts.jetBrainsMono();
     final spaceFont = GoogleFonts.spaceGrotesk();
 
-    final badgeColor = _platformColor(savedLink.platform);
+    final badgeColor = savedLink.platform.color;
 
     return Container(
       decoration: BoxDecoration(
@@ -205,7 +205,7 @@ class SavedLinkCard extends StatelessWidget {
     return Container(
       color: primaryColor,
       child: Center(
-        child: _platformIcon(savedLink.platform)
+        child: savedLink.platform.iconWidget,
       ),
     );
   }
@@ -226,11 +226,11 @@ class SavedLinkCard extends StatelessWidget {
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 6, vertical: 2),
       decoration: BoxDecoration(
-        color: _platformColor(savedLink.platform),
+        color: savedLink.platform.color,
         border: Border.all(color: primaryColor, width: 2),
       ),
       child: Text(
-        _platformLabel(savedLink.platform),
+        savedLink.platform.label,
         style: style.copyWith(
           fontSize: 8,
           fontWeight: FontWeight.bold,
@@ -240,147 +240,6 @@ class SavedLinkCard extends StatelessWidget {
     );
   }
 
-  Color _platformColor(SocialPlatform platform) {
-    switch (platform) {
-      case SocialPlatform.youtube:
-      return const Color(0xFFFF0000);
-
-    case SocialPlatform.instagram:
-      return const Color(0xFFE4405F);
-
-    case SocialPlatform.facebook:
-      return const Color(0xFF1877F2);
-
-    case SocialPlatform.reddit:
-      return const Color(0xFFFF4500);
-
-    case SocialPlatform.linkedin:
-      return const Color(0xFF0A66C2);
-
-    case SocialPlatform.pinterest:
-      return const Color(0xFFE60023);
-
-    case SocialPlatform.x:
-      return const Color(0xFF929090);
-
-    case SocialPlatform.snapchat:
-      return const Color(0xFFFFFC00);
-
-    case SocialPlatform.threads:
-      return const Color(0xFF101010);
-
-    case SocialPlatform.unknown:
-      return tertiaryFixed;
-    }
-  }
-
-  String _platformLabel(SocialPlatform platform) {
-    switch (platform) {
-      case SocialPlatform.youtube:
-        return "YOUTUBE";
-
-      case SocialPlatform.instagram:
-        return "INSTAGRAM";
-
-      case SocialPlatform.facebook:
-        return "FACEBOOK";
-
-      case SocialPlatform.threads:
-        return "THREADS";
-
-      case SocialPlatform.reddit:
-        return "REDDIT";
-
-      case SocialPlatform.linkedin:
-        return "LINKEDIN";
-
-      case SocialPlatform.pinterest:
-        return "PINTEREST";
-
-      case SocialPlatform.x:
-        return "X";
-
-      case SocialPlatform.snapchat:
-        return "SNAPCHAT";
-
-      case SocialPlatform.unknown:
-        return "LINK";
-    }
-  }
-
-  Widget _platformIcon(SocialPlatform platform) {
-    switch (platform) {
-      case SocialPlatform.youtube:
-        return const FaIcon(
-          FontAwesomeIcons.youtube,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.instagram:
-        return const FaIcon(
-          FontAwesomeIcons.instagram,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.facebook:
-        return const FaIcon(
-          FontAwesomeIcons.facebook,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.reddit:
-        return const FaIcon(
-          FontAwesomeIcons.reddit,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.linkedin:
-        return const FaIcon(
-          FontAwesomeIcons.linkedin,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.pinterest:
-        return const FaIcon(
-          FontAwesomeIcons.pinterest,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.x:
-        return const FaIcon(
-          FontAwesomeIcons.xTwitter,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.threads:
-        return const FaIcon(
-          FontAwesomeIcons.threads,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.snapchat:
-        return const FaIcon(
-          FontAwesomeIcons.snapchat,
-          color: Colors.white,
-          size: 30,
-        );
-
-      case SocialPlatform.unknown:
-        return const Icon(
-          Icons.link_rounded,
-          color: Colors.white,
-          size: 30,
-        );
-    }
-  }
 
   String _formatDate(DateTime date) {
     final diff = DateTime.now().difference(date).inDays;

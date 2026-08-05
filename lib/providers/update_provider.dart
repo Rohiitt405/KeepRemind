@@ -15,7 +15,7 @@ class UpdateProvider extends ChangeNotifier {
   bool get hasUpdate => _updateInfo?.hasUpdate ?? false;
 
   Future<void> checkForUpdate() async {
-    if(_isChecking) return;
+    if (_isChecking) return;
 
     _isChecking = true;
     notifyListeners();

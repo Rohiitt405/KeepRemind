@@ -3,6 +3,8 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import '../services/notification_service.dart';
 import '../services/settings_service.dart';
+import '../widgets/shared/dot_grid_overlay.dart';
+import '../widgets/shared/neo_brutalist_button.dart';
 
 class SettingsScreen extends StatefulWidget {
   const SettingsScreen({super.key});
@@ -41,31 +43,33 @@ class _SettingsScreenState extends State<SettingsScreen> {
   static const Color onSurfaceVariant = Color(0xFF4C4546);
 
   List<BoxShadow> get neoShadow => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(6, 6),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black,
+      offset: Offset(6, 6),
+      blurRadius: 0,
+      spreadRadius: 0,
+    ),
+  ];
 
   List<BoxShadow> get neoShadowSm => const [
-        BoxShadow(
-          color: Colors.black,
-          offset: Offset(4, 4),
-          blurRadius: 0,
-          spreadRadius: 0,
-        ),
-      ];
+    BoxShadow(
+      color: Colors.black,
+      offset: Offset(4, 4),
+      blurRadius: 0,
+      spreadRadius: 0,
+    ),
+  ];
 
   @override
   void initState() {
     super.initState();
-    SystemChrome.setSystemUIOverlayStyle(const SystemUiOverlayStyle(
-      statusBarColor: Colors.transparent,
-      statusBarIconBrightness: Brightness.dark,
-      systemNavigationBarColor: backgroundColor,
-    ));
+    SystemChrome.setSystemUIOverlayStyle(
+      const SystemUiOverlayStyle(
+        statusBarColor: Colors.transparent,
+        statusBarIconBrightness: Brightness.dark,
+        systemNavigationBarColor: backgroundColor,
+      ),
+    );
     _loadSettings();
   }
 
@@ -112,7 +116,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             content: Text(
               'SUCCESS: REMINDER_MATRIX_UPDATED',
               style: GoogleFonts.jetBrainsMono(
-                textStyle: const TextStyle(color: tertiaryFixed, fontWeight: FontWeight.bold),
+                textStyle: const TextStyle(
+                  color: tertiaryFixed,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             backgroundColor: primaryColor,
@@ -126,7 +133,10 @@ class _SettingsScreenState extends State<SettingsScreen> {
             content: Text(
               'CRITICAL_ERR: HANDSHAKE_FAILED',
               style: GoogleFonts.jetBrainsMono(
-                textStyle: const TextStyle(color: Colors.white, fontWeight: FontWeight.bold),
+                textStyle: const TextStyle(
+                  color: Colors.white,
+                  fontWeight: FontWeight.bold,
+                ),
               ),
             ),
             backgroundColor: errorColor,
@@ -168,9 +178,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final spaceFont = GoogleFonts.spaceGrotesk();
 
     return Theme(
-      data: Theme.of(context).copyWith(
-        scaffoldBackgroundColor: backgroundColor,
-      ),
+      data: Theme.of(
+        context,
+      ).copyWith(scaffoldBackgroundColor: backgroundColor),
       child: Scaffold(
         // --- Top Bar Component ---
         appBar: AppBar(
@@ -187,7 +197,9 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 onTap: () => Navigator.pop(context),
                 child: Container(
                   padding: const EdgeInsets.all(4),
-                  decoration: BoxDecoration(border: Border.all(color: Colors.black, width: 2)),
+                  decoration: BoxDecoration(
+                    border: Border.all(color: Colors.black, width: 2),
+                  ),
                   child: const Icon(Icons.arrow_back, color: primaryColor),
                 ),
               ),
@@ -203,7 +215,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
             ],
           ),
         ),
-        
+
         body: _isLoading
             ? const Center(
                 child: CircularProgressIndicator(color: primaryColor),
@@ -212,15 +224,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                 children: [
                   const Positioned.fill(
                     child: IgnorePointer(
-                      child: RepaintBoundary(
-                        child: DotGridOverlay(),
-                      ),
+                      child: RepaintBoundary(child: DotGridOverlay()),
                     ),
                   ),
 
                   Positioned.fill(
                     child: SingleChildScrollView(
-                      padding: const EdgeInsets.symmetric(horizontal: 16.0, vertical: 32.0),
+                      padding: const EdgeInsets.symmetric(
+                        horizontal: 16.0,
+                        vertical: 32.0,
+                      ),
                       child: Column(
                         crossAxisAlignment: CrossAxisAlignment.stretch,
                         children: [
@@ -260,10 +273,14 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             ),
                           ),
                           const SizedBox(height: 22),
-                          
+
                           Row(
                             children: [
-                              const Icon(Icons.schedule, color: primaryColor, size: 20),
+                              const Icon(
+                                Icons.schedule,
+                                color: primaryColor,
+                                size: 20,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'REMINDER_TARGET',
@@ -272,7 +289,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
                                 ),
-                              )
+                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
@@ -285,17 +302,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   padding: const EdgeInsets.all(10),
                                   decoration: BoxDecoration(
                                     color: Colors.white,
-                                    border: Border.all(color: primaryColor, width: 4),
+                                    border: Border.all(
+                                      color: primaryColor,
+                                      width: 4,
+                                    ),
                                     boxShadow: neoShadow,
                                   ),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 2),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 8,
+                                      vertical: 2,
+                                    ),
                                     decoration: BoxDecoration(
                                       color: primaryColor,
-                                      border: Border.all(color: primaryColor, width: 8),
+                                      border: Border.all(
+                                        color: primaryColor,
+                                        width: 8,
+                                      ),
                                     ),
                                     child: Row(
-                                      mainAxisAlignment: MainAxisAlignment.center,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
                                       children: [
                                         Text(
                                           _formatTimeOfDay(_selectedTime),
@@ -314,10 +341,16 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                 bottom: -12,
                                 right: 12,
                                 child: Container(
-                                  padding: const EdgeInsets.symmetric(horizontal: 12, vertical: 4),
+                                  padding: const EdgeInsets.symmetric(
+                                    horizontal: 12,
+                                    vertical: 4,
+                                  ),
                                   decoration: BoxDecoration(
                                     color: tertiaryFixed,
-                                    border: Border.all(color: primaryColor, width: 4),
+                                    border: Border.all(
+                                      color: primaryColor,
+                                      width: 4,
+                                    ),
                                   ),
                                   child: Text(
                                     '24H_MODE_ACTIVE',
@@ -328,14 +361,18 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                     ),
                                   ),
                                 ),
-                              )
+                              ),
                             ],
                           ),
                           const SizedBox(height: 25),
 
                           Row(
                             children: [
-                              const Icon(Icons.update, color: primaryColor, size: 20),
+                              const Icon(
+                                Icons.update,
+                                color: primaryColor,
+                                size: 20,
+                              ),
                               const SizedBox(width: 8),
                               Text(
                                 'SYNC_FREQUENCY',
@@ -344,19 +381,31 @@ class _SettingsScreenState extends State<SettingsScreen> {
                                   fontWeight: FontWeight.bold,
                                   color: primaryColor,
                                 ),
-                              )
+                              ),
                             ],
                           ),
                           const SizedBox(height: 8),
                           Row(
                             children: [
-                              _buildTerminalToggleOption('DAILY', _reminderType == 'daily', () {
-                                setState(() => _reminderType = 'daily');
-                              }, tertiaryFixed, monoFont),
+                              _buildTerminalToggleOption(
+                                'DAILY',
+                                _reminderType == 'daily',
+                                () {
+                                  setState(() => _reminderType = 'daily');
+                                },
+                                tertiaryFixed,
+                                monoFont,
+                              ),
                               const SizedBox(width: 16),
-                              _buildTerminalToggleOption('WEEKLY', _reminderType == 'weekly', () {
-                                setState(() => _reminderType = 'weekly');
-                              }, tertiaryFixed, monoFont),
+                              _buildTerminalToggleOption(
+                                'WEEKLY',
+                                _reminderType == 'weekly',
+                                () {
+                                  setState(() => _reminderType = 'weekly');
+                                },
+                                tertiaryFixed,
+                                monoFont,
+                              ),
                             ],
                           ),
                           const SizedBox(height: 25),
@@ -364,11 +413,19 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           if (_reminderType == 'weekly') ...[
                             Row(
                               children: [
-                                const Icon(Icons.calendar_today, color: primaryColor, size: 18),
+                                const Icon(
+                                  Icons.calendar_today,
+                                  color: primaryColor,
+                                  size: 18,
+                                ),
                                 const SizedBox(width: 8),
                                 Text(
                                   'ON_THIS_DAY',
-                                  style: spaceFont.copyWith(fontSize: 14, fontWeight: FontWeight.bold, color: primaryColor),
+                                  style: spaceFont.copyWith(
+                                    fontSize: 14,
+                                    fontWeight: FontWeight.bold,
+                                    color: primaryColor,
+                                  ),
                                 ),
                               ],
                             ),
@@ -377,15 +434,28 @@ class _SettingsScreenState extends State<SettingsScreen> {
                               spacing: 8,
                               runSpacing: 8,
                               children: _weekdays.entries.map((entry) {
-                                final isSelected = _selectedWeekday == entry.key;
+                                final isSelected =
+                                    _selectedWeekday == entry.key;
                                 return GestureDetector(
-                                  onTap: () => setState(() => _selectedWeekday = entry.key),
+                                  onTap: () => setState(
+                                    () => _selectedWeekday = entry.key,
+                                  ),
                                   child: Container(
-                                    padding: const EdgeInsets.symmetric(horizontal: 14, vertical: 10),
+                                    padding: const EdgeInsets.symmetric(
+                                      horizontal: 14,
+                                      vertical: 10,
+                                    ),
                                     decoration: BoxDecoration(
-                                      color: isSelected ? secondaryFixed : surfaceContainerLowest,
-                                      border: Border.all(color: primaryColor, width: 3),
-                                      boxShadow: isSelected ? null : neoShadowSm,
+                                      color: isSelected
+                                          ? secondaryFixed
+                                          : surfaceContainerLowest,
+                                      border: Border.all(
+                                        color: primaryColor,
+                                        width: 3,
+                                      ),
+                                      boxShadow: isSelected
+                                          ? null
+                                          : neoShadowSm,
                                     ),
                                     transform: isSelected
                                         ? Matrix4.translationValues(2, 2, 0)
@@ -405,11 +475,48 @@ class _SettingsScreenState extends State<SettingsScreen> {
                             const SizedBox(height: 32),
                           ],
 
-                          NeoBrutalistSynchronizeButton(
-                            onPressed: _isSaving ? () {} : _saveSettings,
-                            isLoading: _isSaving,
-                            displayFont: displayFont,
+                          NeoBrutalistButton(
+                            onPressed: _isSaving ? null : _saveSettings,
                             backgroundColor: secondaryFixed,
+                            borderColor: primaryColor,
+                            shape: BoxShape.rectangle,
+                            padding: const EdgeInsets.symmetric(vertical: 18),
+                            enabled: !_isSaving,
+                            child: AnimatedSwitcher(
+                              duration: const Duration(milliseconds: 200),
+                              child: _isSaving
+                                  ? const SizedBox(
+                                      key: ValueKey('loading'),
+                                      width: 24,
+                                      height: 24,
+                                      child: CircularProgressIndicator(
+                                        color: Colors.black,
+                                        strokeWidth: 3,
+                                      ),
+                                    )
+                                  : Row(
+                                      key: const ValueKey('text'),
+                                      mainAxisSize: MainAxisSize.min,
+                                      mainAxisAlignment:
+                                          MainAxisAlignment.center,
+                                      children: [
+                                        Text(
+                                          'SYNCHRONIZE',
+                                          style: displayFont.copyWith(
+                                            fontSize: 28,
+                                            letterSpacing: 2,
+                                            color: Colors.black,
+                                          ),
+                                        ),
+                                        const SizedBox(width: 12),
+                                        const Icon(
+                                          Icons.bolt,
+                                          color: Colors.black,
+                                          size: 30,
+                                        ),
+                                      ],
+                                    ),
+                            ),
                           ),
                         ],
                       ),
@@ -463,123 +570,4 @@ class _SettingsScreenState extends State<SettingsScreen> {
     final minute = time.minute.toString().padLeft(2, '0');
     return '$hour:$minute';
   }
-}
-
-class NeoBrutalistSynchronizeButton extends StatefulWidget {
-  final VoidCallback onPressed;
-  final bool isLoading;
-  final TextStyle displayFont;
-  final Color backgroundColor;
-
-  const NeoBrutalistSynchronizeButton({
-    super.key,
-    required this.onPressed,
-    required this.isLoading,
-    required this.displayFont,
-    required this.backgroundColor,
-  });
-
-  @override
-  State<NeoBrutalistSynchronizeButton> createState() => _NeoBrutalistSynchronizeButtonState();
-}
-
-class _NeoBrutalistSynchronizeButtonState extends State<NeoBrutalistSynchronizeButton> {
-  bool _isPressed = false;
-
-  @override
-  Widget build(BuildContext context) {
-    return GestureDetector(
-      onTapDown: (_) => setState(() => _isPressed = true),
-      onTapUp: (_) {
-        setState(() => _isPressed = false);
-        widget.onPressed();
-      },
-      onTapCancel: () => setState(() => _isPressed = false),
-      child: AnimatedContainer(
-        duration: const Duration(milliseconds: 60),
-        width: double.infinity,
-        height: 72,
-        transform: Matrix4.translationValues(
-          _isPressed ? 4 : 0,
-          _isPressed ? 4 : 0,
-          0,
-        ),
-        decoration: BoxDecoration(
-          color: widget.backgroundColor,
-          border: Border.all(color: Colors.black, width: 4),
-          boxShadow: _isPressed
-              ? const [
-                  BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(2, 2),
-                  ),
-                ]
-              : const [
-                  BoxShadow(
-                    color: Colors.black,
-                    offset: Offset(6, 6),
-                  ),
-                ],
-        ),
-        child: Center(
-          child: AnimatedSwitcher(
-            duration: const Duration(milliseconds: 200),
-            child: Row(
-                    key: const ValueKey('text'),
-                    mainAxisSize: MainAxisSize.min,
-                    mainAxisAlignment: MainAxisAlignment.center,
-                    children: [
-                      Text(
-                        'SYNCHRONIZE',
-                        style: widget.displayFont.copyWith(
-                          fontSize: 28,
-                          letterSpacing: 2,
-                          color: Colors.black,
-                        ),
-                      ),
-                      const SizedBox(width: 12),
-                      const Icon(
-                        Icons.bolt,
-                        color: Colors.black,
-                        size: 30,
-                      ),
-                    ],
-                  ),
-          ),
-        ),
-      ),
-    );
-  }
-}
-
-// --- Canvas Alignment Elements ---
-
-class DotGridOverlay extends StatelessWidget {
-  const DotGridOverlay({super.key});
-
-  @override
-  Widget build(BuildContext context) {
-    return CustomPaint(
-      painter: _DotGridPainter(),
-    );
-  }
-}
-
-class _DotGridPainter extends CustomPainter {
-  @override
-  void paint(Canvas canvas, Size size) {
-    final paint = Paint()
-      ..color = Colors.black.withValues(alpha: 0.06)
-      ..style = PaintingStyle.fill;
-
-    const double spacing = 20.0;
-    for (double x = 0; x < size.width; x += spacing) {
-      for (double y = 0; y < size.height; y += spacing) {
-        canvas.drawCircle(Offset(x, y), 1.2, paint);
-      }
-    }
-  }
-
-  @override
-  bool shouldRepaint(covariant CustomPainter oldDelegate) => false;
 }

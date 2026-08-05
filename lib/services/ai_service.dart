@@ -26,7 +26,8 @@ class AiService {
     required String title,
     required String caption,
   }) async {
-    final prompt = '''
+    final prompt =
+        '''
 You are helping users remember why they saved a social media link.
 
 The link can come from:
@@ -93,9 +94,7 @@ Example:
 
     for (var attempt = 1; attempt <= _maxAttempts; attempt++) {
       try {
-        final response = await _model.generateContent([
-          Content.text(prompt),
-        ]);
+        final response = await _model.generateContent([Content.text(prompt)]);
 
         final text = response.text;
 
@@ -125,9 +124,7 @@ Example:
             parsed = jsonDecode(candidate);
           } catch (_) {
             try {
-              parsed = jsonDecode(
-                candidate.replaceAll("'", '"'),
-              );
+              parsed = jsonDecode(candidate.replaceAll("'", '"'));
             } catch (_) {
               return null;
             }
@@ -138,11 +135,12 @@ Example:
           return null;
         }
 
-        final memory = (parsed['memory'] ??
-                parsed['aiMemory'] ??
-                parsed['ai_memory'] ??
-                '')
-            .toString();
+        final memory =
+            (parsed['memory'] ??
+                    parsed['aiMemory'] ??
+                    parsed['ai_memory'] ??
+                    '')
+                .toString();
 
         dynamic tagsValue =
             parsed['tags'] ??
@@ -167,14 +165,9 @@ Example:
               .toList();
         }
 
-        return AiMemory(
-          memory: memory,
-          tags: tags,
-        );
+        return AiMemory(memory: memory, tags: tags);
       } catch (e, stackTrace) {
-        debugPrint(
-          'generateMemory attempt $attempt failed: $e',
-        );
+        debugPrint('generateMemory attempt $attempt failed: $e');
 
         debugPrintStack(stackTrace: stackTrace);
 
@@ -190,9 +183,7 @@ Example:
           return null;
         }
 
-        await Future.delayed(
-          _retryDelays[attempt - 1],
-        );
+        await Future.delayed(_retryDelays[attempt - 1]);
       }
     }
 

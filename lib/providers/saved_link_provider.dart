@@ -1,7 +1,7 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 
-import '/models/social_platform.dart';
+import '../models/social_platform.dart';
 import '../models/saved_link_model.dart';
 import '../services/ai_service.dart';
 import '../services/firestore_service.dart';
@@ -36,26 +36,28 @@ class SavedLinkProvider extends ChangeNotifier {
   void listenToSavedLinks() {
     _savedLinksSubscription?.cancel();
 
-    _savedLinksSubscription =
-        _firestoreService.getSavedLinks().listen((savedLinks) {
-      _savedLinks = savedLinks;
+    _savedLinksSubscription = _firestoreService.getSavedLinks().listen(
+      (savedLinks) {
+        _savedLinks = savedLinks;
 
-      if (!_hasLoadedInitialData) {
-        _hasLoadedInitialData = true;
-        _initialDataCompleter?.complete();
-        _initialDataCompleter = null;
-      }
+        if (!_hasLoadedInitialData) {
+          _hasLoadedInitialData = true;
+          _initialDataCompleter?.complete();
+          _initialDataCompleter = null;
+        }
 
-      notifyListeners();
-    }, onError: (error) {
-      debugPrint('SavedLink stream error: $error');
+        notifyListeners();
+      },
+      onError: (error) {
+        debugPrint('SavedLink stream error: $error');
 
-      if (!_hasLoadedInitialData) {
-        _hasLoadedInitialData = true;
-        _initialDataCompleter?.complete();
-        _initialDataCompleter = null;
-      }
-    });
+        if (!_hasLoadedInitialData) {
+          _hasLoadedInitialData = true;
+          _initialDataCompleter?.complete();
+          _initialDataCompleter = null;
+        }
+      },
+    );
   }
 
   Future<void> ensureInitialDataLoaded({
@@ -104,12 +106,9 @@ class SavedLinkProvider extends ChangeNotifier {
         isReviewed: false,
       );
 
-      final savedLinkId =
-          await _firestoreService.saveSavedLink(savedLink);
+      final savedLinkId = await _firestoreService.saveSavedLink(savedLink);
 
-      final newSavedLink = savedLink.copyWith(
-        id: savedLinkId,
-      );
+      final newSavedLink = savedLink.copyWith(id: savedLinkId);
 
       if (!_savedLinks.any((item) => item.id == savedLinkId)) {
         _savedLinks.insert(0, newSavedLink);
@@ -117,8 +116,7 @@ class SavedLinkProvider extends ChangeNotifier {
       }
 
       final settingsService = SettingsService();
-      final settings =
-          await settingsService.loadReminderSettings();
+      final settings = await settingsService.loadReminderSettings();
 
       await _notificationService.scheduleWeeklyReminder(
         weekday: settings['weekday']!,
@@ -173,19 +171,17 @@ class SavedLinkProvider extends ChangeNotifier {
         );
 
         if (aiMemory != null && aiMemory.memory.trim().isNotEmpty) {
-          await _firestoreService.updateSavedLink(
-            reelId,
-            {
-              'aiMemory': aiMemory.memory,
-              'aiTags': aiMemory.tags,
-              'aiGenerating': false,
-            },
-          );
+          await _firestoreService.updateSavedLink(reelId, {
+            'aiMemory': aiMemory.memory,
+            'aiTags': aiMemory.tags,
+            'aiGenerating': false,
+          });
           return;
         }
       } catch (e, stackTrace) {
         debugPrint(
-            'AI generation error for $reelId (attempt ${attempt + 1}): $e');
+          'AI generation error for $reelId (attempt ${attempt + 1}): $e',
+        );
         debugPrintStack(stackTrace: stackTrace);
       }
 
@@ -194,20 +190,12 @@ class SavedLinkProvider extends ChangeNotifier {
       }
     }
 
-    await _firestoreService.updateSavedLink(
-      reelId,
-      {
-        'aiGenerating': false,
-      },
-    );
+    await _firestoreService.updateSavedLink(reelId, {'aiGenerating': false});
   }
 
   Future<void> toggleReviewed(SavedLink savedLink) async {
     try {
-      await _firestoreService.setReviewed(
-        savedLink.id,
-        !savedLink.isReviewed,
-      );
+      await _firestoreService.setReviewed(savedLink.id, !savedLink.isReviewed);
     } catch (_) {
       _errorMessage = 'Could not update saved link.';
       notifyListeners();

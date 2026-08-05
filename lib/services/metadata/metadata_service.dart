@@ -1,6 +1,6 @@
 import 'metadata_fetch_service.dart';
 import '../../models/link_metadata.dart';
-import 'platfrom_detector_service.dart';
+import 'platform_detector_service.dart';
 import 'fallback_metadata_service.dart';
 
 class MetadataService {
@@ -21,15 +21,14 @@ class MetadataService {
     final platform = _platformDetector.detectPlatform(url);
 
     try {
-      final metadata =
-          await _genericMetadataService.fetchMetadata(url, platform);
+      final metadata = await _genericMetadataService.fetchMetadata(
+        url,
+        platform,
+      );
 
       return metadata;
     } catch (_) {
-      return _fallback.generate(
-        url: url,
-        platform: platform,
-      );
+      return _fallback.generate(url: url, platform: platform);
     }
   }
 }
