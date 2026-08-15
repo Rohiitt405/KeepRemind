@@ -42,6 +42,26 @@ class FirestoreService {
         );
   }
 
+  Future<List<SavedLink>> getSavedLinkOnce() async {
+    final collection = await _savedLinksCollection();
+
+    final snapshot = await collection
+      .orderBy('savedAt', descending: true)
+      .get();
+
+    return snapshot.docs
+      .map((doc) => SavedLink.fromMap(doc.id, doc.data()))
+      .toList();
+  }
+
+  Future<void> restoreSavedLink(SavedLink savedLink) async {
+    final collection = await _savedLinksCollection();
+
+    await collection.add(
+      savedLink.toMap(),
+    );
+  }
+
   Future<void> updateSavedLink(
     String savedLinkId,
     Map<String, dynamic> data,
