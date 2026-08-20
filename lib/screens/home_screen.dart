@@ -3,7 +3,7 @@ import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 
 import 'backup_screen.dart';
-import 'settings_screen.dart';
+import 'reminder_screen.dart';
 import 'detail_screen.dart';
 import 'add_url_screen.dart';
 import '../services/settings_service.dart';
@@ -173,7 +173,7 @@ class _HomeScreenState extends State<HomeScreen>
                       color: primaryColor,
                     ),
                     title: Text(
-                      'SETTINGS',
+                      'REMINDER',
                       style: spaceFont.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -186,7 +186,7 @@ class _HomeScreenState extends State<HomeScreen>
                       Navigator.push(
                         context,
                         MaterialPageRoute(
-                          builder: (_) => const SettingsScreen(),
+                          builder: (_) => const ReminderScreen(),
                         ),
                       );
                     },

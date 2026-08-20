@@ -6,14 +6,14 @@ import '../services/settings_service.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
 import '../widgets/shared/neo_brutalist_button.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+class ReminderScreen extends StatefulWidget {
+  const ReminderScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<ReminderScreen> createState() => _ReminderScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _ReminderScreenState extends State<ReminderScreen> {
   final NotificationService _notificationService = NotificationService();
   final SettingsService _settingsService = SettingsService();
 
