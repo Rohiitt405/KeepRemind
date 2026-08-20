@@ -60,6 +60,10 @@ class SavedLinkProvider extends ChangeNotifier {
     );
   }
 
+  void refreshSavedLinks() {
+    listenToSavedLinks();
+  }
+
   Future<void> ensureInitialDataLoaded({
     Duration timeout = const Duration(seconds: 6),
   }) async {

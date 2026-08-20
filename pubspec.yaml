@@ -52,8 +52,8 @@ dependencies:
   firebase_ai: ^3.12.2
   google_fonts: ^8.1.0
   font_awesome_flutter: ^11.0.0
-  file_picker: ^11.0.2
-  package_info_plus: ^9.0.1
+  file_picker: ^12.0.0
+  package_info_plus: ^10.2.1
 
 dev_dependencies:
   flutter_test:
@@ -77,7 +77,7 @@ flutter_launcher_icons:
   ios: true
   image_path: "assets/icons/Logo.png"
 
-  adaptive_icon_background: "#FFFFFFF"
+  adaptive_icon_background: "#FFFFFFFF"
   adaptive_icon_foreground: "assets/icons/Logo.png"
 
 flutter:

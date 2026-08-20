@@ -90,7 +90,7 @@ class NotificationService {
       body: reminderText ?? 'Review your saved links',
       scheduledDate: scheduledDate,
       notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
     );
   }
@@ -127,7 +127,7 @@ class NotificationService {
       body: 'Take a moment to review your saved links and key takeaways.',
       scheduledDate: scheduledDate,
       notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.exactAllowWhileIdle,
+      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
       // time only — fires at the same time every single day
       matchDateTimeComponents: DateTimeComponents.time,
     );

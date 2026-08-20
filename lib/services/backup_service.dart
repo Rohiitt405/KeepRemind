@@ -12,18 +12,21 @@ import 'firestore_service.dart';
 class BackupService {
   final FirestoreService _firestoreService;
 
-  String _normalizeUrl(String url) {
-    return url.trim().toLowerCase();
-  }
-
   BackupService({
     FirestoreService? firestoreService,
   }) : _firestoreService = firestoreService ?? FirestoreService();
 
+  String _normalizeUrl(String url) {
+    return url.trim().toLowerCase();
+  }
+
   Future<BackupResult> createBackup() async {
     final savedLinks = await _firestoreService.getSavedLinkOnce();
-    final backup = BackupModel.create(items: savedLinks);
-    
+
+    final backup = BackupModel.create(
+      items: savedLinks,
+    );
+
     final jsonString = const JsonEncoder.withIndent(
       ' ',
     ).convert(backup.toMap());
@@ -42,42 +45,47 @@ class BackupService {
       bytes: bytes,
     );
 
-    if(savedPath == null) {
+    if (savedPath == null) {
       return BackupResult.cancelled();
     }
 
     return BackupResult.success(
       totalItems: savedLinks.length,
-      filePath: savedPath,
+      filePath: savedPath.toString(),
     );
   }
 
   Future<RestoreResult> restoreBackup() async {
-    final result = await FilePicker.pickFiles(
+    final file = await FilePicker.pickFile(
       dialogTitle: 'Select KeepRemind Backup',
       type: FileType.custom,
       allowedExtensions: ['json'],
-      withData: true,
-      allowMultiple: false,
     );
 
-    if(result == null || result.files.isEmpty) {
+    if (file == null) {
       return RestoreResult.cancelled();
     }
 
-    final file = result.files.first;
-    final bytes = file.bytes;
+    final bytes = await file.readAsBytes();
 
-    if(bytes == null || bytes.isEmpty) {
+    if (bytes.isEmpty) {
       throw const BackupException(
         'The selected backup file is empty.',
       );
     }
 
-    final jsonString = utf8.decode(
-      bytes,
-      allowMalformed: false,
-    );
+    final String jsonString;
+
+    try {
+      jsonString = utf8.decode(
+        bytes,
+        allowMalformed: false,
+      );
+    } on FormatException {
+      throw const BackupException(
+        'The selected backup file contains invalid text.',
+      );
+    }
 
     final dynamic decodedJson;
 
@@ -89,7 +97,7 @@ class BackupService {
       );
     }
 
-    if(decodedJson is! Map) {
+    if (decodedJson is! Map) {
       throw const BackupException(
         'Invalid KeepRemind backup format.',
       );
@@ -108,40 +116,44 @@ class BackupService {
     } on FormatException catch (e) {
       throw BackupException(
         e.message,
-      );      
+      );
     }
 
     if (!backup.isSupportedVersion) {
       throw BackupException(
-        'Backup version ${backup.backupVersion}'
+        'Backup version ${backup.backupVersion} '
         'is not supported by this version of KeepRemind.',
       );
     }
 
-    final existingLinks = await _firestoreService.getSavedLinkOnce();
+    final existingLinks =
+        await _firestoreService.getSavedLinkOnce();
+
     final existingUrls = existingLinks
-      .map((link) => _normalizeUrl(link.url))
-      .toSet();
+        .map((link) => _normalizeUrl(link.url))
+        .toSet();
 
     var restoredCount = 0;
     var duplicateCount = 0;
     var skippedCount = 0;
 
-    for(final backuplink in backup.items) {
-      final normalizedUrl = _normalizeUrl(backuplink.url);
+    for (final backupLink in backup.items) {
+      final normalizedUrl = _normalizeUrl(
+        backupLink.url,
+      );
 
-      if(normalizedUrl.isEmpty) {
+      if (normalizedUrl.isEmpty) {
         skippedCount++;
         continue;
       }
 
-      if(existingUrls.contains(normalizedUrl)) {
+      if (existingUrls.contains(normalizedUrl)) {
         duplicateCount++;
         continue;
       }
 
       try {
-        final restoredLink = backuplink.copyWith(
+        final restoredLink = backupLink.copyWith(
           id: '',
           isGenerating: false,
         );
@@ -152,16 +164,16 @@ class BackupService {
 
         existingUrls.add(normalizedUrl);
         restoredCount++;
-
       } catch (_) {
-        skippedCount++;        
+        skippedCount++;
       }
     }
+
     return RestoreResult.success(
-      totalItems: backup.items.length, 
-      restoredItems: restoredCount, 
-      duplicateItems: duplicateCount, 
-      skippedItems: skippedCount
+      totalItems: backup.items.length,
+      restoredItems: restoredCount,
+      duplicateItems: duplicateCount,
+      skippedItems: skippedCount,
     );
   }
 
@@ -177,7 +189,7 @@ class BackupService {
     final second = now.second.toString().padLeft(2, '0');
 
     return 'KeepRemind_Backup_'
-      '$year-$month-$day'
-      '_$hour-$minute-$second.json';
+        '$year-$month-$day'
+        '_$hour-$minute-$second.json';
   }
 }
