@@ -1,17 +1,19 @@
 import 'package:flutter/material.dart';
-import 'settings_screen.dart';
-import '../services/settings_service.dart';
 import 'package:provider/provider.dart';
-import '../constants/app_theme.dart';
-import '../providers/saved_link_provider.dart';
-import '../widgets/shared/dot_grid_overlay.dart';
-import '../widgets/save_link_card.dart';
-import '../models/saved_link_model.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'backup_screen.dart';
+import 'settings_screen.dart';
 import 'detail_screen.dart';
 import 'add_url_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import '../services/settings_service.dart';
+import '../constants/app_theme.dart';
+import '../providers/saved_link_provider.dart';
 import '../providers/update_provider.dart';
+import '../widgets/shared/dot_grid_overlay.dart';
+import '../widgets/save_link_card.dart';
 import '../widgets/update_dialog.dart';
+import '../models/saved_link_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -122,6 +124,27 @@ class _HomeScreenState extends State<HomeScreen>
                 ),
                 child: const Icon(
                   Icons.schedule_rounded,
+                  color: primaryColor,
+                  size: 22,
+                ),
+              ),
+            ),
+            GestureDetector(
+              onTap: () => Navigator.push(
+                context,
+                MaterialPageRoute(builder: (_) => const BackupScreen()),
+              ),
+              child: Container(
+                margin: const EdgeInsets.only(right: 16),
+                padding: const EdgeInsets.all(6),
+                decoration: BoxDecoration(
+                  border: Border.all(
+                    color: AppThemeConstants.primaryColor,
+                    width: 2,
+                  ),
+                ),
+                child: const Icon(
+                  Icons.backup,
                   color: primaryColor,
                   size: 22,
                 ),
