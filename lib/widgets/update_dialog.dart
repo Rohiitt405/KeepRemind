@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/update_info.dart';
-import '../constants/app_theme.dart'; // Adjust path based on your folder structure
+import '../constants/app_theme.dart';
+import '../providers/update_provider.dart';
 import 'shared/neo_brutalist_button.dart';
 
 class UpdateDialog {
@@ -41,7 +43,6 @@ class UpdateDialog {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // --- Terminal Title Header ---
                 Container(
                   color: AppThemeConstants.primaryColor,
                   padding: const EdgeInsets.symmetric(
@@ -70,7 +71,6 @@ class UpdateDialog {
                   ),
                 ),
 
-                // --- Content Body ---
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -202,13 +202,19 @@ class UpdateDialog {
                       ),
                       const SizedBox(height: 24),
 
-                      // --- Action Buttons ---
                       Row(
                         children: [
-                          // "Later" Secondary Action
                           Expanded(
                             child: GestureDetector(
-                              onTap: () => Navigator.of(dialogContext).pop(),
+                              onTap: () async {
+                                final updateProvider = context.read<UpdateProvider>();
+
+                                await updateProvider.skipCurrentUpdate();
+
+                                if(dialogContext.mounted) {
+                                  Navigator.of(dialogContext).pop();
+                                }
+                              },
                               child: Container(
                                 padding: const EdgeInsets.symmetric(
                                   vertical: 14,
@@ -222,7 +228,7 @@ class UpdateDialog {
                                 ),
                                 child: Center(
                                   child: Text(
-                                    'LATER',
+                                    'SKIP VERSION',
                                     style: spaceFont.copyWith(
                                       fontSize: 14,
                                       fontWeight: FontWeight.bold,
@@ -235,7 +241,6 @@ class UpdateDialog {
                           ),
                           const SizedBox(width: 12),
 
-                          // "Update" Primary Action
                           Expanded(
                             flex: 2,
                             child: NeoBrutalistButton(
@@ -290,5 +295,3 @@ class UpdateDialog {
     );
   }
 }
-
-// --- Stateful Interactive Button Component for Press Offset Effects ---

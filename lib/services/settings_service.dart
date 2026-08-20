@@ -6,6 +6,32 @@ class SettingsService {
   static const String _reminderHourKey = 'reminder_hour';
   static const String _reminderMinuteKey = 'reminder_minute';
   static const String _lastUpdateCheckKey = 'last_update_check';
+  static const String _skippedUpdatedVersionKey = 'skipped_update_version';
+
+  Future<void> setSkippedUpdateVersion(String version) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      _skippedUpdatedVersionKey,
+      version,
+    );
+  }
+
+  Future<String?> getSkippedUpdateVersion() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return prefs.getString(
+      _skippedUpdatedVersionKey,
+    );
+  }
+
+  Future<void> clearSkippedUpdateVersion() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.remove(
+      _skippedUpdatedVersionKey,
+    );
+  }
 
   Future<void> saveReminderSettings({
     required String type, // 'daily' or 'weekly'

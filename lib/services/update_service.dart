@@ -3,6 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/foundation.dart';
 
+import 'settings_service.dart';
 import '../constants/github_constants.dart';
 import '../models/update_info.dart';
 import '../utils/version_helper.dart';
@@ -32,10 +33,30 @@ class UpdateService {
         latestVersion: latestVersion,
         currentVersion: currentVersion,
       );
+
+      if(!hasUpdate) {
+        return UpdateInfo.fromGithubJson(
+          json: json,
+          currentVersion: currentVersion,
+          hasUpdate: false,
+        );
+      }
+      
+      final settingsService = SettingsService();
+      final skippedVersion = await settingsService.getSkippedUpdateVersion();
+
+      if(skippedVersion == latestVersion) {
+        return UpdateInfo.fromGithubJson(
+          json: json, 
+          currentVersion: currentVersion, 
+          hasUpdate: false,
+        );
+      }
+
       return UpdateInfo.fromGithubJson(
-        json: json,
-        currentVersion: currentVersion,
-        hasUpdate: hasUpdate,
+        json: json, 
+        currentVersion: currentVersion, 
+        hasUpdate: hasUpdate
       );
     } catch (e, stackTrace) {
       debugPrint("Update Error: $e");
