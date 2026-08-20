@@ -149,7 +149,7 @@ class _HomeScreenState extends State<HomeScreen>
                       border: Border(
                         bottom: BorderSide(
                           color: primaryColor,
-                          width: 6,
+                          width: 5,
                         ),
                       ),
                     ),
@@ -165,9 +165,10 @@ class _HomeScreenState extends State<HomeScreen>
                     ),
                   ),
           
-                  const SizedBox(height: 16),
+                  const SizedBox(height: 12),
           
                   ListTile(
+                    visualDensity: VisualDensity(vertical: -4),
                     leading: const Icon(
                       Icons.schedule_rounded,
                       color: primaryColor,
@@ -191,14 +192,21 @@ class _HomeScreenState extends State<HomeScreen>
                       );
                     },
                   ),
+
+                  const Divider(
+                    height: 3,
+                    indent: 18,
+                    endIndent: 18,
+                  ),
           
                   ListTile(
+                    visualDensity: VisualDensity(vertical: -4),
                     leading: const Icon(
                       Icons.backup,
                       color: primaryColor,
                     ),
                     title: Text(
-                      'BACKUP',
+                      'BACKUP / RESTORE',
                       style: spaceFont.copyWith(
                         fontSize: 14,
                         fontWeight: FontWeight.bold,
@@ -216,6 +224,27 @@ class _HomeScreenState extends State<HomeScreen>
                       );
                     },
                   ),
+
+                  const Spacer(),
+
+                  const Divider(
+                    height: 1,
+                    indent: 18,
+                    endIndent: 18,
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  Text(
+                    'KEEP REMIND',
+                    style: spaceFont.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                      color: primaryColor,
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
                 ],
               ),
             ),
