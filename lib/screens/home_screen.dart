@@ -101,56 +101,125 @@ class _HomeScreenState extends State<HomeScreen>
             child: Text(
               'KEEP REMIND',
               style: displayFont.copyWith(
-                fontSize: 28,
+                fontSize: 32,
                 color: primaryColor,
                 letterSpacing: -0.5,
               ),
             ),
           ),
           actions: [
-            GestureDetector(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
-              ),
-              child: Container(
-                margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppThemeConstants.primaryColor,
-                    width: 2,
+            Builder(
+              builder: (context) => GestureDetector(
+                onTap: () => Scaffold.of(context).openEndDrawer(),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 16),
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppThemeConstants.primaryColor,
+                      width: 2,
+                    ),
                   ),
-                ),
-                child: const Icon(
-                  Icons.schedule_rounded,
-                  color: primaryColor,
-                  size: 22,
-                ),
-              ),
-            ),
-            GestureDetector(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const BackupScreen()),
-              ),
-              child: Container(
-                margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppThemeConstants.primaryColor,
-                    width: 2,
+                  child: const Icon(
+                    Icons.menu,
+                    color: primaryColor,
+                    size: 22,
                   ),
-                ),
-                child: const Icon(
-                  Icons.backup,
-                  color: primaryColor,
-                  size: 22,
                 ),
               ),
             ),
           ],
+        ),
+
+        endDrawer: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.65,
+          child: Drawer(
+            backgroundColor: AppThemeConstants.surfaceColor,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: AppThemeConstants.surfaceContainerLowest,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: primaryColor,
+                          width: 6,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        'MENU',
+                        style: displayFont.copyWith(
+                          fontSize: 30,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+          
+                  const SizedBox(height: 16),
+          
+                  ListTile(
+                    leading: const Icon(
+                      Icons.schedule_rounded,
+                      color: primaryColor,
+                    ),
+                    title: Text(
+                      'SETTINGS',
+                      style: spaceFont.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        color: primaryColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const SettingsScreen(),
+                        ),
+                      );
+                    },
+                  ),
+          
+                  ListTile(
+                    leading: const Icon(
+                      Icons.backup,
+                      color: primaryColor,
+                    ),
+                    title: Text(
+                      'BACKUP',
+                      style: spaceFont.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        color: primaryColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const BackupScreen(),
+                        ),
+                      );
+                    },
+                  ),
+                ],
+              ),
+            ),
+          ),
         ),
 
         body: Stack(
