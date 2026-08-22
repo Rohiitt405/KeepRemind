@@ -1,16 +1,17 @@
 import 'package:flutter/material.dart';
-import 'settings_screen.dart';
-import '../services/settings_service.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
-import '../constants/app_theme.dart';
-import '../providers/saved_link_provider.dart';
-import '../widgets/shared/dot_grid_overlay.dart';
-import '../widgets/save_link_card.dart';
-import '../models/saved_link_model.dart';
+
 import 'detail_screen.dart';
 import 'add_url_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
+import 'settings_screen.dart';
+import '../constants/app_theme.dart';
+import '../services/settings_service.dart';
+import '../models/saved_link_model.dart';
+import '../providers/saved_link_provider.dart';
 import '../providers/update_provider.dart';
+import '../widgets/shared/dot_grid_overlay.dart';
+import '../widgets/save_link_card.dart';
 import '../widgets/update_dialog.dart';
 
 class HomeScreen extends StatefulWidget {
