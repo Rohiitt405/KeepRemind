@@ -202,47 +202,12 @@ class UpdateDialog {
                       ),
                       const SizedBox(height: 24),
 
-                      Row(
+                      // --- Action Buttons ---
+                      Column(
                         children: [
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () async {
-                                final updateProvider = context.read<UpdateProvider>();
-
-                                await updateProvider.skipCurrentUpdate();
-
-                                if(dialogContext.mounted) {
-                                  Navigator.of(dialogContext).pop();
-                                }
-                              },
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppThemeConstants.surfaceColor,
-                                  border: Border.all(
-                                    color: AppThemeConstants.primaryColor,
-                                    width: 3,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'SKIP VERSION',
-                                    style: spaceFont.copyWith(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppThemeConstants.primaryColor,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-
-                          Expanded(
-                            flex: 2,
+                          // UPDATE NOW
+                          SizedBox(
+                            width: double.infinity,
                             child: NeoBrutalistButton(
                               onPressed: () async {
                                 final url = updateInfo.downloadUrl.isNotEmpty
@@ -260,7 +225,9 @@ class UpdateDialog {
                               },
                               backgroundColor: AppThemeConstants.secondaryFixed,
                               borderColor: AppThemeConstants.primaryColor,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                              ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -281,6 +248,84 @@ class UpdateDialog {
                                 ],
                               ),
                             ),
+                          ),
+
+                          const SizedBox(height: 10),
+
+                          // SKIP + LATER
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final updateProvider =
+                                        context.read<UpdateProvider>();
+
+                                    await updateProvider.skipCurrentUpdate();
+
+                                    if (dialogContext.mounted) {
+                                      Navigator.of(dialogContext).pop();
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppThemeConstants.surfaceColor,
+                                      border: Border.all(
+                                        color: AppThemeConstants.primaryColor,
+                                        width: 3,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'SKIP VERSION',
+                                        textAlign: TextAlign.center,
+                                        style: spaceFont.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppThemeConstants.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 10),
+
+                              // LATER
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(dialogContext).pop();
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppThemeConstants.surfaceColor,
+                                      border: Border.all(
+                                        color: AppThemeConstants.primaryColor,
+                                        width: 3,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'LATER',
+                                        style: spaceFont.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppThemeConstants.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
                           ),
                         ],
                       ),
