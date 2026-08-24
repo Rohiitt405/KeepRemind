@@ -1,9 +1,11 @@
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
 
 import '../models/update_info.dart';
-import '../constants/app_theme.dart'; // Adjust path based on your folder structure
+import '../constants/app_theme.dart';
+import '../providers/update_provider.dart';
 import 'shared/neo_brutalist_button.dart';
 
 class UpdateDialog {
@@ -41,7 +43,6 @@ class UpdateDialog {
               mainAxisSize: MainAxisSize.min,
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: [
-                // --- Terminal Title Header ---
                 Container(
                   color: AppThemeConstants.primaryColor,
                   padding: const EdgeInsets.symmetric(
@@ -70,7 +71,6 @@ class UpdateDialog {
                   ),
                 ),
 
-                // --- Content Body ---
                 Padding(
                   padding: const EdgeInsets.all(20),
                   child: Column(
@@ -203,41 +203,11 @@ class UpdateDialog {
                       const SizedBox(height: 24),
 
                       // --- Action Buttons ---
-                      Row(
+                      Column(
                         children: [
-                          // "Later" Secondary Action
-                          Expanded(
-                            child: GestureDetector(
-                              onTap: () => Navigator.of(dialogContext).pop(),
-                              child: Container(
-                                padding: const EdgeInsets.symmetric(
-                                  vertical: 14,
-                                ),
-                                decoration: BoxDecoration(
-                                  color: AppThemeConstants.surfaceColor,
-                                  border: Border.all(
-                                    color: AppThemeConstants.primaryColor,
-                                    width: 3,
-                                  ),
-                                ),
-                                child: Center(
-                                  child: Text(
-                                    'LATER',
-                                    style: spaceFont.copyWith(
-                                      fontSize: 14,
-                                      fontWeight: FontWeight.bold,
-                                      color: AppThemeConstants.primaryColor,
-                                    ),
-                                  ),
-                                ),
-                              ),
-                            ),
-                          ),
-                          const SizedBox(width: 12),
-
-                          // "Update" Primary Action
-                          Expanded(
-                            flex: 2,
+                          // UPDATE NOW
+                          SizedBox(
+                            width: double.infinity,
                             child: NeoBrutalistButton(
                               onPressed: () async {
                                 final url = updateInfo.downloadUrl.isNotEmpty
@@ -255,7 +225,9 @@ class UpdateDialog {
                               },
                               backgroundColor: AppThemeConstants.secondaryFixed,
                               borderColor: AppThemeConstants.primaryColor,
-                              padding: const EdgeInsets.symmetric(vertical: 14),
+                              padding: const EdgeInsets.symmetric(
+                                vertical: 14,
+                              ),
                               child: Row(
                                 mainAxisAlignment: MainAxisAlignment.center,
                                 children: [
@@ -277,6 +249,84 @@ class UpdateDialog {
                               ),
                             ),
                           ),
+
+                          const SizedBox(height: 10),
+
+                          // SKIP + LATER
+                          Row(
+                            children: [
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () async {
+                                    final updateProvider =
+                                        context.read<UpdateProvider>();
+
+                                    await updateProvider.skipCurrentUpdate();
+
+                                    if (dialogContext.mounted) {
+                                      Navigator.of(dialogContext).pop();
+                                    }
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppThemeConstants.surfaceColor,
+                                      border: Border.all(
+                                        color: AppThemeConstants.primaryColor,
+                                        width: 3,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'SKIP VERSION',
+                                        textAlign: TextAlign.center,
+                                        style: spaceFont.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppThemeConstants.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+
+                              const SizedBox(width: 10),
+
+                              // LATER
+                              Expanded(
+                                child: GestureDetector(
+                                  onTap: () {
+                                    Navigator.of(dialogContext).pop();
+                                  },
+                                  child: Container(
+                                    padding: const EdgeInsets.symmetric(
+                                      vertical: 14,
+                                    ),
+                                    decoration: BoxDecoration(
+                                      color: AppThemeConstants.surfaceColor,
+                                      border: Border.all(
+                                        color: AppThemeConstants.primaryColor,
+                                        width: 3,
+                                      ),
+                                    ),
+                                    child: Center(
+                                      child: Text(
+                                        'LATER',
+                                        style: spaceFont.copyWith(
+                                          fontSize: 12,
+                                          fontWeight: FontWeight.bold,
+                                          color: AppThemeConstants.primaryColor,
+                                        ),
+                                      ),
+                                    ),
+                                  ),
+                                ),
+                              ),
+                            ],
+                          ),
                         ],
                       ),
                     ],
@@ -290,5 +340,3 @@ class UpdateDialog {
     );
   }
 }
-
-// --- Stateful Interactive Button Component for Press Offset Effects ---

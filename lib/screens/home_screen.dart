@@ -1,13 +1,13 @@
 import 'package:flutter/material.dart';
-import 'package:provider/provider.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
-import 'backup_screen.dart';
-import 'reminder_screen.dart';
 import 'detail_screen.dart';
 import 'add_url_screen.dart';
-import '../services/settings_service.dart';
+import 'settings_screen.dart';
 import '../constants/app_theme.dart';
+import '../services/settings_service.dart';
+import '../models/saved_link_model.dart';
 import '../providers/saved_link_provider.dart';
 import '../providers/update_provider.dart';
 import '../widgets/shared/dot_grid_overlay.dart';

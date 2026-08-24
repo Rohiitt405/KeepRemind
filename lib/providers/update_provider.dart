@@ -1,14 +1,18 @@
 import 'package:flutter/foundation.dart';
+
 import '../models/update_info.dart';
 import '../services/update_service.dart';
+import '../services/settings_service.dart';
 
 class UpdateProvider extends ChangeNotifier {
   final UpdateService _updateService = const UpdateService();
+  final SettingsService _settingsService = SettingsService();
 
   bool _isChecking = false;
   bool _hasChecked = false;
 
   UpdateInfo? _updateInfo;
+
   bool get isChecking => _isChecking;
   bool get hasChecked => _hasChecked;
   UpdateInfo? get updateInfo => _updateInfo;
@@ -27,6 +31,21 @@ class UpdateProvider extends ChangeNotifier {
       _hasChecked = true;
       notifyListeners();
     }
+  }
+
+  Future<void> skipCurrentUpdate() async {
+    final updateInfo = _updateInfo;
+
+    if(updateInfo == null || !updateInfo.hasUpdate) {
+      return;
+    }
+    
+    await _settingsService.setSkippedUpdateVersion(
+      updateInfo.latestVersion,
+    );
+
+    _updateInfo = null;
+    notifyListeners();
   }
 
   void reset() {

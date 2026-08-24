@@ -155,17 +155,6 @@ class SavedLinkProvider extends ChangeNotifier {
     required String title,
     required String caption,
   }) async {
-    const retryDelays = [
-      Duration(seconds: 5),
-      Duration(seconds: 15),
-      Duration(seconds: 30),
-      Duration(minutes: 1),
-      Duration(minutes: 2),
-    ];
-
-    final maxAttempts = retryDelays.length + 1;
-
-    for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         final aiMemory = await _aiService.generateMemory(
           url: url,
@@ -183,17 +172,9 @@ class SavedLinkProvider extends ChangeNotifier {
           return;
         }
       } catch (e, stackTrace) {
-        debugPrint(
-          'AI generation error for $reelId (attempt ${attempt + 1}): $e',
-        );
+        debugPrint('AI generation failed for $reelId: $e');
         debugPrintStack(stackTrace: stackTrace);
       }
-
-      if (attempt < retryDelays.length) {
-        await Future.delayed(retryDelays[attempt]);
-      }
-    }
-
     await _firestoreService.updateSavedLink(reelId, {'aiGenerating': false});
   }
 

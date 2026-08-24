@@ -55,6 +55,7 @@ Download the latest Android APK from the latest GitHub Release.
 - **🧠 Intelligent Platform Detection** - Automatically detects the source platform and adapts metadata extraction and UI presentation accordingly.
 - **🗑️ Easy Management** - Swipe to delete savedLinks content with confirmation dialogs
 - **🔄 Automatic Update Checker** - Automatically checks GitHub Releases for newer app versions and notifies users with release notes and a direct APK download.
+- **⏭️ Skip Update Version** - Users can skip a specific app version and will only be notified again when a newer version is available.
 - **✨ Material Design 3** - Modern, intuitive UI with deep purple theme
 
 ### AI-Powered Features
@@ -88,18 +89,28 @@ KeepRemind includes a built-in update checker powered by GitHub Releases.
 ### How it works
 
 1. The app checks the latest GitHub release.
-2. It compares the installed version with the latest available version.
-3. If an update is available, users receive an update dialog.
-4. Users can view release notes before updating.
-5. Tapping **Update** opens the latest APK download.
+2. It compares the installed version with the latest available version using semantic version comparison.
+3. If a newer version is available, users receive an update dialog.
+4. Users can view the release notes and compare the current version with the latest version.
+5. Tapping **Update Now** opens the latest APK download.
+6. Users can choose **Skip Version** if they don't want to update to the current release.
+7. The skipped version is stored locally on the device using SharedPreferences.
+8. The skipped version will not be shown again during future update checks.
+9. When a newer version is released, the update notification will appear again automatically.
 
-### Benefits
+### Skip Version Behavior
 
-- Automatic update notifications
-- Semantic version comparison
-- Release notes support
-- Direct APK downloads
-- Reduced network requests through cached update checks
+The skip feature applies only to the specific version that the user chooses to skip.
+
+For example:
+
+```text
+Current Version: 1.0.0
+Latest Version:  1.2.0
+        ↓
+User selects "SKIP VERSION"
+        ↓
+Skipped Version: 1.2.0
 
 ---
 ## 🏗️ Architecture
@@ -123,7 +134,7 @@ lib/
 │
 ├── providers/
 │   ├── saved_link_provider.dart          # Saved links state management
-│   └── update_provider.dart              # Update checking state management
+│   └── update_provider.dart              # Update checking and skip-version state management
 │
 ├── screens/
 │   ├── add_url_screen.dart               # Add URL screen
@@ -144,7 +155,7 @@ lib/
 │   ├── ai_service.dart                   # AI memory generation
 │   ├── firestore_service.dart            # Firestore database operations
 │   ├── notification_service.dart         # Local notification scheduling
-│   ├── settings_service.dart             # SharedPreferences management
+│   ├── settings_service.dart             # Local settings and SharedPreferences management
 │   └── update_service.dart               # GitHub release update checker
 │
 ├── utils/
@@ -152,7 +163,7 @@ lib/
 │
 ├── widgets/
 │   ├── save_link_card.dart               # Saved link card widget
-│   ├── update_dialog.dart                # Update available dialog
+│   ├── update_dialog.dart                # Update dialog with update and skip-version actions
 │   │
 │   └── shared/
 │       ├── dot_grid_overlay.dart         # Dot grid background overlay
@@ -320,6 +331,26 @@ Manages reminders:
 - Timezone-aware scheduling
 - Singleton pattern for consistency
 
+### Update Service
+
+Handles application version checking through GitHub Releases:
+
+- Fetches the latest GitHub release
+- Compares the installed version with the latest release
+- Detects available updates using semantic version comparison
+- Provides release notes and APK download information
+- Checks whether the latest version was previously skipped
+
+### Update Provider
+
+Manages update-checking state and skip-version behavior:
+
+- Tracks update checking state
+- Stores available update information
+- Handles skip-version actions
+- Persists skipped versions through SharedPreferences
+- Prevents the same skipped version from being shown again
+
 ---
 
 ## 🔄 User Flow
@@ -385,7 +416,7 @@ KeepRemind supports multiple kinds of content, including:
 - **Anonymous Authentication**: No user login required; each device gets unique Firebase UID
 - **Data Isolation**: Each user's savedLinks are isolated in their own Firestore subcollection
 - **No Personal Data**: App doesn't collect emails, names, or identifiable info
-- **Local-Only Settings**: Reminder preferences stored locally on device
+- **Local-Only Settings**: Reminder preferences and skipped update versions are stored locally on the device
 - **Third-party Links**: Supports major social media platforms and websites that expose Open Graph metadata.
 
 ---
