@@ -4,11 +4,12 @@ import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'onboarding_screen.dart';
+import 'home_screen.dart';
 import '../constants/app_theme.dart';
 import '../providers/saved_link_provider.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
-import 'home_screen.dart';
-import 'onboarding_screen.dart';
 
 class SplashScreen extends StatefulWidget {
   final bool skipDefaultNavigation;

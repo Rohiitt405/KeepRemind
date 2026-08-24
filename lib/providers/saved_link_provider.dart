@@ -7,7 +7,7 @@ import '../services/ai_service.dart';
 import '../services/firestore_service.dart';
 import '../services/metadata/metadata_service.dart';
 import '../services/notification_service.dart';
-import '../services/settings_service.dart';
+import '../services/reminders_service.dart';
 
 class SavedLinkProvider extends ChangeNotifier {
   final FirestoreService _firestoreService = FirestoreService();
@@ -115,13 +115,13 @@ class SavedLinkProvider extends ChangeNotifier {
         notifyListeners();
       }
 
-      final settingsService = SettingsService();
-      final settings = await settingsService.loadReminderSettings();
+      final remindersService = ReminderService();
+      final reminders = await remindersService.loadReminderReminder();
 
       await _notificationService.scheduleWeeklyReminder(
-        weekday: settings['weekday']!,
-        hour: settings['hour']!,
-        minute: settings['minute']!,
+        weekday: reminders['weekday']!,
+        hour: reminders['hour']!,
+        minute: reminders['minute']!,
       );
 
       unawaited(
@@ -151,17 +151,6 @@ class SavedLinkProvider extends ChangeNotifier {
     required String title,
     required String caption,
   }) async {
-    const retryDelays = [
-      Duration(seconds: 5),
-      Duration(seconds: 15),
-      Duration(seconds: 30),
-      Duration(minutes: 1),
-      Duration(minutes: 2),
-    ];
-
-    final maxAttempts = retryDelays.length + 1;
-
-    for (var attempt = 0; attempt < maxAttempts; attempt++) {
       try {
         final aiMemory = await _aiService.generateMemory(
           url: url,
@@ -180,15 +169,10 @@ class SavedLinkProvider extends ChangeNotifier {
         }
       } catch (e, stackTrace) {
         debugPrint(
-          'AI generation error for $reelId (attempt ${attempt + 1}): $e',
+          'AI generation error for $reelId: $e',
         );
         debugPrintStack(stackTrace: stackTrace);
       }
-
-      if (attempt < retryDelays.length) {
-        await Future.delayed(retryDelays[attempt]);
-      }
-    }
 
     await _firestoreService.updateSavedLink(reelId, {'aiGenerating': false});
   }

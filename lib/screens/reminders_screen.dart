@@ -1,21 +1,22 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+
 import '../services/notification_service.dart';
-import '../services/settings_service.dart';
+import '../services/reminders_service.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
 import '../widgets/shared/neo_brutalist_button.dart';
 
-class SettingsScreen extends StatefulWidget {
-  const SettingsScreen({super.key});
+class ReminderScreen extends StatefulWidget {
+  const ReminderScreen({super.key});
 
   @override
-  State<SettingsScreen> createState() => _SettingsScreenState();
+  State<ReminderScreen> createState() => _ReminderScreenState();
 }
 
-class _SettingsScreenState extends State<SettingsScreen> {
+class _ReminderScreenState extends State<ReminderScreen> {
   final NotificationService _notificationService = NotificationService();
-  final SettingsService _settingsService = SettingsService();
+  final ReminderService _remindersService = ReminderService();
 
   String _reminderType = 'weekly';
   int _selectedWeekday = DateTime.monday;
@@ -33,7 +34,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
     DateTime.sunday: 'SUN',
   };
 
-  // Neo-Brutalist Global Design Tokens
   static const Color primaryColor = Colors.black;
   static const Color backgroundColor = Color(0xFFF9F9F9);
   static const Color surfaceContainerLowest = Colors.white;
@@ -70,27 +70,27 @@ class _SettingsScreenState extends State<SettingsScreen> {
         systemNavigationBarColor: backgroundColor,
       ),
     );
-    _loadSettings();
+    _loadReminder();
   }
 
-  Future<void> _loadSettings() async {
-    final settings = await _settingsService.loadReminderSettings();
+  Future<void> _loadReminder() async {
+    final reminders = await _remindersService.loadReminderReminder();
     setState(() {
-      _reminderType = settings['type'] as String;
-      _selectedWeekday = settings['weekday'] as int;
+      _reminderType = reminders['type'] as String;
+      _selectedWeekday = reminders['weekday'] as int;
       _selectedTime = TimeOfDay(
-        hour: settings['hour'] as int,
-        minute: settings['minute'] as int,
+        hour: reminders['hour'] as int,
+        minute: reminders['minute'] as int,
       );
       _isLoading = false;
     });
   }
 
-  Future<void> _saveSettings() async {
+  Future<void> _saveReminder() async {
     setState(() => _isSaving = true);
 
     try {
-      await _settingsService.saveReminderSettings(
+      await _remindersService.saveReminderReminder(
         type: _reminderType,
         weekday: _selectedWeekday,
         hour: _selectedTime.hour,
@@ -182,7 +182,6 @@ class _SettingsScreenState extends State<SettingsScreen> {
         context,
       ).copyWith(scaffoldBackgroundColor: backgroundColor),
       child: Scaffold(
-        // --- Top Bar Component ---
         appBar: AppBar(
           backgroundColor: backgroundColor,
           elevation: 0,
@@ -476,7 +475,7 @@ class _SettingsScreenState extends State<SettingsScreen> {
                           ],
 
                           NeoBrutalistButton(
-                            onPressed: _isSaving ? null : _saveSettings,
+                            onPressed: _isSaving ? null : _saveReminder,
                             backgroundColor: secondaryFixed,
                             borderColor: primaryColor,
                             shape: BoxShape.rectangle,

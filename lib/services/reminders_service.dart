@@ -1,6 +1,6 @@
 import 'package:shared_preferences/shared_preferences.dart';
 
-class SettingsService {
+class ReminderService {
   static const String _reminderTypeKey = 'reminder_type'; // 'daily' | 'weekly'
   static const String _reminderDayKey = 'reminder_day';
   static const String _reminderHourKey = 'reminder_hour';
@@ -33,7 +33,7 @@ class SettingsService {
     );
   }
 
-  Future<void> saveReminderSettings({
+  Future<void> saveReminderReminder({
     required String type, // 'daily' or 'weekly'
     required int weekday,
     required int hour,
@@ -46,7 +46,7 @@ class SettingsService {
     await prefs.setInt(_reminderMinuteKey, minute);
   }
 
-  Future<Map<String, dynamic>> loadReminderSettings() async {
+  Future<Map<String, dynamic>> loadReminderReminder() async {
     final prefs = await SharedPreferences.getInstance();
     return {
       'type': prefs.getString(_reminderTypeKey) ?? 'weekly',

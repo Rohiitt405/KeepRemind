@@ -34,7 +34,6 @@ The link can come from:
 
 - YouTube
 - Instagram
-- TikTok
 - Facebook
 - Threads
 - Reddit

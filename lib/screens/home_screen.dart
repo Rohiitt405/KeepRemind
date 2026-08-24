@@ -4,9 +4,9 @@ import 'package:provider/provider.dart';
 
 import 'detail_screen.dart';
 import 'add_url_screen.dart';
-import 'settings_screen.dart';
+import 'reminders_screen.dart';
 import '../constants/app_theme.dart';
-import '../services/settings_service.dart';
+import '../services/reminders_service.dart';
 import '../models/saved_link_model.dart';
 import '../providers/saved_link_provider.dart';
 import '../providers/update_provider.dart';
@@ -24,7 +24,7 @@ class HomeScreen extends StatefulWidget {
 class _HomeScreenState extends State<HomeScreen>
     with SingleTickerProviderStateMixin {
   late TabController _tabController;
-  final SettingsService _settingsService = SettingsService();
+  final ReminderService _remindersService = ReminderService();
 
   static const Color primaryColor = AppThemeConstants.primaryColor;
   static const Color backgroundColor = AppThemeConstants.backgroundColor;
@@ -57,7 +57,7 @@ class _HomeScreenState extends State<HomeScreen>
   }
 
   Future<void> _checkForAppUpdate() async {
-    final shouldCheck = await _settingsService.shouldCheckForUpdate();
+    final shouldCheck = await _remindersService.shouldCheckForUpdate();
 
     if (!mounted || !shouldCheck) {
       return;
@@ -66,7 +66,7 @@ class _HomeScreenState extends State<HomeScreen>
     final updateProvider = context.read<UpdateProvider>();
 
     await updateProvider.checkForUpdate();
-    await _settingsService.saveLastUpdateCheck(DateTime.now());
+    await _remindersService.saveLastUpdateCheck(DateTime.now());
 
     if (!mounted) return;
 
@@ -110,7 +110,7 @@ class _HomeScreenState extends State<HomeScreen>
             GestureDetector(
               onTap: () => Navigator.push(
                 context,
-                MaterialPageRoute(builder: (_) => const SettingsScreen()),
+                MaterialPageRoute(builder: (_) => const ReminderScreen()),
               ),
               child: Container(
                 margin: const EdgeInsets.only(right: 16),

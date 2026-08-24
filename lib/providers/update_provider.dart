@@ -2,11 +2,11 @@ import 'package:flutter/foundation.dart';
 
 import '../models/update_info.dart';
 import '../services/update_service.dart';
-import '../services/settings_service.dart';
+import '../services/reminders_service.dart';
 
 class UpdateProvider extends ChangeNotifier {
   final UpdateService _updateService = const UpdateService();
-  final SettingsService _settingsService = SettingsService();
+  final ReminderService _remindersService = ReminderService();
 
   bool _isChecking = false;
   bool _hasChecked = false;
@@ -40,7 +40,7 @@ class UpdateProvider extends ChangeNotifier {
       return;
     }
     
-    await _settingsService.setSkippedUpdateVersion(
+    await _remindersService.setSkippedUpdateVersion(
       updateInfo.latestVersion,
     );
 

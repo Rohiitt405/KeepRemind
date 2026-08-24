@@ -14,10 +14,6 @@ enum SocialPlatform {
   unknown,
 }
 
-/// Extension centralizing platform-related metadata used across the app.
-///
-/// Keeps label, color and icon in one place so UI code can remain thin and
-/// avoid duplication.
 extension SocialPlatformExtension on SocialPlatform {
   String get value {
     switch (this) {
@@ -69,7 +65,6 @@ extension SocialPlatformExtension on SocialPlatform {
     }
   }
 
-  /// Human friendly uppercase label used in badges.
   String get label {
     switch (this) {
       case SocialPlatform.youtube:
@@ -95,7 +90,6 @@ extension SocialPlatformExtension on SocialPlatform {
     }
   }
 
-  /// Primary brand color used for platform badges and accents.
   Color get color {
     switch (this) {
       case SocialPlatform.youtube:
@@ -121,8 +115,6 @@ extension SocialPlatformExtension on SocialPlatform {
     }
   }
 
-  /// Icon widget to display for the platform. Returns a properly configured
-  /// [Widget] so callers don't need to decide between [FaIcon] and [Icon].
   Widget get iconWidget {
     switch (this) {
       case SocialPlatform.youtube:

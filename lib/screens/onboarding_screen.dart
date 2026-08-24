@@ -3,9 +3,10 @@ import 'package:flutter/material.dart';
 import 'package:google_fonts/google_fonts.dart';
 import 'package:flutter/services.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+
+import 'home_screen.dart';
 import '../constants/app_theme.dart';
 import '../widgets/shared/neo_brutalist_button.dart';
-import 'home_screen.dart';
 
 class OnboardingScreen extends StatefulWidget {
   const OnboardingScreen({super.key});
@@ -15,7 +16,6 @@ class OnboardingScreen extends StatefulWidget {
 }
 
 class _OnboardingScreenState extends State<OnboardingScreen> {
-  // Neo-Brutalist Color Palette Mapping
   static const Color primaryColor = AppThemeConstants.primaryColor;
   static const Color backgroundColor = AppThemeConstants.backgroundColor;
   static const Color surfaceContainerLow =
@@ -45,7 +45,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
   late Timer _loaderTimer;
   bool _showCursor = true;
 
-  // Custom Neo-Brutalist Box Shadow Vectors
   List<BoxShadow> get neoShadow => AppThemeConstants.neoShadow;
 
   List<BoxShadow> get neoShadowSm => AppThemeConstants.neoShadowSm;
@@ -656,7 +655,6 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 
-  // Component Building Handler for Neo-Brutalist Features Cells
   Widget _buildGridCard({
     required String title,
     required String description,
@@ -722,5 +720,3 @@ class _OnboardingScreenState extends State<OnboardingScreen> {
     );
   }
 }
-
-// Custom Stateful Button Injecting Mechanical Layout Offset Shift on Actions

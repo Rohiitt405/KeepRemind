@@ -1,9 +1,10 @@
-import 'package:cached_network_image/cached_network_image.dart';
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
-import '../models/social_platform.dart';
 import 'package:provider/provider.dart';
+import 'package:cached_network_image/cached_network_image.dart';
+import 'package:google_fonts/google_fonts.dart';
 import 'package:url_launcher/url_launcher.dart';
+
+import '../models/social_platform.dart';
 import '../models/saved_link_model.dart';
 import '../providers/saved_link_provider.dart';
 import '../constants/app_theme.dart';
@@ -371,7 +372,6 @@ class DetailScreen extends StatelessWidget {
 
     return Column(
       children: [
-        // --- Open Original Button ---
         NeoBrutalistButton(
           onPressed: () => _openUrl(context),
           backgroundColor: AppThemeConstants.surfaceColor,
@@ -464,5 +464,3 @@ class DetailScreen extends StatelessWidget {
     }
   }
 }
-
-// --- Stateful Interactive Mechanical Layout Accent Button Container ---

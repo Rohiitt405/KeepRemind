@@ -3,7 +3,7 @@ import 'package:http/http.dart' as http;
 import 'package:package_info_plus/package_info_plus.dart';
 import 'package:flutter/foundation.dart';
 
-import 'settings_service.dart';
+import 'reminders_service.dart';
 import '../constants/github_constants.dart';
 import '../models/update_info.dart';
 import '../utils/version_helper.dart';
@@ -42,8 +42,8 @@ class UpdateService {
         );
       }
       
-      final settingsService = SettingsService();
-      final skippedVersion = await settingsService.getSkippedUpdateVersion();
+      final remindersService = ReminderService();
+      final skippedVersion = await remindersService.getSkippedUpdateVersion();
 
       if(skippedVersion == latestVersion) {
         return UpdateInfo.fromGithubJson(

@@ -1,10 +1,9 @@
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
-import 'package:timezone/timezone.dart' as tz;
 import 'package:timezone/data/latest.dart' as tz_data;
+import 'package:timezone/timezone.dart' as tz;
 
 class NotificationService {
-  // Singleton pattern — ensures one initialized instance is used everywhere
   NotificationService._internal();
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
@@ -18,7 +17,6 @@ class NotificationService {
   Future<void> initialize() async {
     tz_data.initializeTimeZones();
 
-    // Detect the device's real local timezone and set it
     final timezoneInfo = await FlutterTimezone.getLocalTimezone();
     tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
 
@@ -40,7 +38,6 @@ class NotificationService {
     await _plugin.initialize(settings: settings);
   }
 
-  // Request notification permission (Android 13+ requires explicit permission)
   Future<bool> requestPermission() async {
     final android = _plugin
         .resolvePlatformSpecificImplementation<
@@ -52,21 +49,15 @@ class NotificationService {
       return granted ?? false;
     }
 
-    // iOS handles permission during initialize()
     return true;
   }
 
-  // ─── Weekly ────────────────────────────────────────────────────────────────
-
-  // Schedule a weekly notification
-  // weekday: 1=Monday, 2=Tuesday ... 7=Sunday
   Future<void> scheduleWeeklyReminder({
     int weekday = DateTime.monday,
     int hour = 10,
     int minute = 0,
     String? reminderText,
   }) async {
-    // Cancel both so no stale daily reminder lingers when switching modes
     await cancelAll();
 
     const androidDetails = AndroidNotificationDetails(
@@ -99,9 +90,6 @@ class NotificationService {
     await _plugin.cancel(id: _weeklyReminderId);
   }
 
-  // ─── Daily ─────────────────────────────────────────────────────────────────
-
-  // Schedule a daily notification at the given hour:minute every day
   Future<void> scheduleDailyReminder({int hour = 10, int minute = 0}) async {
     // Cancel both so no stale weekly reminder lingers when switching modes
     await cancelAll();
@@ -137,15 +125,10 @@ class NotificationService {
     await _plugin.cancel(id: _dailyReminderId);
   }
 
-  // ─── Shared ────────────────────────────────────────────────────────────────
-
-  /// Cancel both weekly and daily reminders (use when switching modes)
   Future<void> cancelAll() async {
     await _plugin.cancel(id: _weeklyReminderId);
     await _plugin.cancel(id: _dailyReminderId);
   }
-
-  // ─── Private helpers ───────────────────────────────────────────────────────
 
   tz.TZDateTime _nextWeekdayTime(int weekday, int hour, int minute) {
     final now = tz.TZDateTime.now(tz.local);
@@ -178,7 +161,6 @@ class NotificationService {
       minute,
     );
 
-    // If this time has already passed today, push to tomorrow
     if (scheduled.isBefore(now)) {
       scheduled = scheduled.add(const Duration(days: 1));
     }
@@ -186,7 +168,6 @@ class NotificationService {
     return scheduled;
   }
 
-  // (called from provider before scheduling)
   String buildNotificationBody(int unreviewedCount) {
     if (unreviewedCount == 0) {
       return 'Open the app to revisit your saved links.';

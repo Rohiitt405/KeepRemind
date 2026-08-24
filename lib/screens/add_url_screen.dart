@@ -1,11 +1,12 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
+
+import 'home_screen.dart';
 import '../constants/app_theme.dart';
 import '../providers/saved_link_provider.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
-import 'home_screen.dart';
-import 'package:google_fonts/google_fonts.dart';
 
 class AddUrlScreen extends StatefulWidget {
   final String? initialUrl;
@@ -216,7 +217,6 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                                   ),
                                   const SizedBox(height: 12),
 
-                                  // Brutalist Input Box Style with embedded Action Label
                                   TextFormField(
                                     controller: _urlController,
                                     keyboardType: TextInputType.url,
@@ -295,7 +295,6 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
                       ),
                       const SizedBox(height: 20),
 
-                      // --- Error Terminal Block ---
                       if (provider.errorMessage != null) ...[
                         Container(
                           padding: const EdgeInsets.all(16),
@@ -476,5 +475,3 @@ class _AddUrlScreenState extends State<AddUrlScreen> {
     );
   }
 }
-
-// --- Custom Grid Pattern Canvas Painter Layer ---

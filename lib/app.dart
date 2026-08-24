@@ -1,13 +1,14 @@
+import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'dart:async';
 import 'providers/saved_link_provider.dart';
-import './providers/update_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
+
 import 'constants/app_theme.dart';
 import 'screens/add_url_screen.dart';
 import 'screens/share_loading_screen.dart';
 import 'screens/splash_screen.dart';
+import './providers/update_provider.dart';
 
 class KeepRemindApp extends StatefulWidget {
   const KeepRemindApp({super.key});
