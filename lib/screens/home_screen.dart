@@ -108,20 +108,6 @@ class _HomeScreenState extends State<HomeScreen>
             ),
           ),
           actions: [
-<<<<<<< HEAD
-            GestureDetector(
-              onTap: () => Navigator.push(
-                context,
-                MaterialPageRoute(builder: (_) => const ReminderScreen()),
-              ),
-              child: Container(
-                margin: const EdgeInsets.only(right: 16),
-                padding: const EdgeInsets.all(6),
-                decoration: BoxDecoration(
-                  border: Border.all(
-                    color: AppThemeConstants.primaryColor,
-                    width: 2,
-=======
             Builder(
               builder: (context) => GestureDetector(
                 onTap: () => Scaffold.of(context).openEndDrawer(),
@@ -138,7 +124,6 @@ class _HomeScreenState extends State<HomeScreen>
                     Icons.menu,
                     color: primaryColor,
                     size: 22,
->>>>>>> feature/backup-restore
                   ),
                 ),
               ),
