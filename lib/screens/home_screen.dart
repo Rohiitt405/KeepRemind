@@ -1,18 +1,19 @@
 import 'package:flutter/material.dart';
-import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
+import 'package:google_fonts/google_fonts.dart';
 
+import 'backup_screen.dart';
+import 'reminder_screen.dart';
 import 'detail_screen.dart';
 import 'add_url_screen.dart';
-import 'reminders_screen.dart';
-import '../constants/app_theme.dart';
 import '../services/reminders_service.dart';
-import '../models/saved_link_model.dart';
+import '../constants/app_theme.dart';
 import '../providers/saved_link_provider.dart';
 import '../providers/update_provider.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
 import '../widgets/save_link_card.dart';
 import '../widgets/update_dialog.dart';
+import '../models/saved_link_model.dart';
 
 class HomeScreen extends StatefulWidget {
   const HomeScreen({super.key});
@@ -100,13 +101,14 @@ class _HomeScreenState extends State<HomeScreen>
             child: Text(
               'KEEP REMIND',
               style: displayFont.copyWith(
-                fontSize: 28,
+                fontSize: 32,
                 color: primaryColor,
                 letterSpacing: -0.5,
               ),
             ),
           ),
           actions: [
+<<<<<<< HEAD
             GestureDetector(
               onTap: () => Navigator.push(
                 context,
@@ -119,16 +121,149 @@ class _HomeScreenState extends State<HomeScreen>
                   border: Border.all(
                     color: AppThemeConstants.primaryColor,
                     width: 2,
+=======
+            Builder(
+              builder: (context) => GestureDetector(
+                onTap: () => Scaffold.of(context).openEndDrawer(),
+                child: Container(
+                  margin: const EdgeInsets.only(right: 16),
+                  padding: const EdgeInsets.all(6),
+                  decoration: BoxDecoration(
+                    border: Border.all(
+                      color: AppThemeConstants.primaryColor,
+                      width: 2,
+                    ),
                   ),
-                ),
-                child: const Icon(
-                  Icons.schedule_rounded,
-                  color: primaryColor,
-                  size: 22,
+                  child: const Icon(
+                    Icons.menu,
+                    color: primaryColor,
+                    size: 22,
+>>>>>>> feature/backup-restore
+                  ),
                 ),
               ),
             ),
           ],
+        ),
+
+        endDrawer: SizedBox(
+          width: MediaQuery.of(context).size.width * 0.65,
+          child: Drawer(
+            backgroundColor: AppThemeConstants.surfaceColor,
+            shape: const RoundedRectangleBorder(
+              borderRadius: BorderRadius.zero,
+            ),
+            child: SafeArea(
+              child: Column(
+                children: [
+                  Container(
+                    width: double.infinity,
+                    padding: const EdgeInsets.all(6),
+                    decoration: const BoxDecoration(
+                      color: AppThemeConstants.surfaceContainerLowest,
+                      border: Border(
+                        bottom: BorderSide(
+                          color: primaryColor,
+                          width: 5,
+                        ),
+                      ),
+                    ),
+                    child: Padding(
+                      padding: const EdgeInsets.only(left: 12),
+                      child: Text(
+                        'MENU',
+                        style: displayFont.copyWith(
+                          fontSize: 30,
+                          color: primaryColor,
+                        ),
+                      ),
+                    ),
+                  ),
+          
+                  const SizedBox(height: 12),
+          
+                  ListTile(
+                    visualDensity: VisualDensity(vertical: -4),
+                    leading: const Icon(
+                      Icons.schedule_rounded,
+                      color: primaryColor,
+                    ),
+                    title: Text(
+                      'REMINDER',
+                      style: spaceFont.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        color: primaryColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const ReminderScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const Divider(
+                    height: 3,
+                    indent: 18,
+                    endIndent: 18,
+                  ),
+          
+                  ListTile(
+                    visualDensity: VisualDensity(vertical: -4),
+                    leading: const Icon(
+                      Icons.backup,
+                      color: primaryColor,
+                    ),
+                    title: Text(
+                      'BACKUP / RESTORE',
+                      style: spaceFont.copyWith(
+                        fontSize: 14,
+                        fontWeight: FontWeight.bold,
+                        letterSpacing: 1,
+                        color: primaryColor,
+                      ),
+                    ),
+                    onTap: () {
+                      Navigator.pop(context);
+                      Navigator.push(
+                        context,
+                        MaterialPageRoute(
+                          builder: (_) => const BackupScreen(),
+                        ),
+                      );
+                    },
+                  ),
+
+                  const Spacer(),
+
+                  const Divider(
+                    height: 1,
+                    indent: 18,
+                    endIndent: 18,
+                  ),
+                  
+                  const SizedBox(height: 12),
+                  Text(
+                    'KEEP REMIND',
+                    style: spaceFont.copyWith(
+                      fontSize: 14,
+                      fontWeight: FontWeight.bold,
+                      letterSpacing: 1.5,
+                      color: primaryColor,
+                    ),
+                  ),
+
+                  const SizedBox(height: 14),
+                ],
+              ),
+            ),
+          ),
         ),
 
         body: Stack(
