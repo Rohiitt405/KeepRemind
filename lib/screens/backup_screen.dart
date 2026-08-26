@@ -115,6 +115,7 @@ class _BackupScreenState extends State<BackupScreen> {
 
     await showDialog<void>(
       context: context,
+      barrierDismissible: false,
       builder: (context) {
         return AlertDialog(
           backgroundColor: surfaceColor,
@@ -149,6 +150,7 @@ class _BackupScreenState extends State<BackupScreen> {
             GestureDetector(
               onTap: () {
                 Navigator.of(context).pop();
+                Navigator.of(this.context).pop();
               },
               child: Container(
                 padding: const EdgeInsets.symmetric(
