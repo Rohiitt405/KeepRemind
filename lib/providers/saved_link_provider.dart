@@ -14,6 +14,7 @@ class SavedLinkProvider extends ChangeNotifier {
   final MetadataService _metadataService = MetadataService();
   final NotificationService _notificationService = NotificationService();
   final AiService _aiService = AiService();
+  final ReminderService _reminderService = ReminderService();
 
   StreamSubscription<List<SavedLink>>? _savedLinksSubscription;
   Completer<void>? _initialDataCompleter;
@@ -22,6 +23,7 @@ class SavedLinkProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   bool _hasLoadedInitialData = false;
+  int _lastUnreviewedCount = -1;
 
   List<SavedLink> get savedLinks => _savedLinks;
   bool get isLoading => _isLoading;
@@ -119,15 +121,6 @@ class SavedLinkProvider extends ChangeNotifier {
         notifyListeners();
       }
 
-      final remindersService = ReminderService();
-      final reminders = await remindersService.loadReminderReminder();
-
-      await _notificationService.scheduleWeeklyReminder(
-        weekday: reminders['weekday']!,
-        hour: reminders['hour']!,
-        minute: reminders['minute']!,
-      );
-
       unawaited(
         _generateAiForSavedLink(
           reelId: savedLinkId,
@@ -207,5 +200,91 @@ class SavedLinkProvider extends ChangeNotifier {
   void _setLoading(bool value) {
     _isLoading = value;
     notifyListeners();
+  }
+
+  Future<void> rescheduleReminder() async {
+    await _syncReminderWithSavedLinks(force: true);
+  }
+
+  Future<void> _syncReminderWithSavedLinks({
+    bool force = false,
+  }) async {
+    final eligibleLinks = savedLinks
+      .where((link) => !link.isReviewed && 
+        link.aiMemory != null && 
+        link.aiMemory!.trim().isNotEmpty
+      )
+      .toList();
+
+    final currentCount = eligibleLinks.length;
+
+    if (currentCount == 0) {
+      _lastUnreviewedCount = 0;
+
+      await _notificationService.cancelAll();
+      await _reminderService.clearLastReminderLinkId();
+
+      return;
+    }
+
+    if(!force && currentCount == _lastUnreviewedCount) {
+      return;
+    }
+
+    _lastUnreviewedCount = currentCount;
+
+    final nextLink = await _selectNextReminderLink(eligibleLinks);
+
+    if(nextLink == null) {
+      return;
+    }
+
+    final reminders = await _reminderService.loadReminderReminder();
+
+    final type = reminders['type'] as String;
+    final weekday = reminders['weekday'] as int;
+    final hour = reminders['hour'] as int;
+    final minute = reminders['minute'] as int;
+
+    if(type == 'daily') {
+      await _notificationService.scheduleDailyReminder(
+        hour: hour,
+        minute: minute,
+        savedLink: nextLink,
+      );
+    } else {
+      await _notificationService.scheduleWeeklyReminder(
+        weekday: weekday,
+        hour: hour,
+        minute: minute,
+        savedLink: nextLink,
+      );
+    }
+
+    await _reminderService.savedLastReminderLinkId(nextLink.id);
+  }
+
+  Future<SavedLink?> _selectNextReminderLink(
+    List<SavedLink> eligibleLinks,
+  ) async {
+    if(eligibleLinks.isEmpty) {
+      return null;
+    }
+
+    final lastId = await _reminderService.getLastReminderLinkId();
+
+    if(lastId == null) {
+      return eligibleLinks.first;
+    }
+
+    final lastIndex = eligibleLinks.indexWhere((link) => link.id == lastId);
+
+    if(lastIndex == -1) {
+      return eligibleLinks.first;
+    }
+
+    final nextIndex = (lastIndex + 1) % eligibleLinks.length;
+  
+    return eligibleLinks[nextIndex];
   }
 }
