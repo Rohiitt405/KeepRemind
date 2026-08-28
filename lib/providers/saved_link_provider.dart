@@ -23,7 +23,6 @@ class SavedLinkProvider extends ChangeNotifier {
   bool _isLoading = false;
   String? _errorMessage;
   bool _hasLoadedInitialData = false;
-  int _lastUnreviewedCount = -1;
 
   List<SavedLink> get savedLinks => _savedLinks;
   bool get isLoading => _isLoading;
@@ -39,7 +38,7 @@ class SavedLinkProvider extends ChangeNotifier {
     _savedLinksSubscription?.cancel();
 
     _savedLinksSubscription = _firestoreService.getSavedLinks().listen(
-      (savedLinks) {
+      (savedLinks) async {
         _savedLinks = savedLinks;
 
         if (!_hasLoadedInitialData) {
@@ -49,6 +48,8 @@ class SavedLinkProvider extends ChangeNotifier {
         }
 
         notifyListeners();
+
+        await _syncReminderWithSavedLinks();
       },
       onError: (error) {
         debugPrint('SavedLink stream error: $error');
@@ -203,39 +204,19 @@ class SavedLinkProvider extends ChangeNotifier {
   }
 
   Future<void> rescheduleReminder() async {
-    await _syncReminderWithSavedLinks(force: true);
+    await _syncReminderWithSavedLinks();
   }
 
-  Future<void> _syncReminderWithSavedLinks({
-    bool force = false,
-  }) async {
-    final eligibleLinks = savedLinks
+  Future<void> _syncReminderWithSavedLinks() async {
+    final eligibleLinks = _savedLinks
       .where((link) => !link.isReviewed && 
         link.aiMemory != null && 
         link.aiMemory!.trim().isNotEmpty
       )
       .toList();
 
-    final currentCount = eligibleLinks.length;
-
-    if (currentCount == 0) {
-      _lastUnreviewedCount = 0;
-
+    if(eligibleLinks.isEmpty) {
       await _notificationService.cancelAll();
-      await _reminderService.clearLastReminderLinkId();
-
-      return;
-    }
-
-    if(!force && currentCount == _lastUnreviewedCount) {
-      return;
-    }
-
-    _lastUnreviewedCount = currentCount;
-
-    final nextLink = await _selectNextReminderLink(eligibleLinks);
-
-    if(nextLink == null) {
       return;
     }
 
@@ -247,44 +228,18 @@ class SavedLinkProvider extends ChangeNotifier {
     final minute = reminders['minute'] as int;
 
     if(type == 'daily') {
-      await _notificationService.scheduleDailyReminder(
+      await _notificationService.scheduleDailyReminderBatch(
         hour: hour,
         minute: minute,
-        savedLink: nextLink,
+        savedLinks: eligibleLinks,
       );
     } else {
-      await _notificationService.scheduleWeeklyReminder(
+      await _notificationService.scheduleWeeklyReminderBatch(
         weekday: weekday,
         hour: hour,
         minute: minute,
-        savedLink: nextLink,
+        savedLinks: eligibleLinks,
       );
     }
-
-    await _reminderService.savedLastReminderLinkId(nextLink.id);
-  }
-
-  Future<SavedLink?> _selectNextReminderLink(
-    List<SavedLink> eligibleLinks,
-  ) async {
-    if(eligibleLinks.isEmpty) {
-      return null;
-    }
-
-    final lastId = await _reminderService.getLastReminderLinkId();
-
-    if(lastId == null) {
-      return eligibleLinks.first;
-    }
-
-    final lastIndex = eligibleLinks.indexWhere((link) => link.id == lastId);
-
-    if(lastIndex == -1) {
-      return eligibleLinks.first;
-    }
-
-    final nextIndex = (lastIndex + 1) % eligibleLinks.length;
-  
-    return eligibleLinks[nextIndex];
   }
 }

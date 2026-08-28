@@ -12,8 +12,11 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 
-  static const int _weeklyReminderId = 1;
-  static const int _dailyReminderId = 2;
+  static const int _weeklyReminderId = 100;
+  static const int _dailyReminderId = 200;
+
+  static const int _dailyScheduleCount = 7;
+  static const int _weeklyScheduleCount = 4;
 
   Future<void> initialize() async {
     tz_data.initializeTimeZones();
@@ -85,8 +88,57 @@ class NotificationService {
       scheduledDate: scheduledDate,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.dayOfWeekAndTime,
     );
+  }
+
+  Future<void> scheduleWeeklyReminderBatch({
+    required int weekday,
+    required int hour,
+    required int minute,
+    required List<SavedLink> savedLinks,
+  }) async {
+    await cancelAll();
+
+    if (savedLinks.isEmpty) {
+      return;
+    }
+
+    final eligibleLinks = savedLinks
+        .where(
+          (link) =>
+              !link.isReviewed &&
+              link.aiMemory != null &&
+              link.aiMemory!.trim().isNotEmpty,
+        )
+        .toList();
+
+    if (eligibleLinks.isEmpty) {
+      return;
+    }
+
+    final firstDate = _nextWeekdayTime(
+      weekday,
+      hour,
+      minute,
+    );
+
+    for (int i = 0; i < _weeklyScheduleCount; i++) {
+      final savedLink = eligibleLinks[i % eligibleLinks.length];
+
+      final scheduledDate = firstDate.add(
+        Duration(days: 7 * i),
+      );
+
+      await _scheduleNotification(
+        id: _weeklyReminderId + i,
+        scheduledDate: scheduledDate,
+        savedLink: savedLink,
+        channelId: 'weekly_reminder',
+        channelName: 'Weekly Reminder',
+        channelDescription:
+            'Weekly reminder to revisit your saved content',
+      );
+    }
   }
 
   Future<void> scheduleDailyReminder({
@@ -122,21 +174,102 @@ class NotificationService {
       scheduledDate: scheduledDate,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      matchDateTimeComponents: DateTimeComponents.time,
+    );
+  }
+
+  Future<void> scheduleDailyReminderBatch({
+    required int hour,
+    required int minute,
+    required List<SavedLink> savedLinks,
+  }) async {
+    await cancelAll();
+
+    if (savedLinks.isEmpty) {
+      return;
+    }
+
+    final eligibleLinks = savedLinks
+        .where(
+          (link) =>
+              !link.isReviewed &&
+              link.aiMemory != null &&
+              link.aiMemory!.trim().isNotEmpty,
+        )
+        .toList();
+
+    if (eligibleLinks.isEmpty) {
+      return;
+    }
+
+    final firstDate = _nextDailyTime(hour, minute);
+
+    for (int i = 0; i < _dailyScheduleCount; i++) {
+      final savedLink = eligibleLinks[i % eligibleLinks.length];
+
+      final scheduledDate = firstDate.add(
+        Duration(days: i),
+      );
+
+      await _scheduleNotification(
+        id: _dailyReminderId + i,
+        scheduledDate: scheduledDate,
+        savedLink: savedLink,
+        channelId: 'daily_reminder',
+        channelName: 'Daily Reminder',
+        channelDescription:
+            'Daily reminder to revisit your saved content',
+      );
+    }
+  }
+
+  Future<void> _scheduleNotification({
+    required int id,
+    required tz.TZDateTime scheduledDate,
+    required SavedLink savedLink,
+    required String channelId,
+    required String channelName,
+    required String channelDescription,
+  }) async {
+    const androidDetails = AndroidNotificationDetails(
+      'keepremind_reminders',
+      'KeepRemind Reminders',
+      channelDescription:
+          'Reminders to revisit saved content and AI memories',
+      importance: Importance.high,
+      priority: Priority.high,
+    );
+
+    const details = NotificationDetails(
+      android: androidDetails,
+      iOS: DarwinNotificationDetails(),
+    );
+
+    await _plugin.zonedSchedule(
+      id: id,
+      title: buildNotificationTitle(savedLink),
+      body: buildNotificationBody(savedLink),
+      scheduledDate: scheduledDate,
+      notificationDetails: details,
+      androidScheduleMode:
+          AndroidScheduleMode.inexactAllowWhileIdle,
     );
   }
 
   Future<void> cancelWeeklyReminder() async {
-    await _plugin.cancel(id: _weeklyReminderId);
+    for(int i=0; i<_weeklyScheduleCount; i++) {
+      await _plugin.cancel(id: _weeklyReminderId);
+    }
   }
 
   Future<void> cancelDailyReminder() async {
-    await _plugin.cancel(id: _dailyReminderId);
+    for(int i=0; i<_dailyScheduleCount; i++) {
+      await _plugin.cancel(id: _dailyReminderId);
+    }
   }
 
   Future<void> cancelAll() async {
-    await _plugin.cancel(id: _weeklyReminderId);
-    await _plugin.cancel(id: _dailyReminderId);
+    await cancelWeeklyReminder();
+    await cancelDailyReminder();
   }
 
   String buildNotificationTitle(SavedLink savedLink) {
