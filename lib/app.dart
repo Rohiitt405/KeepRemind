@@ -1,14 +1,16 @@
 import 'dart:async';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'providers/saved_link_provider.dart';
 import 'package:receive_sharing_intent/receive_sharing_intent.dart';
 
 import 'constants/app_theme.dart';
 import 'screens/add_url_screen.dart';
 import 'screens/share_loading_screen.dart';
 import 'screens/splash_screen.dart';
-import './providers/update_provider.dart';
+import 'screens/detail_screen.dart';
+import 'providers/update_provider.dart';
+import 'providers/saved_link_provider.dart';
+import 'services/notification_service.dart';
 
 class KeepRemindApp extends StatefulWidget {
   const KeepRemindApp({super.key});
@@ -19,6 +21,7 @@ class KeepRemindApp extends StatefulWidget {
 
 class _KeepRemindAppState extends State<KeepRemindApp> {
   final GlobalKey<NavigatorState> _navigatorKey = GlobalKey<NavigatorState>();
+  final NotificationService _notificationService = NotificationService();
   StreamSubscription? _shareSubscription;
   String? _pendingUrl;
   bool _shareIntentChecked = false;
@@ -28,13 +31,53 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
   @override
   void initState() {
     super.initState();
+
     _handleShareIntents();
+    _handleNotificationTap();
   }
 
   @override
   void dispose() {
     _shareSubscription?.cancel();
     super.dispose();
+  }
+
+  void _handleNotificationTap() {
+    _notificationService.onNotificationTap = _openSavedLinkFromNotification;
+    
+    final launchPayload = _notificationService.launchPayload;
+
+    if(launchPayload != null && launchPayload.isNotEmpty) {
+      WidgetsBinding.instance.addPostFrameCallback((_) {
+        _openSavedLinkFromNotification(launchPayload);
+        _notificationService.clearLaunchPayload();
+      });
+    }
+  }
+
+  void _openSavedLinkFromNotification(String savedLinkId) {
+    if(!mounted)  return;
+
+    final savedLinkProvider = context.read<SavedLinkProvider>();
+
+    final savedLink = savedLinkProvider.savedLinks
+      .where((link) => link.id == savedLinkId)
+      .firstOrNull;
+    
+    if(savedLink == null) {
+      debugPrint('SavedLink not found for notification: $savedLink');
+      return;
+    }
+
+    final navigator = _navigatorKey.currentState;
+
+    if(navigator == null) return;
+
+    navigator.push(
+      MaterialPageRoute(
+        builder: (_) => DetailScreen(savedLink: savedLink),
+      )
+    );
   }
 
   void _handleShareIntents() {

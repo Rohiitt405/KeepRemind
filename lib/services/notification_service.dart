@@ -12,11 +12,20 @@ class NotificationService {
 
   final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 
+  Function(String savedLinkId)? onNotificationTap;
+  String? _launchPayload;
+
+  String? get launchPayload => _launchPayload;
+
   static const int _weeklyReminderId = 100;
   static const int _dailyReminderId = 200;
 
   static const int _dailyScheduleCount = 7;
   static const int _weeklyScheduleCount = 4;
+
+  void clearLaunchPayload() {
+    _launchPayload = null;
+  }
 
   Future<void> initialize() async {
     tz_data.initializeTimeZones();
@@ -39,7 +48,22 @@ class NotificationService {
       iOS: iosSettings,
     );
 
-    await _plugin.initialize(settings: settings);
+    await _plugin.initialize(
+      settings: settings,
+      onDidReceiveNotificationResponse: (response) {
+        final payload = response.payload;
+
+        if(payload != null && payload.isNotEmpty) {
+          onNotificationTap?.call(payload);
+        }
+      },
+    );
+
+    final lauchDetails = await _plugin.getNotificationAppLaunchDetails();
+    
+    if(lauchDetails?.didNotificationLaunchApp ?? false) {
+      _launchPayload = lauchDetails?.notificationResponse?.payload;
+    }
   }
 
   Future<bool> requestPermission() async {
@@ -252,6 +276,7 @@ class NotificationService {
       notificationDetails: details,
       androidScheduleMode:
           AndroidScheduleMode.inexactAllowWhileIdle,
+      payload: savedLink.id,
     );
   }
 

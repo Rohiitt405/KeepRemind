@@ -4,7 +4,6 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/saved_link_provider.dart';
-import '../services/notification_service.dart';
 import '../services/reminders_service.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
 import '../widgets/shared/neo_brutalist_button.dart';
@@ -17,7 +16,6 @@ class ReminderScreen extends StatefulWidget {
 }
 
 class _ReminderScreenState extends State<ReminderScreen> {
-  final NotificationService _notificationService = NotificationService();
   final ReminderService _remindersService = ReminderService();
 
   String _reminderType = 'weekly';
