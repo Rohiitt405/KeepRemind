@@ -5,8 +5,11 @@ class ReminderService {
   static const String _reminderDayKey = 'reminder_day';
   static const String _reminderHourKey = 'reminder_hour';
   static const String _reminderMinuteKey = 'reminder_minute';
+  
   static const String _lastUpdateCheckKey = 'last_update_check';
   static const String _skippedUpdatedVersionKey = 'skipped_update_version';
+
+  static const String _lastReminderLinkIdKey = 'last_reminder_link_id';
 
   Future<void> setSkippedUpdateVersion(String version) async {
     final prefs = await SharedPreferences.getInstance();
@@ -48,6 +51,7 @@ class ReminderService {
 
   Future<Map<String, dynamic>> loadReminderReminder() async {
     final prefs = await SharedPreferences.getInstance();
+
     return {
       'type': prefs.getString(_reminderTypeKey) ?? 'weekly',
       'weekday': prefs.getInt(_reminderDayKey) ?? DateTime.monday,
@@ -56,10 +60,38 @@ class ReminderService {
     };
   }
 
+  Future<void> savedLastReminderLinkId(String linkId) async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.setString(
+      _lastReminderLinkIdKey, 
+      linkId,
+    );
+  }
+
+  Future<String?> getLastReminderLinkId() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    return prefs.getString(
+      _lastReminderLinkIdKey
+    );
+  }
+
+  Future<void> clearLastReminderLinkId() async {
+    final prefs = await SharedPreferences.getInstance();
+
+    await prefs.remove(
+      _lastReminderLinkIdKey
+    );
+  }
+
   Future<void> saveLastUpdateCheck(DateTime dateTime) async {
     final prefs = await SharedPreferences.getInstance();
 
-    await prefs.setString(_lastUpdateCheckKey, dateTime.toIso8601String());
+    await prefs.setString(
+      _lastUpdateCheckKey, 
+      dateTime.toIso8601String()
+    );
   }
 
   Future<DateTime?> getLastUpdateCheck() async {
