@@ -3,13 +3,14 @@ import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
 import 'package:timezone/timezone.dart' as tz;
 
+import '../models/saved_link_model.dart';
+
 class NotificationService {
   NotificationService._internal();
   static final NotificationService _instance = NotificationService._internal();
   factory NotificationService() => _instance;
 
-  final FlutterLocalNotificationsPlugin _plugin =
-      FlutterLocalNotificationsPlugin();
+  final FlutterLocalNotificationsPlugin _plugin = FlutterLocalNotificationsPlugin();
 
   static const int _weeklyReminderId = 1;
   static const int _dailyReminderId = 2;
@@ -40,9 +41,7 @@ class NotificationService {
 
   Future<bool> requestPermission() async {
     final android = _plugin
-        .resolvePlatformSpecificImplementation<
-          AndroidFlutterLocalNotificationsPlugin
-        >();
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
     if (android != null) {
       final granted = await android.requestNotificationsPermission();
@@ -56,14 +55,18 @@ class NotificationService {
     int weekday = DateTime.monday,
     int hour = 10,
     int minute = 0,
-    String? reminderText,
+    SavedLink? savedLink,
   }) async {
     await cancelAll();
+
+    if (savedLink == null) {
+      return;
+    }
 
     const androidDetails = AndroidNotificationDetails(
       'weekly_reminder',
       'Weekly Reminder',
-      channelDescription: 'Weekly reminder to review your saved links',
+      channelDescription: 'Weekly reminder to revisit your saved content',
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -77,8 +80,8 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: _weeklyReminderId,
-      title: '🎬 Time to review your saved links',
-      body: reminderText ?? 'Review your saved links',
+      title: buildNotificationTitle(savedLink),
+      body: buildNotificationBody(savedLink),
       scheduledDate: scheduledDate,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
@@ -86,18 +89,21 @@ class NotificationService {
     );
   }
 
-  Future<void> cancelWeeklyReminder() async {
-    await _plugin.cancel(id: _weeklyReminderId);
-  }
-
-  Future<void> scheduleDailyReminder({int hour = 10, int minute = 0}) async {
-    // Cancel both so no stale weekly reminder lingers when switching modes
+  Future<void> scheduleDailyReminder({
+    int hour = 10, 
+    int minute = 0,
+    SavedLink? savedLink,
+    }) async {
     await cancelAll();
+
+    if(savedLink == null) {
+      return;
+    }
 
     const androidDetails = AndroidNotificationDetails(
       'daily_reminder',
       'Daily Reminder',
-      channelDescription: 'Daily reminder to review your saved links',
+      channelDescription: 'Daily reminder to revisit your saved content',
       importance: Importance.high,
       priority: Priority.high,
     );
@@ -111,14 +117,17 @@ class NotificationService {
 
     await _plugin.zonedSchedule(
       id: _dailyReminderId,
-      title: '🎬 Daily saved link review!',
-      body: 'Take a moment to review your saved links and key takeaways.',
+      title: buildNotificationTitle(savedLink),
+      body: buildNotificationBody(savedLink),
       scheduledDate: scheduledDate,
       notificationDetails: details,
       androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-      // time only — fires at the same time every single day
       matchDateTimeComponents: DateTimeComponents.time,
     );
+  }
+
+  Future<void> cancelWeeklyReminder() async {
+    await _plugin.cancel(id: _weeklyReminderId);
   }
 
   Future<void> cancelDailyReminder() async {
@@ -128,6 +137,22 @@ class NotificationService {
   Future<void> cancelAll() async {
     await _plugin.cancel(id: _weeklyReminderId);
     await _plugin.cancel(id: _dailyReminderId);
+  }
+
+  String buildNotificationTitle(SavedLink savedLink) {
+    return savedLink.title.isNotEmpty
+      ? savedLink.title
+      : 'Your saved memory';
+  }
+
+  String buildNotificationBody(SavedLink savedLink) {
+    final memory = savedLink.aiMemory?.trim();
+
+    if(memory == null || memory.isEmpty) {
+      return 'Take a moment to revisit this saved content.';
+    }
+
+    return memory;
   }
 
   tz.TZDateTime _nextWeekdayTime(int weekday, int hour, int minute) {
@@ -166,15 +191,5 @@ class NotificationService {
     }
 
     return scheduled;
-  }
-
-  String buildNotificationBody(int unreviewedCount) {
-    if (unreviewedCount == 0) {
-      return 'Open the app to revisit your saved links.';
-    } else if (unreviewedCount == 1) {
-      return 'You have 1 unreviewed saved link waiting. Tap to review it!';
-    } else {
-      return 'You have $unreviewedCount unreviewed saved links waiting. Tap to review them!';
-    }
   }
 }
