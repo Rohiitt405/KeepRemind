@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/saved_link_provider.dart';
 import '../services/notification_service.dart';
 import '../services/reminders_service.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
@@ -97,18 +99,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
         minute: _selectedTime.minute,
       );
 
-      if (_reminderType == 'daily') {
-        await _notificationService.scheduleDailyReminder(
-          hour: _selectedTime.hour,
-          minute: _selectedTime.minute,
-        );
-      } else {
-        await _notificationService.scheduleWeeklyReminder(
-          weekday: _selectedWeekday,
-          hour: _selectedTime.hour,
-          minute: _selectedTime.minute,
-        );
-      }
+      await context.read<SavedLinkProvider>().rescheduleReminder();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
