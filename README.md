@@ -67,11 +67,14 @@ Download the latest Android APK from the latest GitHub Release.
 
 ### 📌 Metadata & Reminders
 
-* **📌 Smart Metadata Extraction** — Extract titles, descriptions, thumbnails, and platform information using Open Graph metadata with fallback handling.
-* **🧠 Intelligent Platform Detection** — Automatically detect the source platform and adapt processing accordingly.
-* **🔔 Flexible Reminders** — Schedule daily or weekly reminders to revisit saved content.
-* **🔄 Automatic Updates** — Check GitHub Releases for new versions, view release notes, download the latest APK, and skip specific versions.
-* **🎨 Material Design 3** — Modern interface built with Material Design 3.
+* **🔔 Smart Reminders** — Daily or weekly reminders for saved content.
+* **🧠 AI Memory** — Notifications show AI-generated memories.
+* **📚 Unreviewed Content** — Only eligible unreviewed links are scheduled.
+* **🔄 Dynamic Scheduling** — Reminders update when content changes.
+* **📅 Batch Scheduling** — Multiple reminders are scheduled in advance.
+* **🧠 Platform Detection** — Automatically detects content platforms.
+* **🔄 Automatic Updates** — Check releases, notes, APKs, and skipped versions.
+* **🎨 Material Design 3** — Modern, consistent UI.
 
 ### 💾 Backup & Restore
 
@@ -386,11 +389,11 @@ SavedLink(
 ### `SavedLinkProvider`
 
 Manages the saved-link lifecycle:
-
 * Real-time Firestore updates
 * URL validation
 * AI insight generation with retry logic
-* Reminder scheduling
+* Dynamic reminder scheduling
+* Reschedules reminders when saved content changes
 * Review and deletion state
 * Refreshes saved-link state after backup restoration
 
@@ -443,9 +446,11 @@ Generates AI memory notes and tags using Gemini:
 ### `NotificationService`
 
 Manages scheduled reminders:
-
-* Weekly reminders on a selected weekday
-* Daily reminders at a selected time
+* Daily and weekly reminder scheduling
+* AI memory-based notification content
+* Batch scheduling of upcoming reminders
+* Filters reviewed content and links without AI memory
+* Cancels and reschedules notifications when saved content changes
 * Timezone-aware scheduling
 * Singleton-based notification management
 
@@ -497,6 +502,9 @@ Real-time UI Update as AI Processing Completes
 ### Reminders
 - Toggle notification mode (daily/weekly)
 - Set reminder day and time
+- Receive notifications containing the AI memory of saved content
+- Only unreviewed saved content with AI memory is scheduled
+- Notifications are automatically rescheduled when saved content is reviewed or updated
 - View app info
 
 ### 💾 Backup & Restore
