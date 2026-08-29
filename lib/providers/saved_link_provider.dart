@@ -43,7 +43,9 @@ class SavedLinkProvider extends ChangeNotifier {
 
         if (!_hasLoadedInitialData) {
           _hasLoadedInitialData = true;
-          _initialDataCompleter?.complete();
+          if (_initialDataCompleter != null && !_initialDataCompleter!.isCompleted) {
+            _initialDataCompleter!.complete();
+          }
           _initialDataCompleter = null;
         }
 
@@ -56,7 +58,9 @@ class SavedLinkProvider extends ChangeNotifier {
 
         if (!_hasLoadedInitialData) {
           _hasLoadedInitialData = true;
-          _initialDataCompleter?.complete();
+          if (_initialDataCompleter != null && !_initialDataCompleter!.isCompleted) {
+            _initialDataCompleter!.complete();
+          }
           _initialDataCompleter = null;
         }
       },
@@ -68,22 +72,32 @@ class SavedLinkProvider extends ChangeNotifier {
   }
 
   Future<void> ensureInitialDataLoaded({
-    Duration timeout = const Duration(seconds: 6),
+    Duration timeout = const Duration(seconds: 4),
   }) async {
     if (_hasLoadedInitialData) return;
 
-    final completer = Completer<void>();
-    _initialDataCompleter = completer;
+    final completer = _initialDataCompleter ??= Completer<void>();
 
     try {
       await completer.future.timeout(timeout);
     } on TimeoutException {
       debugPrint('Timed out waiting for initial saved links.');
-    } finally {
-      if (_initialDataCompleter == completer) {
-        _initialDataCompleter = null;
-      }
     }
+  }
+
+  Future<SavedLink?> fetchSavedLinkById(String savedLinkId) async {
+    final existing = _savedLinks.where((item) => item.id == savedLinkId).firstOrNull;
+    if (existing != null) return existing;
+
+    final fetched = await _firestoreService.getSavedLinkById(savedLinkId);
+    if (fetched != null) {
+      if (!_savedLinks.any((item) => item.id == fetched.id)) {
+        _savedLinks.insert(0, fetched);
+        notifyListeners();
+      }
+      return fetched;
+    }
+    return null;
   }
 
   Future<void> saveSavedLinkFromUrl(String url) async {
@@ -208,38 +222,31 @@ class SavedLinkProvider extends ChangeNotifier {
   }
 
   Future<void> _syncReminderWithSavedLinks() async {
-    final eligibleLinks = _savedLinks
-      .where((link) => !link.isReviewed && 
-        link.aiMemory != null && 
-        link.aiMemory!.trim().isNotEmpty
-      )
-      .toList();
+    try {
+      final reminders = await _reminderService.loadReminderReminder();
 
-    if(eligibleLinks.isEmpty) {
-      await _notificationService.cancelAll();
-      return;
-    }
+      final type = reminders['type'] as String? ?? 'weekly';
+      final weekday = reminders['weekday'] as int? ?? DateTime.monday;
+      final hour = reminders['hour'] as int? ?? 10;
+      final minute = reminders['minute'] as int? ?? 0;
 
-    final reminders = await _reminderService.loadReminderReminder();
-
-    final type = reminders['type'] as String;
-    final weekday = reminders['weekday'] as int;
-    final hour = reminders['hour'] as int;
-    final minute = reminders['minute'] as int;
-
-    if(type == 'daily') {
-      await _notificationService.scheduleDailyReminderBatch(
-        hour: hour,
-        minute: minute,
-        savedLinks: eligibleLinks,
-      );
-    } else {
-      await _notificationService.scheduleWeeklyReminderBatch(
-        weekday: weekday,
-        hour: hour,
-        minute: minute,
-        savedLinks: eligibleLinks,
-      );
+      if (type == 'daily') {
+        await _notificationService.scheduleDailyReminderBatch(
+          hour: hour,
+          minute: minute,
+          savedLinks: _savedLinks,
+        );
+      } else {
+        await _notificationService.scheduleWeeklyReminderBatch(
+          weekday: weekday,
+          hour: hour,
+          minute: minute,
+          savedLinks: _savedLinks,
+        );
+      }
+      await _notificationService.debugScheduledNotifications();
+    } catch (e) {
+      debugPrint('Error syncing reminder with saved links: $e');
     }
   }
 }

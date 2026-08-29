@@ -10,7 +10,9 @@ void main() async {
   await Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform);
 
   final notificationService = NotificationService();
+  
   await notificationService.initialize();
+  await notificationService.requestPermission();
 
   runApp(const KeepRemindApp());
 }

@@ -4,6 +4,7 @@ import 'package:google_fonts/google_fonts.dart';
 import 'package:provider/provider.dart';
 
 import '../providers/saved_link_provider.dart';
+import '../services/notification_service.dart';
 import '../services/reminders_service.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
 import '../widgets/shared/neo_brutalist_button.dart';
@@ -90,6 +91,8 @@ class _ReminderScreenState extends State<ReminderScreen> {
     setState(() => _isSaving = true);
 
     try {
+      await NotificationService().requestPermission();
+
       await _remindersService.saveReminderReminder(
         type: _reminderType,
         weekday: _selectedWeekday,
@@ -97,6 +100,7 @@ class _ReminderScreenState extends State<ReminderScreen> {
         minute: _selectedTime.minute,
       );
 
+      if (!mounted) return;
       await context.read<SavedLinkProvider>().rescheduleReminder();
 
       if (mounted) {

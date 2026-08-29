@@ -43,40 +43,40 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
   }
 
   void _handleNotificationTap() {
-    _notificationService.onNotificationTap = _openSavedLinkFromNotification;
-    
-    final launchPayload = _notificationService.launchPayload;
-
-    if(launchPayload != null && launchPayload.isNotEmpty) {
-      WidgetsBinding.instance.addPostFrameCallback((_) {
-        _openSavedLinkFromNotification(launchPayload);
-        _notificationService.clearLaunchPayload();
-      });
-    }
+    _notificationService.onNotificationTap = (savedLinkId) {
+      if (savedLinkId.isNotEmpty) {
+        _openSavedLinkFromNotification(savedLinkId);
+      }
+    };
   }
 
-  void _openSavedLinkFromNotification(String savedLinkId) {
-    if(!mounted)  return;
+  Future<void> _openSavedLinkFromNotification(String savedLinkId) async {
+    if (savedLinkId.isEmpty) return;
 
-    final savedLinkProvider = context.read<SavedLinkProvider>();
+    final navContext = _navigatorKey.currentContext;
+    if (navContext == null) return;
 
-    final savedLink = savedLinkProvider.savedLinks
+    final savedLinkProvider = navContext.read<SavedLinkProvider>();
+    await savedLinkProvider.ensureInitialDataLoaded();
+
+    var savedLink = savedLinkProvider.savedLinks
       .where((link) => link.id == savedLinkId)
       .firstOrNull;
     
-    if(savedLink == null) {
-      debugPrint('SavedLink not found for notification: $savedLink');
+    savedLink ??= await savedLinkProvider.fetchSavedLinkById(savedLinkId);
+    
+    if (savedLink == null) {
+      debugPrint('SavedLink not found for notification ID: $savedLinkId');
       return;
     }
 
-    final navigator = _navigatorKey.currentState;
+    final currentNav = _navigatorKey.currentState;
+    if (currentNav == null) return;
 
-    if(navigator == null) return;
-
-    navigator.push(
+    currentNav.push(
       MaterialPageRoute(
-        builder: (_) => DetailScreen(savedLink: savedLink),
-      )
+        builder: (_) => DetailScreen(savedLink: savedLink!),
+      ),
     );
   }
 
@@ -196,7 +196,9 @@ class _KeepRemindAppState extends State<KeepRemindApp> {
         theme: AppThemeConstants.buildTheme(),
         home: shouldShowShareLoading
             ? ShareLoadingScreen(initialUrl: _pendingUrl)
-            : const SplashScreen(),
+            : SplashScreen(
+                initialSavedLinkId: _notificationService.launchPayload,
+              ),
       ),
     );
   }

@@ -16,7 +16,9 @@ import '../widgets/update_dialog.dart';
 import '../models/saved_link_model.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final String? initialSavedLinkId;
+
+  const HomeScreen({super.key, this.initialSavedLinkId});
 
   @override
   State<HomeScreen> createState() => _HomeScreenState();
@@ -48,7 +50,33 @@ class _HomeScreenState extends State<HomeScreen>
 
     WidgetsBinding.instance.addPostFrameCallback((_) {
       _checkForAppUpdate();
+      if (widget.initialSavedLinkId != null &&
+          widget.initialSavedLinkId!.isNotEmpty) {
+        _openDetailFromNotification(widget.initialSavedLinkId!);
+      }
     });
+  }
+
+  Future<void> _openDetailFromNotification(String linkId) async {
+    final provider = context.read<SavedLinkProvider>();
+    await provider.ensureInitialDataLoaded();
+
+    if (!mounted) return;
+
+    var savedLink = provider.savedLinks
+        .where((item) => item.id == linkId)
+        .firstOrNull;
+
+    savedLink ??= await provider.fetchSavedLinkById(linkId);
+
+    if (savedLink != null && mounted) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (_) => DetailScreen(savedLink: savedLink!),
+        ),
+      );
+    }
   }
 
   @override

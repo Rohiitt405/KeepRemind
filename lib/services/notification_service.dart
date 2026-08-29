@@ -1,3 +1,4 @@
+import 'package:flutter/material.dart';
 import 'package:flutter_local_notifications/flutter_local_notifications.dart';
 import 'package:flutter_timezone/flutter_timezone.dart';
 import 'package:timezone/data/latest.dart' as tz_data;
@@ -23,6 +24,11 @@ class NotificationService {
   static const int _dailyScheduleCount = 7;
   static const int _weeklyScheduleCount = 4;
 
+  static const String defaultChannelId = 'keepremind_reminders';
+  static const String defaultChannelName = 'KeepRemind Reminders';
+  static const String defaultChannelDescription =
+      'Reminders to revisit saved content and AI memories';
+
   void clearLaunchPayload() {
     _launchPayload = null;
   }
@@ -30,8 +36,18 @@ class NotificationService {
   Future<void> initialize() async {
     tz_data.initializeTimeZones();
 
-    final timezoneInfo = await FlutterTimezone.getLocalTimezone();
-    tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
+    try {
+      final timezoneInfo = await FlutterTimezone.getLocalTimezone();
+      tz.setLocalLocation(tz.getLocation(timezoneInfo.identifier));
+    } catch (e) {
+      debugPrint('NotificationService: Failed to configure local timezone, falling back to local/UTC: $e');
+      try {
+        final rawTimezone = await FlutterTimezone.getLocalTimezone();
+        tz.setLocalLocation(tz.getLocation(rawTimezone.toString()));
+      } catch (_) {
+        tz.setLocalLocation(tz.getLocation('UTC'));
+      }
+    }
 
     const androidSettings = AndroidInitializationSettings(
       '@mipmap/ic_launcher',
@@ -53,29 +69,95 @@ class NotificationService {
       onDidReceiveNotificationResponse: (response) {
         final payload = response.payload;
 
-        if(payload != null && payload.isNotEmpty) {
+        if (payload != null && payload.isNotEmpty) {
           onNotificationTap?.call(payload);
         }
       },
     );
 
-    final lauchDetails = await _plugin.getNotificationAppLaunchDetails();
-    
-    if(lauchDetails?.didNotificationLaunchApp ?? false) {
-      _launchPayload = lauchDetails?.notificationResponse?.payload;
+    final android = _plugin
+        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    if (android != null) {
+      const channel = AndroidNotificationChannel(
+        defaultChannelId,
+        defaultChannelName,
+        description: defaultChannelDescription,
+        importance: Importance.high,
+        playSound: true,
+        enableVibration: true,
+      );
+      await android.createNotificationChannel(channel);
+    }
+
+    final launchDetails = await _plugin.getNotificationAppLaunchDetails();
+    if (launchDetails?.didNotificationLaunchApp ?? false) {
+      _launchPayload = launchDetails?.notificationResponse?.payload;
     }
   }
 
   Future<bool> requestPermission() async {
-    final android = _plugin
-        .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+    try {
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
 
-    if (android != null) {
-      final granted = await android.requestNotificationsPermission();
-      return granted ?? false;
+      if (android != null) {
+        final granted = await android.requestNotificationsPermission() ?? false;
+        final exactAlarmGranted = await android.canScheduleExactNotifications() ?? false;
+
+        debugPrint('Notification permission: $granted, exact alarm: $exactAlarmGranted');
+
+        if (!exactAlarmGranted) {
+          try {
+            await android.requestExactAlarmsPermission();
+          } catch (e) {
+            debugPrint('Error requesting exact alarms permission: $e');
+          }
+        }
+
+        return granted;
+      }
+
+      final ios = _plugin
+          .resolvePlatformSpecificImplementation<IOSFlutterLocalNotificationsPlugin>();
+      if (ios != null) {
+        final granted = await ios.requestPermissions(
+          alert: true,
+          badge: true,
+          sound: true,
+        ) ?? false;
+        return granted;
+      }
+    } catch (e) {
+      debugPrint('Error requesting notification permissions: $e');
     }
 
     return true;
+  }
+
+  Future<AndroidScheduleMode> _getScheduleMode() async {
+    try {
+      final android = _plugin
+          .resolvePlatformSpecificImplementation<AndroidFlutterLocalNotificationsPlugin>();
+      if (android != null) {
+        final canExact = await android.canScheduleExactNotifications() ?? false;
+        if (canExact) {
+          return AndroidScheduleMode.exactAllowWhileIdle;
+        }
+      }
+    } catch (e) {
+      debugPrint('Error checking exact alarm support: $e');
+    }
+    return AndroidScheduleMode.inexactAllowWhileIdle;
+  }
+
+  List<SavedLink> _getPrioritizedLinks(List<SavedLink> savedLinks) {
+    return savedLinks
+      .where(
+        (link) => !link.isReviewed && 
+          link.aiMemory != null && 
+          link.aiMemory!.trim().isNotEmpty,
+      )
+      .toList();
   }
 
   Future<void> scheduleWeeklyReminder({
@@ -86,162 +168,124 @@ class NotificationService {
   }) async {
     await cancelAll();
 
-    if (savedLink == null) {
-      return;
-    }
-
-    const androidDetails = AndroidNotificationDetails(
-      'weekly_reminder',
-      'Weekly Reminder',
-      channelDescription: 'Weekly reminder to revisit your saved content',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-
-    const details = NotificationDetails(
-      android: androidDetails,
-      iOS: DarwinNotificationDetails(),
-    );
-
     final scheduledDate = _nextWeekdayTime(weekday, hour, minute);
 
-    await _plugin.zonedSchedule(
-      id: _weeklyReminderId,
-      title: buildNotificationTitle(savedLink),
-      body: buildNotificationBody(savedLink),
-      scheduledDate: scheduledDate,
-      notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    );
+    if (savedLink != null) {
+      await _scheduleNotification(
+        id: _weeklyReminderId,
+        scheduledDate: scheduledDate,
+        title: buildNotificationTitle(savedLink),
+        body: buildNotificationBody(savedLink),
+        payload: savedLink.id,
+      );
+    } else {
+      await _scheduleNotification(
+        id: _weeklyReminderId,
+        scheduledDate: scheduledDate,
+        title: 'KeepRemind Weekly',
+        body: 'Check out your saved content and organize your weekly insights!',
+        payload: null,
+      );
+    }
   }
 
   Future<void> scheduleWeeklyReminderBatch({
     required int weekday,
     required int hour,
     required int minute,
-    required List<SavedLink> savedLinks,
+    List<SavedLink> savedLinks = const [],
   }) async {
     await cancelAll();
 
-    if (savedLinks.isEmpty) {
+    final firstDate = _nextWeekdayTime(weekday, hour, minute);
+    final eligibleLinks = _getPrioritizedLinks(savedLinks);
+
+    if(eligibleLinks.isEmpty) {
       return;
     }
-
-    final eligibleLinks = savedLinks
-        .where(
-          (link) =>
-              !link.isReviewed &&
-              link.aiMemory != null &&
-              link.aiMemory!.trim().isNotEmpty,
-        )
-        .toList();
-
-    if (eligibleLinks.isEmpty) {
-      return;
-    }
-
-    final firstDate = _nextWeekdayTime(
-      weekday,
-      hour,
-      minute,
-    );
 
     for (int i = 0; i < _weeklyScheduleCount; i++) {
-      final savedLink = eligibleLinks[i % eligibleLinks.length];
-
-      final scheduledDate = firstDate.add(
-        Duration(days: 7 * i),
+      final scheduledDate = tz.TZDateTime(
+        tz.local,
+        firstDate.year,
+        firstDate.month,
+        firstDate.day + (7 * i),
+        firstDate.hour,
+        firstDate.minute,
       );
+
+      final savedLink = eligibleLinks[i % eligibleLinks.length];
 
       await _scheduleNotification(
         id: _weeklyReminderId + i,
         scheduledDate: scheduledDate,
-        savedLink: savedLink,
-        channelId: 'weekly_reminder',
-        channelName: 'Weekly Reminder',
-        channelDescription:
-            'Weekly reminder to revisit your saved content',
+        title: buildNotificationTitle(savedLink),
+        body: buildNotificationBody(savedLink),
+        payload: savedLink.id,
       );
     }
   }
 
   Future<void> scheduleDailyReminder({
-    int hour = 10, 
+    int hour = 10,
     int minute = 0,
     SavedLink? savedLink,
-    }) async {
+  }) async {
     await cancelAll();
-
-    if(savedLink == null) {
-      return;
-    }
-
-    const androidDetails = AndroidNotificationDetails(
-      'daily_reminder',
-      'Daily Reminder',
-      channelDescription: 'Daily reminder to revisit your saved content',
-      importance: Importance.high,
-      priority: Priority.high,
-    );
-
-    const details = NotificationDetails(
-      android: androidDetails,
-      iOS: DarwinNotificationDetails(),
-    );
 
     final scheduledDate = _nextDailyTime(hour, minute);
 
-    await _plugin.zonedSchedule(
-      id: _dailyReminderId,
-      title: buildNotificationTitle(savedLink),
-      body: buildNotificationBody(savedLink),
-      scheduledDate: scheduledDate,
-      notificationDetails: details,
-      androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
-    );
+    if (savedLink != null) {
+      await _scheduleNotification(
+        id: _dailyReminderId,
+        scheduledDate: scheduledDate,
+        title: buildNotificationTitle(savedLink),
+        body: buildNotificationBody(savedLink),
+        payload: savedLink.id,
+      );
+    } else {
+      await _scheduleNotification(
+        id: _dailyReminderId,
+        scheduledDate: scheduledDate,
+        title: 'KeepRemind Daily',
+        body: 'Take a moment to revisit your saved ideas or add new links!',
+        payload: null,
+      );
+    }
   }
 
   Future<void> scheduleDailyReminderBatch({
     required int hour,
     required int minute,
-    required List<SavedLink> savedLinks,
+    List<SavedLink> savedLinks = const [],
   }) async {
     await cancelAll();
 
-    if (savedLinks.isEmpty) {
-      return;
-    }
-
-    final eligibleLinks = savedLinks
-        .where(
-          (link) =>
-              !link.isReviewed &&
-              link.aiMemory != null &&
-              link.aiMemory!.trim().isNotEmpty,
-        )
-        .toList();
-
-    if (eligibleLinks.isEmpty) {
-      return;
-    }
-
     final firstDate = _nextDailyTime(hour, minute);
+    final eligibleLinks = _getPrioritizedLinks(savedLinks);
+
+    if(eligibleLinks.isEmpty) {
+      return;
+    }
 
     for (int i = 0; i < _dailyScheduleCount; i++) {
-      final savedLink = eligibleLinks[i % eligibleLinks.length];
-
-      final scheduledDate = firstDate.add(
-        Duration(days: i),
+      final scheduledDate = tz.TZDateTime(
+        tz.local,
+        firstDate.year,
+        firstDate.month,
+        firstDate.day + i,
+        firstDate.hour,
+        firstDate.minute,
       );
 
+      final savedLink = eligibleLinks[i % eligibleLinks.length];
+        
       await _scheduleNotification(
         id: _dailyReminderId + i,
         scheduledDate: scheduledDate,
-        savedLink: savedLink,
-        channelId: 'daily_reminder',
-        channelName: 'Daily Reminder',
-        channelDescription:
-            'Daily reminder to revisit your saved content',
+        title: buildNotificationTitle(savedLink),
+        body: buildNotificationBody(savedLink),
+        payload: savedLink.id,
       );
     }
   }
@@ -249,68 +293,126 @@ class NotificationService {
   Future<void> _scheduleNotification({
     required int id,
     required tz.TZDateTime scheduledDate,
-    required SavedLink savedLink,
-    required String channelId,
-    required String channelName,
-    required String channelDescription,
+    required String title,
+    required String body,
+    String? payload,
+    String channelId = defaultChannelId,
+    String channelName = defaultChannelName,
+    String channelDescription = defaultChannelDescription,
   }) async {
-    const androidDetails = AndroidNotificationDetails(
-      'keepremind_reminders',
-      'KeepRemind Reminders',
-      channelDescription:
-          'Reminders to revisit saved content and AI memories',
+    final androidDetails = AndroidNotificationDetails(
+      channelId,
+      channelName,
+      channelDescription: channelDescription,
       importance: Importance.high,
       priority: Priority.high,
+      icon: '@mipmap/ic_launcher',
+      playSound: true,
+      enableVibration: true,
     );
 
-    const details = NotificationDetails(
+    const iosDetails = DarwinNotificationDetails(
+      presentAlert: true,
+      presentBadge: true,
+      presentSound: true,
+    );
+
+    final details = NotificationDetails(
       android: androidDetails,
-      iOS: DarwinNotificationDetails(),
+      iOS: iosDetails,
     );
 
-    await _plugin.zonedSchedule(
-      id: id,
-      title: buildNotificationTitle(savedLink),
-      body: buildNotificationBody(savedLink),
-      scheduledDate: scheduledDate,
-      notificationDetails: details,
-      androidScheduleMode:
-          AndroidScheduleMode.inexactAllowWhileIdle,
-      payload: savedLink.id,
-    );
+    final scheduleMode = await _getScheduleMode();
+
+    try {
+      await _plugin.zonedSchedule(
+        id: id,
+        title: title,
+        body: body,
+        scheduledDate: scheduledDate,
+        notificationDetails: details,
+        androidScheduleMode: scheduleMode,
+        payload: payload,
+      );
+    } catch (e) {
+      debugPrint('Exact schedule failed ($e), falling back to inexact schedule mode.');
+      try {
+        await _plugin.zonedSchedule(
+          id: id,
+          title: title,
+          body: body,
+          scheduledDate: scheduledDate,
+          notificationDetails: details,
+          androidScheduleMode: AndroidScheduleMode.inexactAllowWhileIdle,
+          payload: payload,
+        );
+      } catch (fallbackError) {
+        debugPrint('Fallback scheduling failed: $fallbackError');
+      }
+    }
   }
 
   Future<void> cancelWeeklyReminder() async {
-    for(int i=0; i<_weeklyScheduleCount; i++) {
-      await _plugin.cancel(id: _weeklyReminderId);
+    for (int i = 0; i < _weeklyScheduleCount; i++) {
+      await _plugin.cancel(id: _weeklyReminderId + i);
     }
   }
 
   Future<void> cancelDailyReminder() async {
-    for(int i=0; i<_dailyScheduleCount; i++) {
-      await _plugin.cancel(id: _dailyReminderId);
+    for (int i = 0; i < _dailyScheduleCount; i++) {
+      await _plugin.cancel(id: _dailyReminderId + i);
     }
   }
 
   Future<void> cancelAll() async {
-    await cancelWeeklyReminder();
-    await cancelDailyReminder();
+    try {
+      await _plugin.cancelAll();
+    } catch (e) {
+      debugPrint('Error in plugin.cancelAll: $e');
+    }
+    for (int i = 0; i < _weeklyScheduleCount; i++) {
+      await _plugin.cancel(id: _weeklyReminderId + i);
+    }
+    for (int i = 0; i < _dailyScheduleCount; i++) {
+      await _plugin.cancel(id: _dailyReminderId + i);
+    }
+  }
+
+  Future<void> debugScheduledNotifications() async {
+    try {
+      final pending = await _plugin.pendingNotificationRequests();
+
+      debugPrint('Pending notifications count: ${pending.length}');
+      for (final notification in pending) {
+        debugPrint(
+          'Notification ID: ${notification.id}, '
+          'Title: ${notification.title}, '
+          'Body: ${notification.body}, '
+          'Payload: ${notification.payload}',
+        );
+      }
+    } catch (e) {
+      debugPrint('Error fetching pending notifications: $e');
+    }
   }
 
   String buildNotificationTitle(SavedLink savedLink) {
-    return savedLink.title.isNotEmpty
-      ? savedLink.title
-      : 'Your saved memory';
+    final title = savedLink.title.trim();
+    return title.isNotEmpty ? title : 'Your saved memory';
   }
 
   String buildNotificationBody(SavedLink savedLink) {
     final memory = savedLink.aiMemory?.trim();
-
-    if(memory == null || memory.isEmpty) {
-      return 'Take a moment to revisit this saved content.';
+    if (memory != null && memory.isNotEmpty) {
+      return memory;
     }
 
-    return memory;
+    final caption = savedLink.caption.trim();
+    if (caption.isNotEmpty) {
+      return caption;
+    }
+
+    return 'Take a moment to revisit this saved content.';
   }
 
   tz.TZDateTime _nextWeekdayTime(int weekday, int hour, int minute) {
@@ -329,7 +431,14 @@ class NotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    return scheduled;
+    return tz.TZDateTime(
+      tz.local,
+      scheduled.year,
+      scheduled.month,
+      scheduled.day,
+      hour,
+      minute,
+    );
   }
 
   tz.TZDateTime _nextDailyTime(int hour, int minute) {
@@ -348,6 +457,13 @@ class NotificationService {
       scheduled = scheduled.add(const Duration(days: 1));
     }
 
-    return scheduled;
+    return tz.TZDateTime(
+      tz.local,
+      scheduled.year,
+      scheduled.month,
+      scheduled.day,
+      hour,
+      minute,
+    );
   }
 }
