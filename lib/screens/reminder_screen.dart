@@ -1,7 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:google_fonts/google_fonts.dart';
+import 'package:provider/provider.dart';
 
+import '../providers/saved_link_provider.dart';
 import '../services/notification_service.dart';
 import '../services/reminders_service.dart';
 import '../widgets/shared/dot_grid_overlay.dart';
@@ -15,7 +17,6 @@ class ReminderScreen extends StatefulWidget {
 }
 
 class _ReminderScreenState extends State<ReminderScreen> {
-  final NotificationService _notificationService = NotificationService();
   final ReminderService _remindersService = ReminderService();
 
   String _reminderType = 'weekly';
@@ -90,6 +91,8 @@ class _ReminderScreenState extends State<ReminderScreen> {
     setState(() => _isSaving = true);
 
     try {
+      await NotificationService().requestPermission();
+
       await _remindersService.saveReminderReminder(
         type: _reminderType,
         weekday: _selectedWeekday,
@@ -97,18 +100,8 @@ class _ReminderScreenState extends State<ReminderScreen> {
         minute: _selectedTime.minute,
       );
 
-      if (_reminderType == 'daily') {
-        await _notificationService.scheduleDailyReminder(
-          hour: _selectedTime.hour,
-          minute: _selectedTime.minute,
-        );
-      } else {
-        await _notificationService.scheduleWeeklyReminder(
-          weekday: _selectedWeekday,
-          hour: _selectedTime.hour,
-          minute: _selectedTime.minute,
-        );
-      }
+      if (!mounted) return;
+      await context.read<SavedLinkProvider>().rescheduleReminder();
 
       if (mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

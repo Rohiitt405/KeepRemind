@@ -1,5 +1,6 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:flutter/material.dart';
 
 import '../models/saved_link_model.dart';
 
@@ -52,6 +53,19 @@ class FirestoreService {
     return snapshot.docs
       .map((doc) => SavedLink.fromMap(doc.id, doc.data()))
       .toList();
+  }
+
+  Future<SavedLink?> getSavedLinkById(String savedLinkId) async {
+    try {
+      final collection = await _savedLinksCollection();
+      final doc = await collection.doc(savedLinkId).get();
+      if (doc.exists && doc.data() != null) {
+        return SavedLink.fromMap(doc.id, doc.data()!);
+      }
+    } catch (e) {
+      debugPrint('Error fetching saved link by id $savedLinkId: $e');
+    }
+    return null;
   }
 
   Future<void> restoreSavedLink(SavedLink savedLink) async {

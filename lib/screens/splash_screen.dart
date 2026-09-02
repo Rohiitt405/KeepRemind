@@ -13,8 +13,13 @@ import '../widgets/shared/dot_grid_overlay.dart';
 
 class SplashScreen extends StatefulWidget {
   final bool skipDefaultNavigation;
+  final String? initialSavedLinkId;
 
-  const SplashScreen({super.key, this.skipDefaultNavigation = false});
+  const SplashScreen({
+    super.key,
+    this.skipDefaultNavigation = false,
+    this.initialSavedLinkId,
+  });
 
   @override
   State<SplashScreen> createState() => _SplashScreenState();
@@ -90,8 +95,9 @@ class _SplashScreenState extends State<SplashScreen> {
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(
-        builder: (_) =>
-            onboardingDone ? const HomeScreen() : const OnboardingScreen(),
+        builder: (_) => onboardingDone
+            ? HomeScreen(initialSavedLinkId: widget.initialSavedLinkId)
+            : const OnboardingScreen(),
       ),
     );
   }
