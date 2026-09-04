@@ -373,7 +373,7 @@ class DetailScreen extends StatelessWidget {
     return Column(
       children: [
         NeoBrutalistButton(
-          onPressed: () => _openUrl(context),
+          onPressed: () => _openUrl(context, currentSavedLink.url),
           backgroundColor: AppThemeConstants.surfaceColor,
           borderColor: AppThemeConstants.primaryColor,
           padding: const EdgeInsets.symmetric(vertical: 16),
@@ -451,16 +451,58 @@ class DetailScreen extends StatelessWidget {
     );
   }
 
-  Future<void> _openUrl(BuildContext context) async {
-    final uri = Uri.parse(savedLink.url);
-    if (await canLaunchUrl(uri)) {
-      await launchUrl(uri, mode: LaunchMode.externalApplication);
-    } else {
+  Future<void> _openUrl(BuildContext context, String rawUrl) async {
+    String trimmedUrl = rawUrl.trim();
+    if (trimmedUrl.isEmpty) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Could not open the link.')),
+          const SnackBar(content: Text('No URL available to open.')),
         );
       }
+      return;
+    }
+
+    if (!trimmedUrl.startsWith('http://') && !trimmedUrl.startsWith('https://')) {
+      trimmedUrl = 'https://$trimmedUrl';
+    }
+
+    final uri = Uri.tryParse(trimmedUrl);
+    if (uri == null) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(content: Text('Invalid URL format.')),
+        );
+      }
+      return;
+    }
+
+    bool launched = false;
+    try {
+      launched = await launchUrl(uri, mode: LaunchMode.externalNonBrowserApplication);
+    } catch (_) {
+      launched = false;
+    }
+
+    if (!launched) {
+      try {
+        launched = await launchUrl(uri, mode: LaunchMode.externalApplication);
+      } catch (_) {
+        launched = false;
+      }
+    }
+
+    if (!launched) {
+      try {
+        launched = await launchUrl(uri, mode: LaunchMode.platformDefault);
+      } catch (_) {
+        launched = false;
+      }
+    }
+
+    if (!launched && context.mounted) {
+      ScaffoldMessenger.of(context).showSnackBar(
+        const SnackBar(content: Text('Could not open the link.')),
+      );
     }
   }
 }
