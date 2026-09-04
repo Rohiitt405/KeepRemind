@@ -291,7 +291,9 @@ class DetailScreen extends StatelessWidget {
   Widget _buildPlatformBadge(SavedLink currentSavedLink, TextStyle spaceFont) {
     final platform = currentSavedLink.platform;
     final badgeColor = platform.color;
-    final isDark = badgeColor.computeLuminance() < 0.5;
+    final textColor = badgeColor.computeLuminance() < 0.5
+        ? AppThemeConstants.surfaceColor
+        : AppThemeConstants.primaryColor;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -299,15 +301,20 @@ class DetailScreen extends StatelessWidget {
         color: badgeColor,
         border: Border.all(color: AppThemeConstants.primaryColor, width: 2),
       ),
-      child: Text(
-        '${platform.emoji} ${platform.label}',
-        style: spaceFont.copyWith(
-          color: isDark
-              ? AppThemeConstants.surfaceColor
-              : AppThemeConstants.primaryColor,
-          fontWeight: FontWeight.bold,
-          fontSize: 12,
-        ),
+      child: Row(
+        mainAxisSize: MainAxisSize.min,
+        children: [
+          platform.getIcon(size: 16, color: textColor),
+          const SizedBox(width: 6),
+          Text(
+            platform.label,
+            style: spaceFont.copyWith(
+              color: textColor,
+              fontWeight: FontWeight.bold,
+              fontSize: 14,
+            ),
+          ),
+        ],
       ),
     );
   }
@@ -405,8 +412,11 @@ class DetailScreen extends StatelessWidget {
 
             if (!context.mounted) return;
 
-            ScaffoldMessenger.of(context).showSnackBar(
+            final messenger = ScaffoldMessenger.of(context);
+            messenger.clearSnackBars();
+            messenger.showSnackBar(
               SnackBar(
+                duration: const Duration(milliseconds: 1200),
                 content: Text(
                   wasReviewed
                       ? 'Marked as unreviewed ↩️'
@@ -454,8 +464,13 @@ class DetailScreen extends StatelessWidget {
     String trimmedUrl = rawUrl.trim();
     if (trimmedUrl.isEmpty) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('No URL available to open.')),
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
+          const SnackBar(
+            duration: Duration(milliseconds: 1200),
+            content: Text('No URL available to open.'),
+          ),
         );
       }
       return;
@@ -468,8 +483,13 @@ class DetailScreen extends StatelessWidget {
     final uri = Uri.tryParse(trimmedUrl);
     if (uri == null) {
       if (context.mounted) {
-        ScaffoldMessenger.of(context).showSnackBar(
-          const SnackBar(content: Text('Invalid URL format.')),
+        final messenger = ScaffoldMessenger.of(context);
+        messenger.clearSnackBars();
+        messenger.showSnackBar(
+          const SnackBar(
+            duration: Duration(milliseconds: 800),
+            content: Text('Invalid URL format.'),
+          ),
         );
       }
       return;
@@ -499,8 +519,13 @@ class DetailScreen extends StatelessWidget {
     }
 
     if (!launched && context.mounted) {
-      ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(content: Text('Could not open the link.')),
+      final messenger = ScaffoldMessenger.of(context);
+      messenger.clearSnackBars();
+      messenger.showSnackBar(
+        const SnackBar(
+          duration: Duration(milliseconds: 1500),
+          content: Text('Could not open the link.'),
+        ),
       );
     }
   }

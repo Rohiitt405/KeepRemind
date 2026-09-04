@@ -115,28 +115,30 @@ extension SocialPlatformExtension on SocialPlatform {
     }
   }
 
-  Widget get iconWidget {
+  Widget getIcon({double size = 16, Color? color}) {
     switch (this) {
       case SocialPlatform.youtube:
-        return const FaIcon(FontAwesomeIcons.youtube, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.youtube, size: size, color: color);
       case SocialPlatform.instagram:
-        return const FaIcon(FontAwesomeIcons.instagram, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.instagram, size: size, color: color);
       case SocialPlatform.facebook:
-        return const FaIcon(FontAwesomeIcons.facebook, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.facebook, size: size, color: color);
       case SocialPlatform.reddit:
-        return const FaIcon(FontAwesomeIcons.reddit, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.reddit, size: size, color: color);
       case SocialPlatform.linkedin:
-        return const FaIcon(FontAwesomeIcons.linkedin, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.linkedin, size: size, color: color);
       case SocialPlatform.pinterest:
-        return const FaIcon(FontAwesomeIcons.pinterest, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.pinterest, size: size, color: color);
       case SocialPlatform.x:
-        return const FaIcon(FontAwesomeIcons.xTwitter, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.xTwitter, size: size, color: color);
       case SocialPlatform.threads:
-        return const FaIcon(FontAwesomeIcons.threads, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.threads, size: size, color: color);
       case SocialPlatform.snapchat:
-        return const FaIcon(FontAwesomeIcons.snapchat, color: Colors.white, size: 30);
+        return FaIcon(FontAwesomeIcons.snapchat, size: size, color: color);
       case SocialPlatform.unknown:
-        return const Icon(Icons.link_rounded, color: Colors.white, size: 30);
+        return Icon(Icons.link_rounded, size: size, color: color);
     }
   }
+
+  Widget get iconWidget => getIcon(size: 30, color: Colors.black);
 }
