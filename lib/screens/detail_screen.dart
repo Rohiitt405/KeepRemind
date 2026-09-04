@@ -289,10 +289,9 @@ class DetailScreen extends StatelessWidget {
   }
 
   Widget _buildPlatformBadge(SavedLink currentSavedLink, TextStyle spaceFont) {
-    final isInstagram = currentSavedLink.platform == SocialPlatform.instagram;
-    final badgeColor = isInstagram
-        ? AppThemeConstants.tertiaryFixed
-        : AppThemeConstants.errorColor;
+    final platform = currentSavedLink.platform;
+    final badgeColor = platform.color;
+    final isDark = badgeColor.computeLuminance() < 0.5;
 
     return Container(
       padding: const EdgeInsets.symmetric(horizontal: 10, vertical: 4),
@@ -301,11 +300,11 @@ class DetailScreen extends StatelessWidget {
         border: Border.all(color: AppThemeConstants.primaryColor, width: 2),
       ),
       child: Text(
-        isInstagram ? '📸 INSTAGRAM' : '▶️ YOUTUBE',
+        '${platform.emoji} ${platform.label}',
         style: spaceFont.copyWith(
-          color: isInstagram
-              ? AppThemeConstants.primaryColor
-              : AppThemeConstants.surfaceColor,
+          color: isDark
+              ? AppThemeConstants.surfaceColor
+              : AppThemeConstants.primaryColor,
           fontWeight: FontWeight.bold,
           fontSize: 12,
         ),
